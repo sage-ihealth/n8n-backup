@@ -1,0 +1,445 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Get message id": {
+      "main": [
+        [
+          {
+            "node": "Filter for PDFs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Email": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Binary Data": {
+      "main": [
+        [
+          {
+            "node": "Get message id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter for PDFs": {
+      "main": [
+        [
+          {
+            "node": "Get PDF attachments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contains Attachments?": {
+      "main": [
+        [
+          {
+            "node": "Get Binary Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get PDF attachments": {
+      "main": [
+        [
+          {
+            "node": "Extract from PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from PDF": {
+      "main": [
+        [
+          {
+            "node": "Get a prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a prompt": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create a draft",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Contains Attachments?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-02-04T00:10:17.358Z",
+  "id": "AYL4n3Exw4OePCY8dfV9i",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "Weekly OKR Summary",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "get",
+        "messageId": "={{ $json.id }}",
+        "simple": false,
+        "options": {
+          "downloadAttachments": true
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1152,
+        -192
+      ],
+      "id": "74211545-4757-4b37-b480-9325272d706a",
+      "name": "Get message id",
+      "webhookId": "cf5e2b8c-320f-4717-8adb-745f44f1956e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "bsd68rFO96U4ZCjM",
+          "name": "Gmail account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {
+          "sender": "no-reply@quicksight.aws"
+        },
+        "options": {
+          "downloadAttachments": true
+        }
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        256,
+        -192
+      ],
+      "id": "de6ca019-eaf0-4b21-9c21-fb9bd18a06fd",
+      "name": "Read Email",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "bsd68rFO96U4ZCjM",
+          "name": "Gmail account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "7cdbf83e-33cb-43d8-9763-c4b8bae0b5d6",
+              "leftValue": "={{ $('Read Email').item.binary }}",
+              "rightValue": "application/pdf",
+              "operator": {
+                "type": "object",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        928,
+        -192
+      ],
+      "id": "305afd45-fd9a-40c1-ba19-ab200f7aa120",
+      "name": "Get Binary Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "const newItems = [];\n\nfor (const item of items) {\n  for (const [key, binary] of Object.entries(item.binary)) {\n    if (binary.mimeType === 'application/pdf') {\n      newItems.push({\n        json: item.json,\n        binary: {\n          [key]: binary\n        }\n      });\n    }\n  }\n}\n\nreturn newItems;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1376,
+        -192
+      ],
+      "id": "59cd2dac-f269-4eee-8ed5-d05894ecbf06",
+      "name": "Filter for PDFs"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "bc37ad3a-3ccc-4565-941b-88cb42032d81",
+              "leftValue": "={{ $binary.isNotEmpty() }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        704,
+        -192
+      ],
+      "id": "14999086-3e66-459e-98cd-6e0a7e3817be",
+      "name": "Contains Attachments?"
+    },
+    {
+      "parameters": {
+        "jsCode": "let results = [];\n\nfor (const item of $input.all()) {\n  for (key of Object.keys(item.binary)) {\n        results.push({\n            json: {},\n            binary: {\n                data: item.binary[key],\n            }\n        });\n    }\n}\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1600,
+        -192
+      ],
+      "id": "178fe8a0-c321-4f86-9ab7-648e543410de",
+      "name": "Get PDF attachments"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        1824,
+        -192
+      ],
+      "id": "52887197-4eff-4d5d-9601-cfd8ce035c14",
+      "name": "Extract from PDF"
+    },
+    {
+      "parameters": {
+        "promptName": "summarize",
+        "requestOptions": {}
+      },
+      "type": "@langfuse/n8n-nodes-langfuse.langfuse",
+      "typeVersion": 1,
+      "position": [
+        2048,
+        -192
+      ],
+      "id": "298062ec-3d3c-4cb2-88f8-b6d018a05946",
+      "name": "Get a prompt",
+      "credentials": {
+        "langfuseApi": {
+          "id": "gHSORKqnJIeunW4d",
+          "name": "Langfuse account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "={{ $('Get a prompt').item.json['prompt'] }}\ncontent: {{ $('Extract from PDF').item.json['text'] }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        2272,
+        -192
+      ],
+      "id": "a09703ce-a2f9-45fa-a5a8-bb7adc1310ea",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "Oj08scHKr6wdz972",
+          "name": "OpenAi account 6"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://langfuse.ihealth-eng.com/api/public/ingestion",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "langfuseApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"batch\": [\n    {\n      \"type\": \"generation\",\n      \"id\": {{ JSON.stringify($('Message a model').item.json['output'][0]['id']) }}, \n      \"timestamp\": {{ JSON.stringify(new Date().toISOString()) }},\n      \"body\": {\n        \"name\": \"chatgpt-generation\",\n        \"traceId\": {{ JSON.stringify($execution.id) }},\n        \"model\": \"gpt-4o\",\n        \"input\": {{ JSON.stringify($('Get a prompt').item.json['prompt']) }},\n        \"output\": {{ JSON.stringify($('Message a model').item.json['output'][0]['content'][0]['text']) }},\n        \"metadata\": {\n          \"workflowId\": {{ JSON.stringify($workflow.id) }},\n          \"source\": \"n8n-automation\",\n          \"executionId\": {{ JSON.stringify($execution.id) }}\n        }\n      }\n    }\n  ]\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2624,
+        -288
+      ],
+      "id": "10288570-3f18-4b59-8db6-cbea9d268385",
+      "name": "HTTP Request",
+      "credentials": {
+        "langfuseApi": {
+          "id": "gHSORKqnJIeunW4d",
+          "name": "Langfuse account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "Weekly OKR Report Test",
+        "message": "={{ $('Message a model').item.json['output'][0]['content'][0]['text'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        2624,
+        -96
+      ],
+      "id": "a5fca403-8ca3-4455-8aba-ced0f08375e4",
+      "name": "Create a draft",
+      "webhookId": "1eb878c9-d307-4938-8546-0129bcb0cf4e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "bsd68rFO96U4ZCjM",
+          "name": "Gmail account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "https://docs.google.com/spreadsheets/d/1tqK7hrAlj4Q8HVm2QyyF86ghk7KbF3iGRH9QMLiwbQc/edit?gid=0#gid=0"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        480,
+        -192
+      ],
+      "id": "70bddfd0-a319-4331-84d6-459ae232ccac",
+      "name": "Append row in sheet"
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-04T00:10:17.365Z",
+      "createdAt": "2026-02-04T00:10:17.365Z",
+      "role": "workflow:owner",
+      "workflowId": "AYL4n3Exw4OePCY8dfV9i",
+      "projectId": "kugITzN49x98FAtM"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-02-06T04:47:14.744Z",
+  "versionId": "d7f2016d-7970-4100-b6ee-2326be65950d"
+}
