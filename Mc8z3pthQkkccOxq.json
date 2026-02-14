@@ -1,0 +1,464 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Hourly Check": {
+      "main": [
+        [
+          {
+            "node": "Get All Courses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get All Courses": {
+      "main": [
+        [
+          {
+            "node": "Extract Course IDs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Course IDs": {
+      "main": [
+        [
+          {
+            "node": "Get Course Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Course Details": {
+      "main": [
+        [
+          {
+            "node": "Find ILT Units",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find ILT Units": {
+      "main": [
+        [
+          {
+            "node": "Has ILT Units?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has ILT Units?": {
+      "main": [
+        [
+          {
+            "node": "Get ILT Sessions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get ILT Sessions": {
+      "main": [
+        [
+          {
+            "node": "Prepare Calendar Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Calendar Events": {
+      "main": [
+        [
+          {
+            "node": "Has Sessions?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Sessions?": {
+      "main": [
+        [
+          {
+            "node": "Check Existing Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Existing Event": {
+      "main": [
+        [
+          {
+            "node": "Check for Duplicates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check for Duplicates": {
+      "main": [
+        [
+          {
+            "node": "New Events Only",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "New Events Only": {
+      "main": [
+        [
+          {
+            "node": "Create Calendar Event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-14T18:45:30.512Z",
+  "id": "Mc8z3pthQkkccOxq",
+  "isArchived": false,
+  "meta": null,
+  "name": "TalentLMS to Google Calendar Sync",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "schedule-trigger",
+      "name": "Hourly Check"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://ihealthlabs.talentlms.com/api/v1/courses",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "get-courses",
+      "name": "Get All Courses",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "REPLACE_WITH_CREDENTIAL_ID",
+          "name": "TalentLMS API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract courses that have ILT units\nconst courses = items[0].json;\nconst coursesArray = Array.isArray(courses) ? courses : [courses];\n\nconst results = [];\nfor (const course of coursesArray) {\n  if (course.id) {\n    results.push({\n      json: {\n        courseId: course.id,\n        courseName: course.name\n      }\n    });\n  }\n}\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        0
+      ],
+      "id": "extract-courses",
+      "name": "Extract Course IDs"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://ihealthlabs.talentlms.com/api/v1/courses/id:{{ $json.courseId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        660,
+        0
+      ],
+      "id": "get-course-details",
+      "name": "Get Course Details",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "REPLACE_WITH_CREDENTIAL_ID",
+          "name": "TalentLMS API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Find ILT units in course and get enrolled users\nconst results = [];\n\nfor (const item of items) {\n  const course = item.json;\n  const units = course.units || [];\n  const users = course.users || [];\n  \n  // Get user emails for calendar invites\n  const attendeeEmails = users\n    .filter(u => u.email)\n    .map(u => u.email);\n  \n  for (const unit of units) {\n    // ILT units have type 'ILT' or contain ilt_id\n    if (unit.type === 'ILT' || unit.ilt_id) {\n      results.push({\n        json: {\n          courseId: course.id,\n          courseName: course.name,\n          unitId: unit.id,\n          unitName: unit.name,\n          iltId: unit.ilt_id || unit.id,\n          attendeeEmails: attendeeEmails\n        }\n      });\n    }\n  }\n}\n\nreturn results.length > 0 ? results : [{ json: { noILT: true } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        0
+      ],
+      "id": "find-ilt-units",
+      "name": "Find ILT Units"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "filter-ilt",
+              "leftValue": "={{ $json.noILT }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "notTrue"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        1100,
+        0
+      ],
+      "id": "filter-ilt",
+      "name": "Has ILT Units?"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://ihealthlabs.talentlms.com/api/v1/getiltsessions/ilt_id:{{ $json.iltId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1320,
+        0
+      ],
+      "id": "get-ilt-sessions",
+      "name": "Get ILT Sessions",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "REPLACE_WITH_CREDENTIAL_ID",
+          "name": "TalentLMS API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Process ILT sessions and prepare calendar events\nconst results = [];\nconst now = new Date();\n\nfor (const item of items) {\n  const sessions = item.json;\n  const sessionsArray = Array.isArray(sessions) ? sessions : (sessions.sessions || [sessions]);\n  const attendeeEmails = item.json.attendeeEmails || [];\n  const courseName = item.json.courseName || '';\n  const unitName = item.json.unitName || '';\n  \n  for (const session of sessionsArray) {\n    if (!session.id || !session.start_timestamp) continue;\n    \n    // Only process future sessions\n    const startTime = new Date(session.start_timestamp * 1000);\n    if (startTime <= now) continue;\n    \n    // Calculate end time from duration\n    const durationMs = (session.duration_minutes || 60) * 60 * 1000;\n    const endTime = new Date(startTime.getTime() + durationMs);\n    \n    // Create unique ID for duplicate prevention\n    const uniqueId = `talentlms-ilt-${session.id}`;\n    \n    results.push({\n      json: {\n        sessionId: session.id,\n        uniqueId: uniqueId,\n        summary: `${courseName}: ${session.name || unitName}`,\n        description: session.description || `ILT Session for ${courseName}`,\n        location: session.location || (session.type === 'webinar' ? 'Online Webinar' : ''),\n        startTime: startTime.toISOString(),\n        endTime: endTime.toISOString(),\n        attendeeEmails: attendeeEmails,\n        sessionType: session.type || 'classroom',\n        capacity: session.capacity || 0\n      }\n    });\n  }\n}\n\nreturn results.length > 0 ? results : [{ json: { noSessions: true } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1540,
+        0
+      ],
+      "id": "prepare-events",
+      "name": "Prepare Calendar Events"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "filter-sessions",
+              "leftValue": "={{ $json.noSessions }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "notTrue"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        1760,
+        0
+      ],
+      "id": "filter-sessions",
+      "name": "Has Sessions?"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendarId": "primary",
+        "returnAll": false,
+        "limit": 50,
+        "options": {
+          "timeMin": "={{ $now.toISO() }}",
+          "q": "={{ 'talentlms-ilt-' + $json.sessionId }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.2,
+      "position": [
+        1980,
+        0
+      ],
+      "id": "check-existing",
+      "name": "Check Existing Event",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "REPLACE_WITH_GOOGLE_CREDENTIAL_ID",
+          "name": "Google Calendar Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Check if event already exists to prevent duplicates\nconst originalData = $('Prepare Calendar Events').item.json;\nconst existingEvents = items;\n\n// If no existing events found with this ID, create new event\nconst hasExisting = existingEvents.some(e => \n  e.json && e.json.description && \n  e.json.description.includes(originalData.uniqueId)\n);\n\nif (hasExisting) {\n  return [{ json: { skip: true, reason: 'Event already exists', sessionId: originalData.sessionId } }];\n}\n\nreturn [{ json: { ...originalData, skip: false } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2200,
+        0
+      ],
+      "id": "check-duplicates",
+      "name": "Check for Duplicates"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "skip-existing",
+              "leftValue": "={{ $json.skip }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "notTrue"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        2420,
+        0
+      ],
+      "id": "filter-new-only",
+      "name": "New Events Only"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "calendarId": "primary",
+        "start": "={{ $json.startTime }}",
+        "end": "={{ $json.endTime }}",
+        "additionalFields": {
+          "summary": "={{ $json.summary }}",
+          "description": "={{ $json.description + '\\n\\nID: ' + $json.uniqueId }}",
+          "location": "={{ $json.location }}",
+          "attendees": "={{ $json.attendeeEmails.join(',') }}",
+          "sendUpdates": "all"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.2,
+      "position": [
+        2640,
+        0
+      ],
+      "id": "create-calendar-event",
+      "name": "Create Calendar Event",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "REPLACE_WITH_GOOGLE_CREDENTIAL_ID",
+          "name": "Google Calendar Account"
+        }
+      }
+    }
+  ],
+  "origin": "n8n",
+  "pinData": null,
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Los_Angeles",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-14T18:45:30.516Z",
+      "createdAt": "2026-01-14T18:45:30.516Z",
+      "role": "workflow:owner",
+      "workflowId": "Mc8z3pthQkkccOxq",
+      "projectId": "SzgLfYyy3lWDJHJA"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-02-11T01:00:41.766Z",
+  "versionId": "66314baa-5a3a-42d9-8c06-7496c66a3797"
+}
