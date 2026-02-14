@@ -1,0 +1,332 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Build Time Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Time Filter": {
+      "main": [
+        [
+          {
+            "node": "Init PageToken",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Init PageToken": {
+      "main": [
+        [
+          {
+            "node": "List Messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Messages": {
+      "main": [
+        [
+          {
+            "node": "Extract Messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Messages": {
+      "main": [
+        [
+          {
+            "node": "Merge Top + Thread Messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect Threads": {
+      "main": [
+        [
+          {
+            "node": "List Thread Messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Thread Messages": {
+      "main": [
+        [
+          {
+            "node": "Merge Top + Thread Messages",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge Top + Thread Messages": {
+      "main": [
+        [
+          {
+            "node": "Extract Attachments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Attachments": {
+      "main": [
+        [
+          {
+            "node": "Download Attachment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Attachment": {
+      "main": [
+        [
+          {
+            "node": "OCR Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OCR Image": {
+      "main": [
+        [
+          {
+            "node": "Write CSV",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-09T22:06:26.446Z",
+  "id": "kF7UNOGwtKaZ3R5w",
+  "isArchived": false,
+  "meta": null,
+  "name": "Google Chat Full Export (Messages + Threads + OCR)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "6e15e84b-df5a-43ce-8d91-3457e53ac7bb",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "position": [
+        352,
+        160
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "functionCode": "const tz = 'America/Los_Angeles';\nconst now = new Date(new Date().toLocaleString('en-US', { timeZone: tz }));\nconst startOfWeek = new Date(now);\nstartOfWeek.setDate(now.getDate() - now.getDay());\nstartOfWeek.setHours(0,0,0,0);\nconst startOfLastWeek = new Date(startOfWeek);\nstartOfLastWeek.setDate(startOfWeek.getDate() - 8);\nconst endOfLastWeek = new Date(startOfLastWeek);\nendOfLastWeek.setDate(startOfLastWeek.getDate() + 6);\nendOfLastWeek.setHours(23,59,59,999);\nreturn [{ json: { filter: `createTime > \\\"${startOfLastWeek.toISOString()}\\\" AND createTime < \\\"${endOfLastWeek.toISOString()}\\\"` } }];"
+      },
+      "id": "cad8ae40-bc96-45fc-bb17-1affce0c809f",
+      "name": "Build Time Filter",
+      "type": "n8n-nodes-base.function",
+      "position": [
+        576,
+        160
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "91ea4e27-3b8c-4963-92a2-1b46ee753e3d",
+      "name": "Init PageToken",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        800,
+        160
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "url": "={{`https://chat.googleapis.com/v1/${$json.SPACE_ID}/messages`}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleChatOAuth2Api",
+        "options": {}
+      },
+      "id": "90becde9-0abd-48e7-bb59-0ab088f9b225",
+      "name": "List Messages",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1024,
+        160
+      ],
+      "typeVersion": 4.3,
+      "credentials": {
+        "googleChatOAuth2Api": {
+          "id": "JWXrbxNG7Kq5QJ8H",
+          "name": "Chat account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "const msgs = $json.messages || [];\nconst token = $json.nextPageToken;\nreturn msgs.map(m => ({ json: { ...m, pageToken: token } }));"
+      },
+      "id": "4ed7d2ba-3d2d-4cab-8b4b-7bec742ebb13",
+      "name": "Extract Messages",
+      "type": "n8n-nodes-base.function",
+      "position": [
+        1232,
+        160
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "functionCode": "const threads = new Set();\nitems.forEach(i => { if (i.json.thread?.name) threads.add(i.json.thread.name); });\nreturn Array.from(threads).map(t => ({ json: { threadName: t } }));"
+      },
+      "id": "052e56ed-8a86-4b1c-bba2-5cf6d654b18e",
+      "name": "Collect Threads",
+      "type": "n8n-nodes-base.function",
+      "position": [
+        1440,
+        160
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "url": "={{`https://chat.googleapis.com/v1/${$node[\"Init PageToken\"].json.SPACE_ID}/messages`}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleChatOAuth2Api",
+        "options": {}
+      },
+      "id": "aca7c007-98f8-4319-b488-d079d5f47f18",
+      "name": "List Thread Messages",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        1632,
+        160
+      ],
+      "typeVersion": 4.3,
+      "credentials": {
+        "googleChatOAuth2Api": {
+          "id": "JWXrbxNG7Kq5QJ8H",
+          "name": "Chat account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "2314a667-b85b-48fa-900b-b63c049fa013",
+      "name": "Merge Top + Thread Messages",
+      "type": "n8n-nodes-base.merge",
+      "position": [
+        1840,
+        160
+      ],
+      "typeVersion": 3.2
+    },
+    {
+      "parameters": {
+        "functionCode": "return items.flatMap(i => {\n  const atts = i.json.attachment || [];\n  return atts.filter(a => a.attachmentDataRef).map(a => ({ json: { ...i.json, resourceName: a.attachmentDataRef.resourceName } }));\n});"
+      },
+      "id": "c0458f63-8083-44cf-8293-4d48b6664551",
+      "name": "Extract Attachments",
+      "type": "n8n-nodes-base.function",
+      "position": [
+        2032,
+        160
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "url": "={{`https://chat.googleapis.com/v1/${$json.resourceName}`}}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleChatOAuth2Api",
+        "options": {}
+      },
+      "id": "ca841342-c2ae-4155-bd04-654587b9faaf",
+      "name": "Download Attachment",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        2240,
+        160
+      ],
+      "typeVersion": 4.3
+    },
+    {
+      "parameters": {
+        "url": "https://vision.googleapis.com/v1/images:annotate",
+        "options": {}
+      },
+      "id": "09e7e07e-7cdb-4f91-a903-7e5738c43390",
+      "name": "OCR Image",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        2432,
+        160
+      ],
+      "typeVersion": 4.3
+    },
+    {
+      "parameters": {
+        "operation": "write"
+      },
+      "id": "4eb70ca9-1ffb-4d46-80b3-0d8637be204a",
+      "name": "Write CSV",
+      "type": "n8n-nodes-base.spreadsheetFile",
+      "position": [
+        2640,
+        160
+      ],
+      "typeVersion": 2
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-09T22:06:26.456Z",
+      "createdAt": "2026-01-09T22:06:26.456Z",
+      "role": "workflow:owner",
+      "workflowId": "kF7UNOGwtKaZ3R5w",
+      "projectId": "IGL0EzJNN8XZ65mm"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-01-09T22:07:13.267Z",
+  "versionId": "46fea470-1097-4eac-8a1f-8be837553385"
+}
