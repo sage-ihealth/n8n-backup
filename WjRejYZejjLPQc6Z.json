@@ -1,0 +1,194 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch ADP Workers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch ADP Workers": {
+      "main": [
+        [
+          {
+            "node": "Transform for Org Chart",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform for Org Chart": {
+      "main": [
+        [
+          {
+            "node": "Clear Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clear Sheet": {
+      "main": [
+        [
+          {
+            "node": "Write to Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-20T23:29:38.432Z",
+  "id": "WjRejYZejjLPQc6Z",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "ADP Org Chart Visualization",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        256,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://coraciiform-conchita-webbiest.ngrok-free.dev/workers",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "fetch_workers",
+      "name": "Fetch ADP Workers",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const workers = $input.first().json.workers || [];\n\nconst activeWorkers = workers.filter(worker => {\n  const wa = worker.workAssignments?.[0];\n  return wa?.assignmentStatus?.statusCode?.codeValue === 'A';\n});\n\nconst orgChartData = activeWorkers.map(worker => {\n  const person = worker.person || {};\n  const name = person.legalName || {};\n  const wa = worker.workAssignments?.[0] || {};\n  const dept = wa.homeOrganizationalUnits?.[0]?.nameCode || {};\n  const managerInfo = wa.reportsTo?.[0] || {};\n  const workEmail = worker.businessCommunication?.emails?.[0]?.emailUri || '';\n  \n  const employeeName = name.formattedName || '';\n  const jobTitle = wa.jobTitle || '';\n  const department = dept.longName || dept.codeValue || '';\n  const managerName = managerInfo.reportsToWorkerName?.formattedName || '';\n  \n  return {\n    json: {\n      'Name': employeeName,\n      'Reports To': managerName,\n      'Job Title': jobTitle,\n      'Department': department,\n      'Email': workEmail\n    }\n  };\n});\n\norgChartData.sort((a, b) => {\n  if (!a.json['Reports To'] && b.json['Reports To']) return -1;\n  if (a.json['Reports To'] && !b.json['Reports To']) return 1;\n  return a.json['Name'].localeCompare(b.json['Name']);\n});\n\nreturn orgChartData;"
+      },
+      "id": "transform_data",
+      "name": "Transform for Org Chart",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        704,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1qja_FMk355xZRx-RI-44k1OM4uHCvrQy1td0W_TUqPk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Sheet9"
+        }
+      },
+      "id": "clear_sheet",
+      "name": "Clear Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        928,
+        304
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "vdcRQ7DzD7EJYCNd",
+          "name": "Google Sheets account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1qja_FMk355xZRx-RI-44k1OM4uHCvrQy1td0W_TUqPk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Sheet9"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json['Name'] }}",
+            "Reports To": "={{ $json['Reports To'] }}",
+            "Job Title": "={{ $json['Job Title'] }}",
+            "Department": "={{ $json['Department'] }}",
+            "Email": "={{ $json['Email'] }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "write_sheet",
+      "name": "Write to Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1152,
+        304
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "vdcRQ7DzD7EJYCNd",
+          "name": "Google Sheets account 3"
+        }
+      }
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-20T23:29:38.435Z",
+      "createdAt": "2026-01-20T23:29:38.435Z",
+      "role": "workflow:owner",
+      "workflowId": "WjRejYZejjLPQc6Z",
+      "projectId": "SzgLfYyy3lWDJHJA"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-02-05T01:29:11.591Z",
+  "versionId": "2bff883c-a943-4c39-9292-c3f3eb19e1f4"
+}
