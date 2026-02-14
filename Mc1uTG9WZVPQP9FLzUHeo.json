@@ -1,0 +1,280 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "login",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "login": {
+      "main": [
+        [
+          {
+            "node": "session token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "request": {
+      "main": [
+        []
+      ]
+    },
+    "session token": {
+      "main": [
+        [
+          {
+            "node": "request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-02-04T06:08:50.879Z",
+  "id": "Mc1uTG9WZVPQP9FLzUHeo",
+  "isArchived": false,
+  "meta": null,
+  "name": "care portal login",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Care Portal Login",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "username"
+            },
+            {
+              "fieldLabel": "password",
+              "fieldType": "password"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        0,
+        0
+      ],
+      "id": "cfb731d0-bd7b-465c-8b1a-d2ae4cb82715",
+      "name": "On form submission",
+      "webhookId": "597be29e-3e9e-4f96-ab9a-ef5d82c25824"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://dev-uc.ihealth-eng.com/v1/uc/screening-patient/list",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-session-token",
+              "value": "={{ $json.session_token }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"filter\": {\n    \"clinicId\": \"5a31ba2f29a4aa7591648b06\",\n    \"visitTimeRange\": {\n      \"gte\": \"2026-02-04T00:00:00\",\n      \"lte\": \"2026-02-04T23:59:59\"\n    }\n  },\n  \"pageInfo\": {\n    \"page\": 1,\n    \"size\": 20,\n    \"sort\": [\n      {\n        \"direction\": \"ASC\",\n        \"property\": \"visitTime\"\n      }\n    ],\n    \"pagination\": true\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        608,
+        0
+      ],
+      "id": "4f5c12da-4cd4-48b0-9d3d-03212c35b832",
+      "name": "request"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://dev-uc.ihealth-eng.com/v1/uc/auth/login",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "usernameOrEmail",
+              "value": "={{ $json.username }}"
+            },
+            {
+              "name": "password",
+              "value": "={{ $json.password }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        208,
+        0
+      ],
+      "id": "c255897e-9a3c-463c-a87e-cf8ebf042cc6",
+      "name": "login"
+    },
+    {
+      "parameters": {
+        "jsCode": "\nreturn [\n  {\n    json: {\n      session_token: $input.first().json.data.sessionToken\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "75d2f691-fa76-4f09-8630-9b0e1883eae8",
+      "name": "session token"
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {
+    "On form submission": [
+      {
+        "json": {
+          "username": "quan.deng@ihealthlabs.com",
+          "password": "iHealth99!",
+          "submittedAt": "2026-02-04T00:58:13.164-05:00",
+          "formMode": "test"
+        }
+      }
+    ],
+    "login": [
+      {
+        "json": {
+          "code": 200,
+          "data": {
+            "sessionToken": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSWQiOiJkZTU4OTBkMWMzY2VhOWJjYWYxYzAxNWQ1MjA5ZGM2NWUwMDIwNTkwMzEyYzdjOWE5NmJmMzE2NzBkNDYxODNhIiwidXNlclR5cGUiOiJFTVBMT1lFRSIsImV4cCI6MTc3MDI3MTEwMywidXNlcklkIjoiNjYyMWQ5ODQ2OTVmMTgxNjVlMjcxZDQ0IiwiaWF0IjoxNzcwMTg0NzAzLCJlbWFpbCI6InF1YW4uZGVuZ0BpaGVhbHRobGFicy5jb20ifQ.90nr9l-0Ev2iqtjsZC1n-95n9Zk2XkujRhUeRE5Q1yQ",
+            "gqlToken": null,
+            "sessionId": "de5890d1c3cea9bcaf1c015d5209dc65e0020590312c7c9a96bf31670d46183a",
+            "userInfo": {
+              "id": "6621d984695f18165e271d44",
+              "createdAt": "2024-04-19T02:40:04.660",
+              "updatedAt": "2024-12-10T09:00:53.614",
+              "auth": null,
+              "hasPassword": null,
+              "salt": "",
+              "isDefaultPassword": false,
+              "isTestUser": null,
+              "deleted": false,
+              "isNew": false,
+              "capacities": null,
+              "isObserverUser": false,
+              "dataAnalytics": null,
+              "userType": "IHEALTH_EMPLOYEE",
+              "staffRole": null,
+              "status": "ACTIVATED",
+              "loginId": null,
+              "defaultClinicId": null,
+              "createdBy": null,
+              "updatedBy": "65bbcee3316c7e2fc37b3688",
+              "supervisingProviderId": null,
+              "supervisingProviderDetails": null,
+              "statusPriority": 1,
+              "verified": null,
+              "employeeProfile": {
+                "firstName": "quan",
+                "lastName": "test",
+                "title": null,
+                "language": [
+                  "EL"
+                ],
+                "credentials": [],
+                "degree": null,
+                "specialties": null,
+                "workState": null,
+                "workTimezone": null,
+                "phone": {
+                  "countryCode": "",
+                  "areaCode": null,
+                  "number": "",
+                  "verified": null,
+                  "isPrimary": null,
+                  "isPrivate": null,
+                  "type": null,
+                  "canUseForLogin": null,
+                  "isSmartPhone": null
+                },
+                "address": null,
+                "directAddress": null,
+                "avatar": {
+                  "fileKey": "avatar/user/65e25bd567321209c6f16d4a/Image_20240628_140139_764.jpeg"
+                },
+                "npi": ""
+              },
+              "email": "quan.deng@ihealthlabs.com",
+              "lastLoginTime": "2026-02-04T05:58:23.713",
+              "duration": null,
+              "description": "",
+              "twilioWorkerSid": null,
+              "assignedRoles": null,
+              "supervisingProviderUsers": null
+            },
+            "roles": [
+              {
+                "id": "683638d37f8dfc982a194c16",
+                "createdAt": null,
+                "updatedAt": null,
+                "memberId": "6621d984695f18165e271d44",
+                "organizationId": "635700bfba27eb0eabce5000",
+                "roleType": "CA",
+                "active": true,
+                "miniOrganization": {
+                  "id": "635700bfba27eb0eabce5000",
+                  "name": "Unified Care",
+                  "businessName": null,
+                  "orgNumber": null
+                }
+              }
+            ],
+            "chatInfo": {
+              "authKey": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJkYXRhIjp7InVzZXJDaGF0SWQiOiI2NjIxZDk4NDY5NWYxODE2NWUyNzFkNDQifSwiZXhwIjoxNzcwMjcxMTAzLCJpYXQiOjE3NzAxODQ3MDN9.M7qw9YfLVFbgUgmj0GZzMQn-5uP9rnVQV0C8sRiLR8k",
+              "publishKey": "pub-c-2ca37c7a-ab03-4a45-beb8-26058c3e586d",
+              "subscribeKey": "sub-c-f421ed7e-4d8c-11e8-9796-063929a21258"
+            }
+          },
+          "msg": null,
+          "error": null
+        }
+      }
+    ]
+  },
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-04T06:08:50.882Z",
+      "createdAt": "2026-02-04T06:08:50.882Z",
+      "role": "workflow:owner",
+      "workflowId": "Mc1uTG9WZVPQP9FLzUHeo",
+      "projectId": "IGL0EzJNN8XZ65mm"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-02-04T06:18:07.165Z",
+  "versionId": "ba40f702-cd4a-4bc4-9ec8-13950bd993cb"
+}
