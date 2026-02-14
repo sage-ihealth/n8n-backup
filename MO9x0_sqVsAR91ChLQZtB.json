@@ -1,0 +1,214 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "All users except for deleted",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "All users except for deleted": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-02-04T21:32:32.012Z",
+  "id": "MO9x0_sqVsAR91ChLQZtB",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "Monthly Review Google Accounts",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "months",
+              "triggerAtDayOfMonth": 22,
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -640,
+        16
+      ],
+      "id": "1ee1f5f4-505e-40c2-ab63-48a562af65fc",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "747676bf-ebe2-475f-9d09-a44541868f39",
+              "name": "Email",
+              "value": "={{ $json.primaryEmail }}",
+              "type": "string"
+            },
+            {
+              "id": "32278823-cd3e-4773-a561-06e19fd4f81d",
+              "name": "First Name",
+              "value": "={{ $json.name.givenName }}",
+              "type": "string"
+            },
+            {
+              "id": "73a700ba-7b0c-42b1-b75b-2b1055172086",
+              "name": "Last Name",
+              "value": "={{ $json.name.familyName }}",
+              "type": "string"
+            },
+            {
+              "id": "1abfd011-d8bd-4645-977a-d1384581e28c",
+              "name": "Last Login",
+              "value": "={{ $json.lastLoginTime }}",
+              "type": "string"
+            },
+            {
+              "id": "66407b52-db09-4fbc-a5ca-8a57b252de82",
+              "name": "Status",
+              "value": "={{ $json.archived ? 'Archived' : ($json.suspended ? 'Suspended' : 'Active') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -208,
+        16
+      ],
+      "id": "3b8a9d74-e5cb-4d67-8a06-5a4afc6115a2",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "returnAll": true,
+        "output": "raw",
+        "projection": "custom",
+        "customFieldMask": "={{ \"primaryEmail,name,lastLoginTime,suspended,archived\" }}",
+        "filter": {}
+      },
+      "type": "n8n-nodes-base.gSuiteAdmin",
+      "typeVersion": 1,
+      "position": [
+        -432,
+        16
+      ],
+      "id": "29056e89-8950-4751-8e03-068f3fb85514",
+      "name": "All users except for deleted",
+      "credentials": {
+        "gSuiteAdminOAuth2Api": {
+          "id": "EGMHOJZOQY0EOX9n",
+          "name": "Google Workspace Admin account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "a4378d83-9c70-460c-9ee1-9f06d81c92b7",
+              "leftValue": "={{ $json['Last Login'] }}",
+              "rightValue": "={{ $now.minus({ days: 30 }) }}",
+              "operator": {
+                "type": "dateTime",
+                "operation": "before"
+              }
+            },
+            {
+              "id": "77625ce4-37ed-4d3c-b810-901c22b2c6b5",
+              "leftValue": "={{ $json.Status }}",
+              "rightValue": "Active",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        0,
+        16
+      ],
+      "id": "b1543705-e366-4717-a9a9-f760348920c2",
+      "name": "Filter"
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-04T21:32:32.018Z",
+      "createdAt": "2026-02-04T21:32:32.018Z",
+      "role": "workflow:owner",
+      "workflowId": "MO9x0_sqVsAR91ChLQZtB",
+      "projectId": "zqVlevjPOeDBzNIB"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-02-06T22:18:33.279Z",
+      "createdAt": "2026-02-06T22:18:17.560Z",
+      "id": "8EvIOYMpDRudcHi6",
+      "name": "user review"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-02-07T01:06:04.261Z",
+  "versionId": "4567160f-5586-4026-8dfa-ea609f4dcecf"
+}
