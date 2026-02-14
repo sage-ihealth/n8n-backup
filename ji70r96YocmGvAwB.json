@@ -1,0 +1,327 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-01-22T00:48:08.828Z",
+    "createdAt": "2026-01-22T00:48:08.828Z",
+    "versionId": "61d13e3c-a721-41dc-ad62-582d5e37603a",
+    "workflowId": "ji70r96YocmGvAwB",
+    "nodes": [
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1UGw9wImf7ALy4QgQcMhy_eK3dY4OkY6ZUedG-EaWf5A",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 67569316,
+            "mode": "list",
+            "cachedResultName": "for Netsuite",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UGw9wImf7ALy4QgQcMhy_eK3dY4OkY6ZUedG-EaWf5A/edit#gid=67569316"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          352,
+          0
+        ],
+        "id": "30ece17c-2b79-4d0b-9fb9-4ebe5e47d7bf",
+        "name": "Get row(s) in sheet",
+        "executeOnce": true,
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "AkxcXiliPoTpkXRS",
+            "name": "N8N googlesheet"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "hours",
+                "hoursInterval": 2
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          48,
+          0
+        ],
+        "id": "3088195f-85d2-49f6-b31c-482a562210cf",
+        "name": "Schedule Trigger"
+      },
+      {
+        "parameters": {
+          "jsCode": "return $input.all().map(item => item.json).filter(r =>\n    r[\"Customers Type\"]?.trim() &&\n    r[\"Department\"]?.trim()\n  ).map(r => {\n  return {\n    json: {\n      rowNumber: r.row_number,\n      customerEntityId: r.ID,\n      classType: r.Class,\n      department: r.Department,\n    }\n  };\n});"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          592,
+          0
+        ],
+        "id": "a0dab3f4-077e-4e6d-bce7-1bd0f4af231f",
+        "name": "TranformRows"
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "collection": "netsuite_entity_raw_configuration",
+          "updateKey": "customerEntityId",
+          "fields": "classType,department",
+          "upsert": true,
+          "options": {}
+        },
+        "type": "n8n-nodes-base.mongoDb",
+        "typeVersion": 1.2,
+        "position": [
+          816,
+          0
+        ],
+        "id": "730f682d-7756-48b0-8dfd-6304e63460c2",
+        "name": "UpdateNetsuiteRawConfiguration",
+        "credentials": {
+          "mongoDb": {
+            "id": "LUAtqhAorJGKWLeb",
+            "name": "UnifiedCare"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Get row(s) in sheet": {
+        "main": [
+          [
+            {
+              "node": "TranformRows",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Schedule Trigger": {
+        "main": [
+          [
+            {
+              "node": "Get row(s) in sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "TranformRows": {
+        "main": [
+          [
+            {
+              "node": "UpdateNetsuiteRawConfiguration",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Lu Ouyang",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "activeVersionId": "61d13e3c-a721-41dc-ad62-582d5e37603a",
+  "connections": {
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "TransformRows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TransformRows": {
+      "main": [
+        [
+          {
+            "node": "UpdateNetsuiteRawConfiguration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-21T23:11:28.528Z",
+  "id": "ji70r96YocmGvAwB",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "NetsuiteConfigurationUpdate",
+  "nodes": [
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1UGw9wImf7ALy4QgQcMhy_eK3dY4OkY6ZUedG-EaWf5A",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 67569316,
+          "mode": "list",
+          "cachedResultName": "for Netsuite",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UGw9wImf7ALy4QgQcMhy_eK3dY4OkY6ZUedG-EaWf5A/edit#gid=67569316"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        352,
+        0
+      ],
+      "id": "30ece17c-2b79-4d0b-9fb9-4ebe5e47d7bf",
+      "name": "Get row(s) in sheet",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "AkxcXiliPoTpkXRS",
+          "name": "N8N googlesheet"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 2
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        48,
+        0
+      ],
+      "id": "3088195f-85d2-49f6-b31c-482a562210cf",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "collection": "netsuite_entity_raw_configuration",
+        "updateKey": "customerEntityId",
+        "fields": "classType,department",
+        "upsert": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        816,
+        0
+      ],
+      "id": "730f682d-7756-48b0-8dfd-6304e63460c2",
+      "name": "UpdateNetsuiteRawConfiguration",
+      "credentials": {
+        "mongoDb": {
+          "id": "LUAtqhAorJGKWLeb",
+          "name": "UnifiedCare"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map(item => item.json).filter(r =>\n    r[\"Customers Type\"]?.trim() &&\n    r[\"Department\"]?.trim() &&\n   r[\"ID\"]?.trim()\n  ).map(r => {\n  return {\n    json: {\n      rowNumber: r.row_number,\n      customerEntityId: r.ID.trim(),\n      classType: r.Class.trim(),\n      department: r.Department.trim(),\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        592,
+        0
+      ],
+      "id": "a0dab3f4-077e-4e6d-bce7-1bd0f4af231f",
+      "name": "TransformRows"
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-21T23:11:28.531Z",
+      "createdAt": "2026-01-21T23:11:28.531Z",
+      "role": "workflow:owner",
+      "workflowId": "ji70r96YocmGvAwB",
+      "projectId": "eMUywwHEm5lrOsOi"
+    }
+  ],
+  "staticData": {
+    "node:Google Sheets Trigger": {
+      "documentId": "1C3ne5XoVsaFefZvsI2nWreQ-bqU-1grWLmCHFsAlo30",
+      "sheetId": 0,
+      "lastRevision": 71,
+      "lastRevisionLink": "https://docs.google.com/spreadsheets/export?id=1C3ne5XoVsaFefZvsI2nWreQ-bqU-1grWLmCHFsAlo30&revision=71&exportFormat=xlsx"
+    },
+    "node:Schedule Trigger": {
+      "recurrenceRules": [
+        18
+      ]
+    }
+  },
+  "tags": [
+    {
+      "updatedAt": "2026-01-16T22:51:47.521Z",
+      "createdAt": "2026-01-16T22:51:47.521Z",
+      "id": "2Yso2axgFawSJG9i",
+      "name": "billing"
+    },
+    {
+      "updatedAt": "2026-01-16T22:51:41.453Z",
+      "createdAt": "2026-01-16T22:51:41.453Z",
+      "id": "3n9C0kBs5J5Y9L9H",
+      "name": "configuration"
+    },
+    {
+      "updatedAt": "2026-01-21T23:11:27.553Z",
+      "createdAt": "2026-01-21T23:11:27.553Z",
+      "id": "Vl0iwJerlTFlz1ju",
+      "name": "netsuite"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2026-01-27T19:34:18.845Z",
+  "versionId": "252277fc-f267-444a-869d-af003eab5c18"
+}
