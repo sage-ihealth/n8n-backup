@@ -1,0 +1,654 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-01-29T02:03:03.156Z",
+    "createdAt": "2026-01-29T02:03:03.156Z",
+    "versionId": "c83a060f-0230-4b64-8b0c-ee2517292fdf",
+    "workflowId": "vExTgsQOJVpZUdOr",
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "hours"
+              }
+            ]
+          }
+        },
+        "id": "schedule-trigger",
+        "name": "Hourly Schedule",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          -192,
+          32
+        ]
+      },
+      {
+        "parameters": {
+          "url": "https://ihealthlabs.talentlms.com/api/v1/users",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpBasicAuth",
+          "options": {}
+        },
+        "id": "get-all-users",
+        "name": "Get All Users",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          32,
+          -112
+        ],
+        "credentials": {
+          "httpBasicAuth": {
+            "id": "EsyepIMWisrkDo1g",
+            "name": "TalentLMS"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "url": "https://ihealthlabs.talentlms.com/api/v1/courses",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpBasicAuth",
+          "options": {}
+        },
+        "id": "get-all-courses",
+        "name": "Get All Courses",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          32,
+          192
+        ],
+        "credentials": {
+          "httpBasicAuth": {
+            "id": "EsyepIMWisrkDo1g",
+            "name": "TalentLMS"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "url": "=https://ihealthlabs.talentlms.com/api/v1/courses/id:{{ $json.id }}",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpBasicAuth",
+          "options": {}
+        },
+        "id": "get-course-details",
+        "name": "Get Course Details",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          256,
+          32
+        ],
+        "credentials": {
+          "httpBasicAuth": {
+            "id": "EsyepIMWisrkDo1g",
+            "name": "TalentLMS"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Extract learners with expired but incomplete courses\n// Avoid duplicates by tracking notified learners per day\nconst results = [];\nconst now = new Date();\n// Use LA timezone for date calculation to prevent duplicate resets at UTC midnight\nconst today = new Date().toLocaleDateString(\"en-CA\", { timeZone: \"America/Los_Angeles\" }); // YYYY-MM-DD\n\n// Build user lookup map from Get All Users node (has full names and emails)\nconst userLookup = {};\nconst allUsers = $(\"Get All Users\").all();\nfor (const userItem of allUsers) {\n  const u = userItem.json;\n  userLookup[u.id] = {\n    firstName: u.first_name,\n    lastName: u.last_name,\n    fullName: `${u.first_name} ${u.last_name}`,\n    email: u.email\n  };\n}\n\n// Get static data for tracking notified learners\nconst staticData = $getWorkflowStaticData(\"global\");\n\n// Reset tracking if it is a new day\nif (staticData.lastRunDate !== today) {\n  staticData.lastRunDate = today;\n  staticData.notifiedLearners = {};\n}\n\n// Initialize if not exists\nif (!staticData.notifiedLearners) {\n  staticData.notifiedLearners = {};\n}\n\n// Get course details from Get Course Details node\nconst courseItems = $(\"Get Course Details\").all();\n\nfor (const item of courseItems) {\n  const course = item.json;\n  const courseName = course.name;\n  const courseId = course.id;\n  \n  // Check if course has users array\n  if (course.users && Array.isArray(course.users)) {\n    // Get the expiration date from the first expired user (same for all users in course)\n    let courseExpiredOn = \"\";\n    for (const u of course.users) {\n      if (u.expired_on && u.expired_on !== \"\") {\n        courseExpiredOn = u.expired_on;\n        break;\n      }\n    }\n    \n    for (const user of course.users) {\n      // Check if expiration date has passed\n      let hasExpired = false;\n      if (user.expired_on && user.expired_on !== \"\") {\n        const expirationDate = new Date(user.expired_on);\n        hasExpired = expirationDate < now;\n      }\n      \n      // Get full name and email from user lookup\n      const userDetails = userLookup[user.id] || {};\n      const fullName = userDetails.fullName || user.name;\n      const userEmail = userDetails.email || \"No email\";\n      \n      // Create unique key for this learner + course combination\n      const notificationKey = `${user.id}_${courseId}`;\n      \n      // Filter: learner role, expiration date has PASSED, not completed, not already notified today\n      if (user.role === \"learner\" && \n          hasExpired &&\n          (!user.completed_on || user.completed_on === \"\") &&\n          !staticData.notifiedLearners[notificationKey]) {\n        \n        // Mark as notified\n        staticData.notifiedLearners[notificationKey] = true;\n        \n        results.push({\n          json: {\n            userId: user.id,\n            userName: fullName,\n            userEmail: userEmail,\n            courseId: courseId,\n            courseName: courseName,\n            courseExpiredOn: courseExpiredOn,\n            progress: user.completion_percentage || \"0\"\n          }\n        });\n      }\n    }\n  }\n}\n\nreturn results.length > 0 ? results : [{json: {noResults: true}}];"
+        },
+        "id": "filter-expired-learners",
+        "name": "Filter Expired Learners",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          672,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict"
+            },
+            "conditions": [
+              {
+                "id": "check-has-results",
+                "leftValue": "={{ $json.noResults }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "notEquals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "check-results",
+        "name": "Has Expired Learners?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2,
+        "position": [
+          880,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "// Group expired learners by course\nconst items = $input.all();\n\n// Group by course\nconst courseGroups = {};\nfor (const item of items) {\n  const data = item.json;\n  const courseKey = data.courseId;\n  if (!courseGroups[courseKey]) {\n    courseGroups[courseKey] = {\n      courseName: data.courseName,\n      courseExpiredOn: data.courseExpiredOn,\n      learners: []\n    };\n  }\n  courseGroups[courseKey].learners.push({\n    name: data.userName,\n    email: data.userEmail,\n    progress: data.progress\n  });\n}\n\n// Build message grouped by course\nlet message = '*TalentLMS Learner Expiration Alert*\\n\\n';\nmessage += `Found ${items.length} learner(s) with expired but incomplete courses:\\n\\n`;\n\nfor (const courseId of Object.keys(courseGroups)) {\n  const course = courseGroups[courseId];\n  message += `*${course.courseName}*\\n`;\n  message += `Expired: ${course.courseExpiredOn}\\n`;\n  for (const learner of course.learners) {\n    message += `  • *${learner.name}* (${learner.email}) - Progress: ${learner.progress}%\\n`;\n  }\n  message += '\\n';\n}\n\nmessage += '_Please follow up with these learners to ensure course completion._';\n\nreturn [{ json: { text: message } }];"
+        },
+        "id": "format-message",
+        "name": "Format Google Chat Message",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1104,
+          -96
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://chat.googleapis.com/v1/spaces/AAQA4Ksbm-M/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=UPaxjAUjYdJowRki8zCMCrbLprOL-C_dQpcW5BxyFno",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ text: $json.text }) }}",
+          "options": {}
+        },
+        "id": "send-google-chat",
+        "name": "Send Google Chat Notification",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1328,
+          -96
+        ]
+      },
+      {
+        "parameters": {},
+        "id": "no-action",
+        "name": "No Expired Learners",
+        "type": "n8n-nodes-base.noOp",
+        "typeVersion": 1,
+        "position": [
+          1104,
+          112
+        ]
+      },
+      {
+        "parameters": {
+          "mode": "chooseBranch",
+          "output": "empty"
+        },
+        "id": "merge-data",
+        "name": "Wait For Both",
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3,
+        "position": [
+          544,
+          0
+        ]
+      }
+    ],
+    "connections": {
+      "Hourly Schedule": {
+        "main": [
+          [
+            {
+              "node": "Get All Users",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Get All Courses",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get All Users": {
+        "main": [
+          [
+            {
+              "node": "Wait For Both",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get All Courses": {
+        "main": [
+          [
+            {
+              "node": "Get Course Details",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Course Details": {
+        "main": [
+          [
+            {
+              "node": "Wait For Both",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Wait For Both": {
+        "main": [
+          [
+            {
+              "node": "Filter Expired Learners",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Filter Expired Learners": {
+        "main": [
+          [
+            {
+              "node": "Has Expired Learners?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Has Expired Learners?": {
+        "main": [
+          [
+            {
+              "node": "Format Google Chat Message",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "No Expired Learners",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Format Google Chat Message": {
+        "main": [
+          [
+            {
+              "node": "Send Google Chat Notification",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Phoebe You",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "activeVersionId": "c83a060f-0230-4b64-8b0c-ee2517292fdf",
+  "connections": {
+    "Hourly Schedule": {
+      "main": [
+        [
+          {
+            "node": "Get All Users",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get All Courses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get All Users": {
+      "main": [
+        [
+          {
+            "node": "Wait For Both",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get All Courses": {
+      "main": [
+        [
+          {
+            "node": "Get Course Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Course Details": {
+      "main": [
+        [
+          {
+            "node": "Wait For Both",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Wait For Both": {
+      "main": [
+        [
+          {
+            "node": "Filter Expired Learners",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Expired Learners": {
+      "main": [
+        [
+          {
+            "node": "Has Expired Learners?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Expired Learners?": {
+      "main": [
+        [
+          {
+            "node": "Format Google Chat Message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Expired Learners",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Google Chat Message": {
+      "main": [
+        [
+          {
+            "node": "Send Google Chat Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-15T23:59:53.360Z",
+  "id": "vExTgsQOJVpZUdOr",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "TalentLMS Learner Expiration Notification",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Hourly Schedule",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -192,
+        -16
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://ihealthlabs.talentlms.com/api/v1/users",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "options": {}
+      },
+      "id": "get-all-users",
+      "name": "Get All Users",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        256,
+        -112
+      ],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "EsyepIMWisrkDo1g",
+          "name": "TalentLMS"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://ihealthlabs.talentlms.com/api/v1/courses",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "options": {}
+      },
+      "id": "get-all-courses",
+      "name": "Get All Courses",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        32,
+        80
+      ],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "EsyepIMWisrkDo1g",
+          "name": "TalentLMS"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://ihealthlabs.talentlms.com/api/v1/courses/id:{{ $json.id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "options": {}
+      },
+      "id": "get-course-details",
+      "name": "Get Course Details",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        256,
+        80
+      ],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "EsyepIMWisrkDo1g",
+          "name": "TalentLMS"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract learners with expired but incomplete courses\n// Avoid duplicates by tracking notified learners per day\nconst results = [];\nconst now = new Date();\n// Use LA timezone for date calculation to prevent duplicate resets at UTC midnight\nconst today = new Date().toLocaleDateString(\"en-CA\", { timeZone: \"America/Los_Angeles\" }); // YYYY-MM-DD\n\n// Build user lookup map from Get All Users node (has full names and emails)\nconst userLookup = {};\nconst allUsers = $(\"Get All Users\").all();\nfor (const userItem of allUsers) {\n  const u = userItem.json;\n  userLookup[u.id] = {\n    firstName: u.first_name,\n    lastName: u.last_name,\n    fullName: `${u.first_name} ${u.last_name}`,\n    email: u.email\n  };\n}\n\n// Get static data for tracking notified learners\nconst staticData = $getWorkflowStaticData(\"global\");\n\n// Reset tracking if it is a new day\nif (staticData.lastRunDate !== today) {\n  staticData.lastRunDate = today;\n  staticData.notifiedLearners = {};\n}\n\n// Initialize if not exists\nif (!staticData.notifiedLearners) {\n  staticData.notifiedLearners = {};\n}\n\n// Get course details from Get Course Details node\nconst courseItems = $(\"Get Course Details\").all();\n\nfor (const item of courseItems) {\n  const course = item.json;\n  const courseName = course.name;\n  const courseId = course.id;\n  \n  // Check if course has users array\n  if (course.users && Array.isArray(course.users)) {\n    // Get the expiration date from the first expired user (same for all users in course)\n    let courseExpiredOn = \"\";\n    for (const u of course.users) {\n      if (u.expired_on && u.expired_on !== \"\") {\n        courseExpiredOn = u.expired_on;\n        break;\n      }\n    }\n    \n    for (const user of course.users) {\n      // Check if expiration date has passed\n      let hasExpired = false;\n      if (user.expired_on && user.expired_on !== \"\") {\n        const expirationDate = new Date(user.expired_on);\n        hasExpired = expirationDate < now;\n      }\n      \n      // Get full name and email from user lookup\n      const userDetails = userLookup[user.id] || {};\n      const fullName = userDetails.fullName || user.name;\n      const userEmail = userDetails.email || \"No email\";\n      \n      // Create unique key for this learner + course combination\n      const notificationKey = `${user.id}_${courseId}`;\n      \n      // Filter: learner role, expiration date has PASSED, not completed, not already notified today\n      if (user.role === \"learner\" && \n          hasExpired &&\n          (!user.completed_on || user.completed_on === \"\") &&\n          !staticData.notifiedLearners[notificationKey]) {\n        \n        // Mark as notified\n        staticData.notifiedLearners[notificationKey] = true;\n        \n        results.push({\n          json: {\n            userId: user.id,\n            userName: fullName,\n            userEmail: userEmail,\n            courseId: courseId,\n            courseName: courseName,\n            courseExpiredOn: courseExpiredOn,\n            progress: user.completion_percentage || \"0\"\n          }\n        });\n      }\n    }\n  }\n}\n\nreturn results.length > 0 ? results : [{json: {noResults: true}}];"
+      },
+      "id": "filter-expired-learners",
+      "name": "Filter Expired Learners",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        704,
+        -16
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "check-has-results",
+              "leftValue": "={{ $json.noResults }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "check-results",
+      "name": "Has Expired Learners?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        928,
+        -16
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Group expired learners by course\nconst items = $input.all();\n\n// Group by course\nconst courseGroups = {};\nfor (const item of items) {\n  const data = item.json;\n  const courseKey = data.courseId;\n  if (!courseGroups[courseKey]) {\n    courseGroups[courseKey] = {\n      courseName: data.courseName,\n      courseExpiredOn: data.courseExpiredOn,\n      learners: []\n    };\n  }\n  courseGroups[courseKey].learners.push({\n    name: data.userName,\n    email: data.userEmail,\n    progress: data.progress\n  });\n}\n\n// Build message grouped by course\nlet message = '*TalentLMS Learner Expiration Alert*\\n\\n';\nmessage += `Found ${items.length} learner(s) with expired but incomplete courses:\\n\\n`;\n\nfor (const courseId of Object.keys(courseGroups)) {\n  const course = courseGroups[courseId];\n  message += `*${course.courseName}*\\n`;\n  message += `Expired: ${course.courseExpiredOn}\\n`;\n  for (const learner of course.learners) {\n    message += `  • *${learner.name}* (${learner.email}) - Progress: ${learner.progress}%\\n`;\n  }\n  message += '\\n';\n}\n\nmessage += '_Please follow up with these learners to ensure course completion._';\n\nreturn [{ json: { text: message } }];"
+      },
+      "id": "format-message",
+      "name": "Format Google Chat Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1152,
+        -112
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://chat.googleapis.com/v1/spaces/AAQA4Ksbm-M/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=UPaxjAUjYdJowRki8zCMCrbLprOL-C_dQpcW5BxyFno",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ text: $json.text }) }}",
+        "options": {}
+      },
+      "id": "send-google-chat",
+      "name": "Send Google Chat Notification",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1376,
+        -112
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "no-action",
+      "name": "No Expired Learners",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1152,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "chooseBranch",
+        "output": "empty"
+      },
+      "id": "merge-data",
+      "name": "Wait For Both",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        480,
+        -16
+      ]
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "timezone": "America/Los_Angeles",
+    "saveDataErrorExecution": "none",
+    "saveManualExecutions": false,
+    "errorWorkflow": "vExTgsQOJVpZUdOr",
+    "timeSavedPerExecution": 15
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-15T23:59:53.364Z",
+      "createdAt": "2026-01-15T23:59:53.364Z",
+      "role": "workflow:owner",
+      "workflowId": "vExTgsQOJVpZUdOr",
+      "projectId": "SzgLfYyy3lWDJHJA"
+    }
+  ],
+  "staticData": {
+    "node:Hourly Schedule": {
+      "recurrenceRules": []
+    },
+    "global": {
+      "lastRunDate": "2026-02-13",
+      "notifiedLearners": {
+        "76_244": true,
+        "165_244": true,
+        "116_244": true,
+        "102_244": true,
+        "106_244": true,
+        "105_244": true
+      }
+    }
+  },
+  "tags": [
+    {
+      "updatedAt": "2026-02-11T01:57:02.890Z",
+      "createdAt": "2026-02-11T01:57:02.890Z",
+      "id": "aOUk5y2lWjpAIKLe",
+      "name": "Training"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2026-02-11T01:58:52.214Z",
+  "versionId": "951eb0eb-456b-4d7e-95c5-b122eeb50d52"
+}
