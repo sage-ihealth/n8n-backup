@@ -1,0 +1,118 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "V2 - Get Users",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "V1 - Get Users (Compare)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-22T20:44:03.744Z",
+  "id": "ZQO8k0JC7Mu8uVwC",
+  "isArchived": false,
+  "meta": null,
+  "name": "TalentLMS API V2 Test",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual_trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://ihealthlabs.talentlms.com/api/v2/users",
+        "authentication": "none",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key",
+              "value": "BaZspQqVVZZrS2SX6vw9X9kgPF6MYT"
+            },
+            {
+              "name": "X-API-Version",
+              "value": "2025-01-01"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "v2_get_users",
+      "name": "V2 - Get Users",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://ihealthlabs.talentlms.com/api/v1/users",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "options": {}
+      },
+      "id": "v1_get_users",
+      "name": "V1 - Get Users (Compare)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        500
+      ],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "EsyepIMWisrkDo1g",
+          "name": "TalentLMS"
+        }
+      }
+    }
+  ],
+  "origin": "n8n",
+  "pinData": null,
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-22T20:44:03.747Z",
+      "createdAt": "2026-01-22T20:44:03.747Z",
+      "role": "workflow:owner",
+      "workflowId": "ZQO8k0JC7Mu8uVwC",
+      "projectId": "SzgLfYyy3lWDJHJA"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-02-05T01:29:01.011Z",
+  "versionId": "0ff3b3b1-4e99-442c-8ecc-6e59d47e6e57"
+}
