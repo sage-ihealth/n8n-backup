@@ -1,0 +1,130 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-02-06T21:48:36.604Z",
+  "id": "rYpgZ8nri29uF3MMnVbLp",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "My workflow 28",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "ca560a8e-f8ae-4ad1-a668-8b5e25bf850d",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "16nSCzaSLxwCaWYsi-7T4nwbmYmaS6IeDUc522n9ITW8",
+          "mode": "list",
+          "cachedResultName": "997 HMG Screening/Outreach",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16nSCzaSLxwCaWYsi-7T4nwbmYmaS6IeDUc522n9ITW8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 281183738,
+          "mode": "list",
+          "cachedResultName": "CGM Service Package",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16nSCzaSLxwCaWYsi-7T4nwbmYmaS6IeDUc522n9ITW8/edit#gid=281183738"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        208,
+        0
+      ],
+      "id": "f12d824b-aaf5-4c32-b179-333752d62f19",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "S80vePTI1zB7y2qN",
+          "name": "Google Sheets account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4fe9e9bc-3dd7-4eb7-acac-8b3fe17a8bf8",
+              "name": "A1c",
+              "value": "= {{ $json.col_8 }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "6b9c7586-abf0-48cb-8e6e-891c15b50f1b",
+      "name": "Edit Fields",
+      "executeOnce": false
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-06T21:48:36.610Z",
+      "createdAt": "2026-02-06T21:48:36.610Z",
+      "role": "workflow:owner",
+      "workflowId": "rYpgZ8nri29uF3MMnVbLp",
+      "projectId": "QqdLZk2iEnhTH0VD"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-02-06T23:18:33.089Z",
+  "versionId": "c36fbf02-f620-440f-bd72-bcc793881935"
+}
