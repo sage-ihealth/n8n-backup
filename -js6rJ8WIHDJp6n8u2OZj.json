@@ -1,0 +1,208 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-02-06T21:17:10.988Z",
+  "id": "-js6rJ8WIHDJp6n8u2OZj",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "screening data",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -512,
+        0
+      ],
+      "id": "329d95d0-f0ab-467d-97c9-4674c15f0086",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1H5cb69WbeTBplIstbtlKKAvndvgge4wAdlTx609Dlmk",
+          "mode": "list",
+          "cachedResultName": "Copy of Clinic 22 Screening 2025",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1H5cb69WbeTBplIstbtlKKAvndvgge4wAdlTx609Dlmk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "={{ $json.sheetName }}"
+        },
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "specifyRange",
+              "headerRow": "={{ $json.headerRow }}",
+              "firstDataRow": "={{ $json.firstDataRow }}"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        208,
+        0
+      ],
+      "id": "23bed5b5-03ce-40c9-af32-d3c2884f316e",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "VkqVQG6uCx2rHBuX",
+          "name": "Google Sheets account 7"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  { sheetName: \"Jan 2025\", headerRow: 17, firstDataRow: 18 },\n  { sheetName: \"Feb 2025\", headerRow: 17, firstDataRow: 18 },\n  { sheetName: \"March 2025\", headerRow: 17, firstDataRow: 18 },\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -32,
+        0
+      ],
+      "id": "ea90d629-004f-4503-8439-410d45bd423a",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1Sgr3XabxM7lhTC4jzsA3zHGkxUTi8yZc1VfHBbtC0Os",
+          "mode": "list",
+          "cachedResultName": "screening data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Sgr3XabxM7lhTC4jzsA3zHGkxUTi8yZc1VfHBbtC0Os/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Sgr3XabxM7lhTC4jzsA3zHGkxUTi8yZc1VfHBbtC0Os/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        416,
+        0
+      ],
+      "id": "227323b0-8de5-4a41-9cf0-ac44b4d798b8",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "VkqVQG6uCx2rHBuX",
+          "name": "Google Sheets account 7"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -304,
+        0
+      ],
+      "id": "44e18214-5c5a-4255-9990-93f1086d8099",
+      "name": "Edit Fields"
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-06T21:17:10.991Z",
+      "createdAt": "2026-02-06T21:17:10.991Z",
+      "role": "workflow:owner",
+      "workflowId": "-js6rJ8WIHDJp6n8u2OZj",
+      "projectId": "kugITzN49x98FAtM"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-02-06T22:31:37.028Z",
+  "versionId": "94386a5b-ffea-4e8a-929a-13e232a877ed"
+}
