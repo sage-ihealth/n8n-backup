@@ -1,0 +1,68 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {},
+  "createdAt": "2026-01-21T22:10:13.904Z",
+  "id": "1gyU6tjx7jW4bSjh",
+  "isArchived": true,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "webhook",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "b8664a35-3a96-441c-add2-45ce99fbcfb0",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b303ff01-f0e8-4245-8378-a7ef960d3017",
+      "name": "Webhook",
+      "webhookId": "b8664a35-3a96-441c-add2-45ce99fbcfb0"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        288,
+        64
+      ],
+      "typeVersion": 1,
+      "id": "ed58632f-dd00-4c24-8213-1c0e2d4091b9",
+      "name": "Sticky Note"
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-21T22:10:13.907Z",
+      "createdAt": "2026-01-21T22:10:13.907Z",
+      "role": "workflow:owner",
+      "workflowId": "1gyU6tjx7jW4bSjh",
+      "projectId": "IGL0EzJNN8XZ65mm"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2026-01-26T19:09:17.000Z",
+  "versionId": "48422951-8324-459a-9a14-ef1c04648005"
+}
