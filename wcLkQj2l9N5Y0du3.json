@@ -1,0 +1,616 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-01-22T01:51:06.002Z",
+    "createdAt": "2026-01-22T01:51:06.002Z",
+    "versionId": "aa2eb1e6-b14b-4326-b153-b83dff4d4e86",
+    "workflowId": "wcLkQj2l9N5Y0du3",
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "cronExpression",
+                "expression": "0 17 * * 1-5"
+              }
+            ]
+          }
+        },
+        "id": "schedule",
+        "name": "5 PM Mon-Fri PST",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          256,
+          384
+        ]
+      },
+      {
+        "parameters": {
+          "url": "https://ihealthlabs.talentlms.com/api/v1/users",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpBasicAuth",
+          "options": {}
+        },
+        "id": "get_users",
+        "name": "Get All TalentLMS Users",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          480,
+          384
+        ],
+        "credentials": {
+          "httpBasicAuth": {
+            "id": "EsyepIMWisrkDo1g",
+            "name": "TalentLMS"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Filter for new hires (hire date within last 14 days)\nconst items = $input.all();\nconst now = new Date();\n\n// Get PST date (UTC-8)\nconst pstOffset = -8 * 60 * 60 * 1000;\nconst pstNow = new Date(now.getTime() + pstOffset);\nconst cutoffDate = new Date(pstNow.getTime() - (14 * 24 * 60 * 60 * 1000));\n\nconst newHires = [];\n\nfor (const item of items) {\n  const user = item.json;\n  const hireDateStr = user.custom_field_31; // Hire Date field\n  if (!hireDateStr) continue;\n  \n  // Parse MM/DD/YYYY format\n  const parts = hireDateStr.split('/');\n  if (parts.length !== 3) continue;\n  \n  const hireDate = new Date(parts[2], parts[0] - 1, parts[1]);\n  \n  if (hireDate >= cutoffDate && user.status === 'active') {\n    // Calculate day number (Day 1 = hire date)\n    const daysDiff = Math.floor((pstNow - hireDate) / (24 * 60 * 60 * 1000));\n    const dayNumber = daysDiff + 1;\n    \n    newHires.push({\n      json: {\n        user_id: user.id,\n        first_name: user.first_name,\n        last_name: user.last_name,\n        name: `${user.first_name} ${user.last_name}`,\n        email: user.email,\n        hire_date: hireDateStr,\n        day_number: dayNumber,\n        reports_to: user.custom_field_30 || 'Unknown'\n      }\n    });\n  }\n}\n\nif (newHires.length === 0) {\n  return [{ json: { skip: true, message: 'No new hires found' } }];\n}\n\nreturn newHires;"
+        },
+        "id": "filter_new_hires",
+        "name": "Filter New Hires (Last 14 Days)",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          704,
+          384
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict"
+            },
+            "conditions": [
+              {
+                "id": "skip_check",
+                "leftValue": "={{ $json.skip }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "notEquals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "if_has_new_hires",
+        "name": "Has New Hires?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2,
+        "position": [
+          928,
+          384
+        ]
+      },
+      {
+        "parameters": {
+          "url": "=https://ihealthlabs.talentlms.com/api/v1/users/id:{{ $json.user_id }}",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpBasicAuth",
+          "options": {}
+        },
+        "id": "get_user_courses",
+        "name": "Get User Courses",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1152,
+          304
+        ],
+        "credentials": {
+          "httpBasicAuth": {
+            "id": "EsyepIMWisrkDo1g",
+            "name": "TalentLMS"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Collect all user course data and pass to summary builder\nconst items = $input.all();\nconst newHireData = $('Has New Hires?').all();\n\n// Build a map of user_id to new hire data\nconst newHireMap = {};\nfor (const item of newHireData) {\n  newHireMap[item.json.user_id] = item.json;\n}\n\n// Combine user courses with new hire metadata\nconst combinedData = [];\nfor (const item of items) {\n  const user = item.json;\n  const newHireInfo = newHireMap[user.id];\n  if (newHireInfo) {\n    combinedData.push({\n      json: {\n        ...newHireInfo,\n        courses: user.courses || []\n      }\n    });\n  }\n}\n\nreturn combinedData.length > 0 ? combinedData : [{ json: { skip: true } }];"
+        },
+        "id": "combine_data",
+        "name": "Combine User Data",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1360,
+          304
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "// Build end-of-day summary message\nconst items = $input.all();\nconst tlmsApiKey = 'BaZspQqVVZZrS2SX6vw9X9kgPF6MYT';\n\n// Get today's date in PST\nconst now = new Date();\nconst pstOptions = { timeZone: 'America/Los_Angeles' };\nconst pstDateStr = now.toLocaleDateString('en-US', { ...pstOptions, month: 'short', day: 'numeric', year: 'numeric' });\n\n// Get midnight PST today as timestamp\nconst pstFormatter = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Los_Angeles', year: 'numeric', month: '2-digit', day: '2-digit' });\nconst pstParts = pstFormatter.formatToParts(now);\nconst pstYear = pstParts.find(p => p.type === 'year').value;\nconst pstMonth = pstParts.find(p => p.type === 'month').value;\nconst pstDay = pstParts.find(p => p.type === 'day').value;\nconst midnightPST = new Date(`${pstYear}-${pstMonth}-${pstDay}T00:00:00-08:00`).getTime() / 1000;\n\nconst completedToday = [];\nconst noActivityToday = [];\n\nfor (const item of items) {\n  const data = item.json;\n  if (data.skip) continue;\n  \n  const courses = data.courses || [];\n  const todayCompletions = [];\n  \n  // Find courses completed today\n  for (const course of courses) {\n    if (course.completion_status !== 'completed') continue;\n    \n    const completedTimestamp = parseInt(course.completed_on_timestamp);\n    if (completedTimestamp >= midnightPST) {\n      // Fetch detailed course info for score and attempts\n      let score = null;\n      let attempts = 1;\n      \n      try {\n        const courseResponse = await this.helpers.httpRequest({\n          method: 'GET',\n          url: `https://ihealthlabs.talentlms.com/api/v1/getuserstatusincourse/user_id:${data.user_id},course_id:${course.id}`,\n          auth: { username: tlmsApiKey, password: '' }\n        });\n        \n        const units = courseResponse.units || [];\n        // First try to get score from Test unit\n        const testUnit = units.find(u => u.type === 'Test' && u.score && u.score !== '');\n        if (testUnit) {\n          score = parseInt(testUnit.score, 10);\n          attempts = testUnit.attempts || 1;\n        } else {\n          // Calculate average score from all completed units with scores\n          const completedUnits = units.filter(u => u.completion_status === 'Completed' && u.score && u.score !== '');\n          if (completedUnits.length > 0) {\n            const totalScore = completedUnits.reduce((sum, u) => sum + parseInt(u.score, 10), 0);\n            score = Math.round(totalScore / completedUnits.length);\n          }\n        }\n      } catch (e) {}\n      \n      // Format duration\n      const totalSeconds = course.total_time_seconds || 0;\n      let durationDisplay = 'N/A';\n      if (totalSeconds > 0) {\n        const hours = Math.floor(totalSeconds / 3600);\n        const minutes = Math.floor((totalSeconds % 3600) / 60);\n        if (hours === 0) durationDisplay = `${minutes} min`;\n        else if (minutes === 0) durationDisplay = `${hours} hr`;\n        else durationDisplay = `${hours} hr ${minutes} min`;\n      }\n      \n      todayCompletions.push({\n        course_name: course.name.replace(/&amp;/g, '&'),\n        duration: durationDisplay,\n        score: score,\n        attempts: attempts\n      });\n    }\n  }\n  \n  const personData = {\n    name: data.name,\n    day_number: data.day_number,\n    reports_to: data.reports_to\n  };\n  \n  if (todayCompletions.length > 0) {\n    // Calculate average score from courses that have scores\n    const scoresWithValues = todayCompletions.filter(c => c.score !== null && !isNaN(c.score));\n    let avgScore = null;\n    if (scoresWithValues.length > 0) {\n      const totalScore = scoresWithValues.reduce((sum, c) => sum + c.score, 0);\n      avgScore = Math.round(totalScore / scoresWithValues.length);\n    }\n    \n    // Calculate average attempts\n    const totalAttempts = todayCompletions.reduce((sum, c) => sum + c.attempts, 0);\n    const avgAttempts = (totalAttempts / todayCompletions.length).toFixed(1);\n    \n    completedToday.push({\n      ...personData,\n      completions: todayCompletions,\n      courses_count: todayCompletions.length,\n      average_score: avgScore,\n      average_attempts: parseFloat(avgAttempts)\n    });\n  } else {\n    noActivityToday.push(personData);\n  }\n}\n\n// Build the message\nlet message = `\\uD83D\\uDCCB Daily Training Summary - ${pstDateStr}\\n`;\n\nif (completedToday.length > 0) {\n  message += `\\n\\u2705 Completed Training Today:\\n`;\n  \n  for (const person of completedToday) {\n    message += `\\n*${person.name}* (Day ${person.day_number}) - Reports to: ${person.reports_to}\\n`;\n    \n    // Summary line with totals\n    const avgScoreDisplay = person.average_score !== null ? `${person.average_score}%` : 'N/A';\n    const avgAttemptsDisplay = person.average_attempts % 1 === 0 ? person.average_attempts.toFixed(0) : person.average_attempts.toFixed(1);\n    message += `Courses Completed: *${person.courses_count}* | Average Score: *${avgScoreDisplay}* | Average Attempts: *${avgAttemptsDisplay}*\\n\\n`;\n    \n    for (const completion of person.completions) {\n      const scoreDisplay = completion.score !== null ? `${completion.score}%` : 'N/A';\n      const attemptWord = completion.attempts === 1 ? 'attempt' : 'attempts';\n      message += `\\u2022 ${completion.course_name} - ${completion.duration}, ${scoreDisplay}, ${completion.attempts} ${attemptWord}\\n`;\n    }\n  }\n}\n\nif (noActivityToday.length > 0) {\n  message += `\\n\\u26A0\\uFE0F No Activity Today:\\n\\n`;\n  \n  for (const person of noActivityToday) {\n    message += `\\u2022 *${person.name}* (Day ${person.day_number}) - Reports to: ${person.reports_to}\\n`;\n  }\n}\n\n// Only return message if there's content beyond just the header\nif (completedToday.length === 0 && noActivityToday.length === 0) {\n  return [{ json: { skip: true, message: 'No new hires to report on' } }];\n}\n\nreturn [{ json: { message: message, completed_count: completedToday.length, no_activity_count: noActivityToday.length } }];"
+        },
+        "id": "build_summary",
+        "name": "Build EOD Summary",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1584,
+          304
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict"
+            },
+            "conditions": [
+              {
+                "id": "skip_check",
+                "leftValue": "={{ $json.skip }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "notEquals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "if_has_summary",
+        "name": "Has Summary?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2,
+        "position": [
+          1808,
+          304
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://chat.googleapis.com/v1/spaces/AAQA4Ksbm-M/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=UPaxjAUjYdJowRki8zCMCrbLprOL-C_dQpcW5BxyFno",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={ \"text\": {{ JSON.stringify($json.message) }} }",
+          "options": {}
+        },
+        "id": "send_chat",
+        "name": "Send to Google Chat",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          2032,
+          224
+        ]
+      }
+    ],
+    "connections": {
+      "5 PM Mon-Fri PST": {
+        "main": [
+          [
+            {
+              "node": "Get All TalentLMS Users",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get All TalentLMS Users": {
+        "main": [
+          [
+            {
+              "node": "Filter New Hires (Last 14 Days)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Filter New Hires (Last 14 Days)": {
+        "main": [
+          [
+            {
+              "node": "Has New Hires?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Has New Hires?": {
+        "main": [
+          [
+            {
+              "node": "Get User Courses",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          []
+        ]
+      },
+      "Get User Courses": {
+        "main": [
+          [
+            {
+              "node": "Combine User Data",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Combine User Data": {
+        "main": [
+          [
+            {
+              "node": "Build EOD Summary",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build EOD Summary": {
+        "main": [
+          [
+            {
+              "node": "Has Summary?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Has Summary?": {
+        "main": [
+          [
+            {
+              "node": "Send to Google Chat",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          []
+        ]
+      }
+    },
+    "authors": "Phoebe You",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "activeVersionId": "aa2eb1e6-b14b-4326-b153-b83dff4d4e86",
+  "connections": {
+    "5 PM Mon-Fri PST": {
+      "main": [
+        [
+          {
+            "node": "Get All TalentLMS Users",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get All TalentLMS Users": {
+      "main": [
+        [
+          {
+            "node": "Filter New Hires (Last 14 Days)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter New Hires (Last 14 Days)": {
+      "main": [
+        [
+          {
+            "node": "Has New Hires?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has New Hires?": {
+      "main": [
+        [
+          {
+            "node": "Get User Courses",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Get User Courses": {
+      "main": [
+        [
+          {
+            "node": "Combine User Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine User Data": {
+      "main": [
+        [
+          {
+            "node": "Build EOD Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build EOD Summary": {
+      "main": [
+        [
+          {
+            "node": "Has Summary?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Summary?": {
+      "main": [
+        [
+          {
+            "node": "Send to Google Chat",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    }
+  },
+  "createdAt": "2026-01-22T01:30:26.669Z",
+  "id": "wcLkQj2l9N5Y0du3",
+  "isArchived": false,
+  "meta": null,
+  "name": "UC LMS End-of-Day Training Summary",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 17 * * 1-5"
+            }
+          ]
+        }
+      },
+      "id": "schedule",
+      "name": "5 PM Mon-Fri PST",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        256,
+        384
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://ihealthlabs.talentlms.com/api/v1/users",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "options": {}
+      },
+      "id": "get_users",
+      "name": "Get All TalentLMS Users",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        384
+      ],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "EsyepIMWisrkDo1g",
+          "name": "TalentLMS"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filter for new hires (hire date within last 14 days)\nconst items = $input.all();\nconst now = new Date();\n\n// Get PST date (UTC-8)\nconst pstOffset = -8 * 60 * 60 * 1000;\nconst pstNow = new Date(now.getTime() + pstOffset);\nconst cutoffDate = new Date(pstNow.getTime() - (14 * 24 * 60 * 60 * 1000));\n\nconst newHires = [];\n\nfor (const item of items) {\n  const user = item.json;\n  const hireDateStr = user.custom_field_31; // Hire Date field\n  if (!hireDateStr) continue;\n  \n  // Parse MM/DD/YYYY format\n  const parts = hireDateStr.split('/');\n  if (parts.length !== 3) continue;\n  \n  const hireDate = new Date(parts[2], parts[0] - 1, parts[1]);\n  \n  if (hireDate >= cutoffDate && user.status === 'active') {\n    // Calculate day number (Day 1 = hire date)\n    const daysDiff = Math.floor((pstNow - hireDate) / (24 * 60 * 60 * 1000));\n    const dayNumber = daysDiff + 1;\n    \n    newHires.push({\n      json: {\n        user_id: user.id,\n        first_name: user.first_name,\n        last_name: user.last_name,\n        name: `${user.first_name} ${user.last_name}`,\n        email: user.email,\n        hire_date: hireDateStr,\n        day_number: dayNumber,\n        reports_to: user.custom_field_30 || 'Unknown'\n      }\n    });\n  }\n}\n\nif (newHires.length === 0) {\n  return [{ json: { skip: true, message: 'No new hires found' } }];\n}\n\nreturn newHires;"
+      },
+      "id": "filter_new_hires",
+      "name": "Filter New Hires (Last 14 Days)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        704,
+        384
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "skip_check",
+              "leftValue": "={{ $json.skip }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if_has_new_hires",
+      "name": "Has New Hires?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        928,
+        384
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://ihealthlabs.talentlms.com/api/v1/users/id:{{ $json.user_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "options": {}
+      },
+      "id": "get_user_courses",
+      "name": "Get User Courses",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1152,
+        304
+      ],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "EsyepIMWisrkDo1g",
+          "name": "TalentLMS"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Collect all user course data and pass to summary builder\nconst items = $input.all();\nconst newHireData = $('Has New Hires?').all();\n\n// Build a map of user_id to new hire data\nconst newHireMap = {};\nfor (const item of newHireData) {\n  newHireMap[item.json.user_id] = item.json;\n}\n\n// Combine user courses with new hire metadata\nconst combinedData = [];\nfor (const item of items) {\n  const user = item.json;\n  const newHireInfo = newHireMap[user.id];\n  if (newHireInfo) {\n    combinedData.push({\n      json: {\n        ...newHireInfo,\n        courses: user.courses || []\n      }\n    });\n  }\n}\n\nreturn combinedData.length > 0 ? combinedData : [{ json: { skip: true } }];"
+      },
+      "id": "combine_data",
+      "name": "Combine User Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1360,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build end-of-day summary message\nconst items = $input.all();\nconst tlmsApiKey = 'BaZspQqVVZZrS2SX6vw9X9kgPF6MYT';\n\n// Get today's date in PST\nconst now = new Date();\nconst pstOptions = { timeZone: 'America/Los_Angeles' };\nconst pstDateStr = now.toLocaleDateString('en-US', { ...pstOptions, month: 'short', day: 'numeric', year: 'numeric' });\n\n// Get midnight PST today as timestamp\nconst pstFormatter = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Los_Angeles', year: 'numeric', month: '2-digit', day: '2-digit' });\nconst pstParts = pstFormatter.formatToParts(now);\nconst pstYear = pstParts.find(p => p.type === 'year').value;\nconst pstMonth = pstParts.find(p => p.type === 'month').value;\nconst pstDay = pstParts.find(p => p.type === 'day').value;\nconst midnightPST = new Date(`${pstYear}-${pstMonth}-${pstDay}T00:00:00-08:00`).getTime() / 1000;\n\nconst completedToday = [];\nconst noActivityToday = [];\n\nfor (const item of items) {\n  const data = item.json;\n  if (data.skip) continue;\n  \n  const courses = data.courses || [];\n  const todayCompletions = [];\n  \n  // Find courses completed today\n  for (const course of courses) {\n    if (course.completion_status !== 'completed') continue;\n    \n    const completedTimestamp = parseInt(course.completed_on_timestamp);\n    if (completedTimestamp >= midnightPST) {\n      // Fetch detailed course info for score and attempts\n      let score = null;\n      let attempts = 1;\n      \n      try {\n        const courseResponse = await this.helpers.httpRequest({\n          method: 'GET',\n          url: `https://ihealthlabs.talentlms.com/api/v1/getuserstatusincourse/user_id:${data.user_id},course_id:${course.id}`,\n          auth: { username: tlmsApiKey, password: '' }\n        });\n        \n        const units = courseResponse.units || [];\n        // First try to get score from Test unit\n        const testUnit = units.find(u => u.type === 'Test' && u.score && u.score !== '');\n        if (testUnit) {\n          score = parseInt(testUnit.score, 10);\n          attempts = testUnit.attempts || 1;\n        } else {\n          // Calculate average score from all completed units with scores\n          const completedUnits = units.filter(u => u.completion_status === 'Completed' && u.score && u.score !== '');\n          if (completedUnits.length > 0) {\n            const totalScore = completedUnits.reduce((sum, u) => sum + parseInt(u.score, 10), 0);\n            score = Math.round(totalScore / completedUnits.length);\n          }\n        }\n      } catch (e) {}\n      \n      // Format duration\n      const totalSeconds = course.total_time_seconds || 0;\n      let durationDisplay = 'N/A';\n      if (totalSeconds > 0) {\n        const hours = Math.floor(totalSeconds / 3600);\n        const minutes = Math.floor((totalSeconds % 3600) / 60);\n        if (hours === 0) durationDisplay = `${minutes} min`;\n        else if (minutes === 0) durationDisplay = `${hours} hr`;\n        else durationDisplay = `${hours} hr ${minutes} min`;\n      }\n      \n      todayCompletions.push({\n        course_name: course.name.replace(/&amp;/g, '&'),\n        duration: durationDisplay,\n        score: score,\n        attempts: attempts\n      });\n    }\n  }\n  \n  const personData = {\n    name: data.name,\n    day_number: data.day_number,\n    reports_to: data.reports_to\n  };\n  \n  if (todayCompletions.length > 0) {\n    // Calculate average score from courses that have scores\n    const scoresWithValues = todayCompletions.filter(c => c.score !== null && !isNaN(c.score));\n    let avgScore = null;\n    if (scoresWithValues.length > 0) {\n      const totalScore = scoresWithValues.reduce((sum, c) => sum + c.score, 0);\n      avgScore = Math.round(totalScore / scoresWithValues.length);\n    }\n    \n    // Calculate average attempts\n    const totalAttempts = todayCompletions.reduce((sum, c) => sum + c.attempts, 0);\n    const avgAttempts = (totalAttempts / todayCompletions.length).toFixed(1);\n    \n    completedToday.push({\n      ...personData,\n      completions: todayCompletions,\n      courses_count: todayCompletions.length,\n      average_score: avgScore,\n      average_attempts: parseFloat(avgAttempts)\n    });\n  } else {\n    noActivityToday.push(personData);\n  }\n}\n\n// Build the message\nlet message = `\\uD83D\\uDCCB Daily Training Summary - ${pstDateStr}\\n`;\n\nif (completedToday.length > 0) {\n  message += `\\n\\u2705 Completed Training Today:\\n`;\n  \n  for (const person of completedToday) {\n    message += `\\n*${person.name}* (Day ${person.day_number}) - Reports to: ${person.reports_to}\\n`;\n    \n    // Summary line with totals\n    const avgScoreDisplay = person.average_score !== null ? `${person.average_score}%` : 'N/A';\n    const avgAttemptsDisplay = person.average_attempts % 1 === 0 ? person.average_attempts.toFixed(0) : person.average_attempts.toFixed(1);\n    message += `Courses Completed: *${person.courses_count}* | Average Score: *${avgScoreDisplay}* | Average Attempts: *${avgAttemptsDisplay}*\\n\\n`;\n    \n    for (const completion of person.completions) {\n      const scoreDisplay = completion.score !== null ? `${completion.score}%` : 'N/A';\n      const attemptWord = completion.attempts === 1 ? 'attempt' : 'attempts';\n      message += `\\u2022 ${completion.course_name} - ${completion.duration}, ${scoreDisplay}, ${completion.attempts} ${attemptWord}\\n`;\n    }\n  }\n}\n\nif (noActivityToday.length > 0) {\n  message += `\\n\\u26A0\\uFE0F No Activity Today:\\n\\n`;\n  \n  for (const person of noActivityToday) {\n    message += `\\u2022 *${person.name}* (Day ${person.day_number}) - Reports to: ${person.reports_to}\\n`;\n  }\n}\n\n// Only return message if there's content beyond just the header\nif (completedToday.length === 0 && noActivityToday.length === 0) {\n  return [{ json: { skip: true, message: 'No new hires to report on' } }];\n}\n\nreturn [{ json: { message: message, completed_count: completedToday.length, no_activity_count: noActivityToday.length } }];"
+      },
+      "id": "build_summary",
+      "name": "Build EOD Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1584,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "skip_check",
+              "leftValue": "={{ $json.skip }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if_has_summary",
+      "name": "Has Summary?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1808,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://chat.googleapis.com/v1/spaces/AAQA4Ksbm-M/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=UPaxjAUjYdJowRki8zCMCrbLprOL-C_dQpcW5BxyFno",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"text\": {{ JSON.stringify($json.message) }} }",
+        "options": {}
+      },
+      "id": "send_chat",
+      "name": "Send to Google Chat",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2032,
+        224
+      ]
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Los_Angeles",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "timeSavedPerExecution": 15
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-22T01:30:26.673Z",
+      "createdAt": "2026-01-22T01:30:26.673Z",
+      "role": "workflow:owner",
+      "workflowId": "wcLkQj2l9N5Y0du3",
+      "projectId": "SzgLfYyy3lWDJHJA"
+    }
+  ],
+  "staticData": {
+    "node:5 PM Mon-Fri PST": {
+      "recurrenceRules": []
+    }
+  },
+  "tags": [
+    {
+      "updatedAt": "2026-02-11T01:57:02.890Z",
+      "createdAt": "2026-02-11T01:57:02.890Z",
+      "id": "aOUk5y2lWjpAIKLe",
+      "name": "Training"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2026-02-11T01:58:42.154Z",
+  "versionId": "aa2eb1e6-b14b-4326-b153-b83dff4d4e86"
+}
