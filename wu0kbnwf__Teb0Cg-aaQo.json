@@ -1,0 +1,850 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-02-14T00:02:43.000Z",
+    "createdAt": "2026-02-14T00:00:23.582Z",
+    "versionId": "7911f8b7-58fc-4bbf-9fa5-b276f1ca1aff",
+    "workflowId": "wu0kbnwf__Teb0Cg-aaQo",
+    "nodes": [
+      {
+        "parameters": {
+          "pollTimes": {
+            "item": [
+              {
+                "hour": 7
+              }
+            ]
+          },
+          "documentId": {
+            "__rl": true,
+            "value": "1DUUs1UpR-BQom29Zh5c5lQD_W6APJauMDBq4moBosOs",
+            "mode": "list",
+            "cachedResultName": "Complaints",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DUUs1UpR-BQom29Zh5c5lQD_W6APJauMDBq4moBosOs/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 1391960032,
+            "mode": "list",
+            "cachedResultName": "Sheet1",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DUUs1UpR-BQom29Zh5c5lQD_W6APJauMDBq4moBosOs/edit#gid=1391960032"
+          },
+          "event": "rowAdded",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheetsTrigger",
+        "typeVersion": 1,
+        "position": [
+          -688,
+          0
+        ],
+        "id": "26ab8d0e-e16d-48bc-a301-003553f99903",
+        "name": "Google Sheets Trigger",
+        "credentials": {
+          "googleSheetsTriggerOAuth2Api": {
+            "id": "i7hKcAk9laKu5xIQ",
+            "name": "Google Sheets Trigger account 3"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "modelId": {
+            "__rl": true,
+            "value": "gpt-4o",
+            "mode": "list",
+            "cachedResultName": "GPT-4O"
+          },
+          "responses": {
+            "values": [
+              {
+                "content": "=Role: You are an expert Product Quality Analyst specializing in customer feedback classification.\nTask: Analyze the provided customer message and classify the alleged product deficiency types using the specific taxonomy below.\nTaxonomy & Definitions:\nidentity: Wrong item, incorrect model, counterfeit, or not as described.\nquality: Poor craftsmanship, defects in material, or poor finish.\ndurability: Item wears out, breaks, or deteriorates faster than expected.\nreliability: Inconsistent operation or intermittent failures.\nusability: Difficult to use, confusing, or poor interface/industrial design.\nsafety: Poses a risk of physical harm or injury.\nperformance: Does not meet functional or technical specifications. \nStrict Constraints:\nEvidence-Based: Base classifications only on explicitly stated facts or clear implications. Do not speculate.\nMulti-Label: Select all labels that apply.\nFallback: If no categories apply, return only the word: Other.\nMessage to Classify:\n\"{{ $json.feedback }}\" \nResponse Format:\nDeficiency Type(s): [Labels]"
+              }
+            ]
+          },
+          "simplify": false,
+          "builtInTools": {},
+          "options": {
+            "textFormat": {
+              "textOptions": {
+                "type": "json_schema",
+                "schema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"deficiency_types\": {\n      \"type\": \"string\"\n    }\n  },\n  \"additionalProperties\": false,\n  \"required\": [\"deficiency_types\"]\n}"
+              }
+            }
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.openAi",
+        "typeVersion": 2.1,
+        "position": [
+          48,
+          0
+        ],
+        "id": "f78953e1-7eb2-402e-8089-beaa76e8bc4a",
+        "name": "Message a model",
+        "credentials": {
+          "openAiApi": {
+            "id": "Oj08scHKr6wdz972",
+            "name": "OpenAi account 6"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "579977b8-bc52-438c-900a-f22310e444ed",
+                "leftValue": "={{ $json.category }}",
+                "rightValue": "Complaint",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals"
+                }
+              },
+              {
+                "id": "93a5b774-d0f3-4e51-8ef1-b47a238a2153",
+                "leftValue": "={{ $json.category }}",
+                "rightValue": "QA Review",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals",
+                  "name": "filter.operator.equals"
+                }
+              }
+            ],
+            "combinator": "or"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.filter",
+        "typeVersion": 2.3,
+        "position": [
+          -304,
+          0
+        ],
+        "id": "0cf47280-39df-49c9-b149-19d9e1e21e41",
+        "name": "Filter for complaints"
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "documentId": {
+            "__rl": true,
+            "value": "1DUUs1UpR-BQom29Zh5c5lQD_W6APJauMDBq4moBosOs",
+            "mode": "list",
+            "cachedResultName": "Complaints",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DUUs1UpR-BQom29Zh5c5lQD_W6APJauMDBq4moBosOs/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 1391960032,
+            "mode": "list",
+            "cachedResultName": "Sheet1",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DUUs1UpR-BQom29Zh5c5lQD_W6APJauMDBq4moBosOs/edit#gid=1391960032"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "deficiency_type": "={{ $json.output[0].content[0].text.deficiency_types }}",
+              "source_id": "={{ $('Edit Fields').item.json.source_id }}"
+            },
+            "matchingColumns": [
+              "source_id"
+            ],
+            "schema": [
+              {
+                "id": "source_id",
+                "displayName": "source_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "date",
+                "displayName": "date",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "patient_id",
+                "displayName": "patient_id",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "feedback_source",
+                "displayName": "feedback_source",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "feedback",
+                "displayName": "feedback",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "category",
+                "displayName": "category",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "fda_rationale",
+                "displayName": "fda_rationale",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "fda_reportable",
+                "displayName": "fda_reportable",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "product_type",
+                "displayName": "product_type",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "severity",
+                "displayName": "severity",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "confidence_classification",
+                "displayName": "confidence_classification",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "confidence_fda_reportable",
+                "displayName": "confidence_fda_reportable",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "confidence_product_type",
+                "displayName": "confidence_product_type",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "confidence_severity",
+                "displayName": "confidence_severity",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "confidence_rationale",
+                "displayName": "confidence_rationale",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "row_index",
+                "displayName": "row_index",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "is_answered",
+                "displayName": "is_answered",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "deficiency_type",
+                "displayName": "deficiency_type",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "row_number",
+                "displayName": "row_number",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "readOnly": true,
+                "removed": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          496,
+          0
+        ],
+        "id": "d6805cf6-bf2b-4f05-94d3-a3b3bdfaa2cd",
+        "name": "Update row in sheet",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "VkqVQG6uCx2rHBuX",
+            "name": "Google Sheets account 7"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Google Sheets Trigger": {
+        "main": [
+          [
+            {
+              "node": "Filter for complaints",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Filter for complaints": {
+        "main": [
+          [
+            {
+              "node": "Message a model",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Message a model": {
+        "main": [
+          [
+            {
+              "node": "Update row in sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "sathish saidula",
+    "name": "Version 7911f8b7",
+    "description": "1. Reads records from complaints sheets when a row is added.\n2. Filters for 'Complaints' and 'QA Review' records.\n3. Processes data to get deficiency type(s) using chatGPT.\n4. Writes the data back into the deficiency_type column in the same sheet.",
+    "autosaved": true
+  },
+  "activeVersionId": "7911f8b7-58fc-4bbf-9fa5-b276f1ca1aff",
+  "connections": {
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "Filter for complaints",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter for complaints": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-02-13T22:51:35.336Z",
+  "id": "wu0kbnwf__Teb0Cg-aaQo",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "Complaints Classification",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "hour": 7
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1DUUs1UpR-BQom29Zh5c5lQD_W6APJauMDBq4moBosOs",
+          "mode": "list",
+          "cachedResultName": "Complaints",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DUUs1UpR-BQom29Zh5c5lQD_W6APJauMDBq4moBosOs/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1391960032,
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DUUs1UpR-BQom29Zh5c5lQD_W6APJauMDBq4moBosOs/edit#gid=1391960032"
+        },
+        "event": "rowAdded",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        -688,
+        0
+      ],
+      "id": "26ab8d0e-e16d-48bc-a301-003553f99903",
+      "name": "Google Sheets Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "i7hKcAk9laKu5xIQ",
+          "name": "Google Sheets Trigger account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=Role: You are an expert Product Quality Analyst specializing in customer feedback classification.\nTask: Analyze the provided customer message and classify the alleged product deficiency types using the specific taxonomy below.\nTaxonomy & Definitions:\nidentity: Wrong item, incorrect model, counterfeit, or not as described.\nquality: Poor craftsmanship, defects in material, or poor finish.\ndurability: Item wears out, breaks, or deteriorates faster than expected.\nreliability: Inconsistent operation or intermittent failures.\nusability: Difficult to use, confusing, or poor interface/industrial design.\nsafety: Poses a risk of physical harm or injury.\nperformance: Does not meet functional or technical specifications. \nStrict Constraints:\nEvidence-Based: Base classifications only on explicitly stated facts or clear implications. Do not speculate.\nMulti-Label: Select all labels that apply.\nFallback: If no categories apply, return only the word: Other.\nMessage to Classify:\n\"{{ $json.feedback }}\" \nResponse Format:\nDeficiency Type(s): [Labels]"
+            }
+          ]
+        },
+        "simplify": false,
+        "builtInTools": {},
+        "options": {
+          "textFormat": {
+            "textOptions": {
+              "type": "json_schema",
+              "schema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"deficiency_types\": {\n      \"type\": \"string\"\n    }\n  },\n  \"additionalProperties\": false,\n  \"required\": [\"deficiency_types\"]\n}"
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        48,
+        0
+      ],
+      "id": "f78953e1-7eb2-402e-8089-beaa76e8bc4a",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "Oj08scHKr6wdz972",
+          "name": "OpenAi account 6"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "579977b8-bc52-438c-900a-f22310e444ed",
+              "leftValue": "={{ $json.category }}",
+              "rightValue": "Complaint",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "93a5b774-d0f3-4e51-8ef1-b47a238a2153",
+              "leftValue": "={{ $json.category }}",
+              "rightValue": "QA Review",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        -304,
+        0
+      ],
+      "id": "0cf47280-39df-49c9-b149-19d9e1e21e41",
+      "name": "Filter for complaints"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1DUUs1UpR-BQom29Zh5c5lQD_W6APJauMDBq4moBosOs",
+          "mode": "list",
+          "cachedResultName": "Complaints",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DUUs1UpR-BQom29Zh5c5lQD_W6APJauMDBq4moBosOs/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1391960032,
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DUUs1UpR-BQom29Zh5c5lQD_W6APJauMDBq4moBosOs/edit#gid=1391960032"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "deficiency_type": "={{ $json.output[0].content[0].text.deficiency_types }}",
+            "source_id": "={{ $('Edit Fields').item.json.source_id }}"
+          },
+          "matchingColumns": [
+            "source_id"
+          ],
+          "schema": [
+            {
+              "id": "source_id",
+              "displayName": "source_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "patient_id",
+              "displayName": "patient_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "feedback_source",
+              "displayName": "feedback_source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "feedback",
+              "displayName": "feedback",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "fda_rationale",
+              "displayName": "fda_rationale",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "fda_reportable",
+              "displayName": "fda_reportable",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "product_type",
+              "displayName": "product_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "severity",
+              "displayName": "severity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "confidence_classification",
+              "displayName": "confidence_classification",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "confidence_fda_reportable",
+              "displayName": "confidence_fda_reportable",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "confidence_product_type",
+              "displayName": "confidence_product_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "confidence_severity",
+              "displayName": "confidence_severity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "confidence_rationale",
+              "displayName": "confidence_rationale",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_index",
+              "displayName": "row_index",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "is_answered",
+              "displayName": "is_answered",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "deficiency_type",
+              "displayName": "deficiency_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        496,
+        0
+      ],
+      "id": "d6805cf6-bf2b-4f05-94d3-a3b3bdfaa2cd",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "VkqVQG6uCx2rHBuX",
+          "name": "Google Sheets account 7"
+        }
+      }
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "Jhg8IyXKHb7IuHGs_FmeP"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-13T22:51:35.339Z",
+      "createdAt": "2026-02-13T22:51:35.339Z",
+      "role": "workflow:owner",
+      "workflowId": "wu0kbnwf__Teb0Cg-aaQo",
+      "projectId": "kugITzN49x98FAtM"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2026-02-14T00:00:23.580Z",
+  "versionId": "7911f8b7-58fc-4bbf-9fa5-b276f1ca1aff"
+}
