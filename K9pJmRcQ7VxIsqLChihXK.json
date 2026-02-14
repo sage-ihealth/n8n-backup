@@ -1,0 +1,203 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-01-27T00:00:52.000Z",
+    "createdAt": "2026-01-27T00:00:47.838Z",
+    "versionId": "a7a4a460-a9b7-4513-bd89-fb234dce2d88",
+    "workflowId": "K9pJmRcQ7VxIsqLChihXK",
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "22fd09d1-4bb0-4064-bc17-71e6db63b2e6",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          -176,
+          -112
+        ],
+        "id": "afdd5387-a585-4148-a03f-d338340fc4af",
+        "name": "Webhook",
+        "webhookId": "22fd09d1-4bb0-4064-bc17-71e6db63b2e6"
+      },
+      {
+        "parameters": {
+          "respondWith": "text",
+          "responseBody": "= {\n    \n  } ",
+          "options": {
+            "responseHeaders": {
+              "entries": [
+                {
+                  "name": "Content-Type",
+                  "value": "application/json"
+                }
+              ]
+            }
+          }
+        },
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.5,
+        "position": [
+          0,
+          -112
+        ],
+        "id": "f2319424-9f21-4c05-91cb-c91bf495826c",
+        "name": "Respond to Webhook"
+      },
+      {
+        "parameters": {
+          "spaceId": "={{ $json.body.chat.messagePayload.space.name }}",
+          "messageUi": {
+            "text": "=i am your mirror: {{ $json.body.chat.messagePayload.message.text }}"
+          },
+          "additionalFields": {}
+        },
+        "type": "n8n-nodes-base.googleChat",
+        "typeVersion": 1,
+        "position": [
+          192,
+          -112
+        ],
+        "id": "49e590a0-9f4f-415c-bab2-50578cbc3c72",
+        "name": "Create a message1",
+        "webhookId": "7ab20981-32e5-4da2-9737-f0d0c7c9c1f2",
+        "credentials": {
+          "googleApi": {
+            "id": "ko63kE0w6maPxIj1",
+            "name": "Google Service Account account 3"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Respond to Webhook": {
+        "main": [
+          [
+            {
+              "node": "Create a message1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Tina Zou",
+    "name": "Version a7a4a460",
+    "description": "",
+    "autosaved": true
+  },
+  "activeVersionId": "a7a4a460-a9b7-4513-bd89-fb234dce2d88",
+  "connections": {
+    "Respond to Webhook": {
+      "main": [
+        [
+          {
+            "node": "Create a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-26T22:20:01.980Z",
+  "id": "K9pJmRcQ7VxIsqLChihXK",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "Gchat message Webhook",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "22fd09d1-4bb0-4064-bc17-71e6db63b2e6",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -176,
+        -112
+      ],
+      "id": "afdd5387-a585-4148-a03f-d338340fc4af",
+      "name": "Webhook",
+      "webhookId": "22fd09d1-4bb0-4064-bc17-71e6db63b2e6"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "= {\n    \n  } ",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        0,
+        -112
+      ],
+      "id": "f2319424-9f21-4c05-91cb-c91bf495826c",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "spaceId": "={{ $json.body.chat.messagePayload.space.name }}",
+        "messageUi": {
+          "text": "=i am your mirror: {{ $json.body.chat.messagePayload.message.text }}"
+        },
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        192,
+        -112
+      ],
+      "id": "49e590a0-9f4f-415c-bab2-50578cbc3c72",
+      "name": "Create a message1",
+      "webhookId": "7ab20981-32e5-4da2-9737-f0d0c7c9c1f2",
+      "credentials": {
+        "googleApi": {
+          "id": "ko63kE0w6maPxIj1",
+          "name": "Google Service Account account 3"
+        }
+      }
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-26T22:20:01.982Z",
+      "createdAt": "2026-01-26T22:20:01.982Z",
+      "role": "workflow:owner",
+      "workflowId": "K9pJmRcQ7VxIsqLChihXK",
+      "projectId": "PvZitumGnZP1AedJ"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2026-02-03T21:41:01.746Z",
+  "versionId": "a7a4a460-a9b7-4513-bd89-fb234dce2d88"
+}
