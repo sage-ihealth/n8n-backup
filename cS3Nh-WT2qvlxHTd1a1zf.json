@@ -7,17 +7,6 @@
       "main": [
         [
           {
-            "node": "Get many issues",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get many issues": {
-      "main": [
-        [
-          {
             "node": "Send a message",
             "type": "main",
             "index": 0
@@ -47,41 +36,50 @@
     },
     {
       "parameters": {
-        "operation": "getAll",
-        "limit": 1,
-        "options": {
-          "jql": "assignee in (currentUser()) AND status not in (\"Done\", \"Closed\", \"DEV VERIFIED\", \"QA VERIFIED\", \"Test\", \"Production\", \"Released to production\", \"Not A Bug\") ORDER BY created DESC"
-        }
+        "sendTo": "thongle.sj@gmail.com",
+        "subject": "lalala",
+        "message": "lalalala",
+        "options": {}
       },
-      "type": "n8n-nodes-base.jira",
-      "typeVersion": 1,
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
       "position": [
-        -80,
+        -32,
         -16
       ],
-      "id": "d3d388f3-02b7-4bfd-ba65-18d11d758b02",
-      "name": "Get many issues",
+      "id": "41fc0a42-94cb-4d7a-9fe3-5720c0aebe15",
+      "name": "Send a message",
+      "webhookId": "ac36d8c3-d1ef-4060-a3cb-0dbe8fd807dd",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "lpWGjHW7hEgclJC5",
+          "name": "GoogleAuth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authenticateWebhook": true,
+        "events": [
+          "jira:issue_created"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.jiraTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        80,
+        128
+      ],
+      "id": "b4e52315-0527-48d8-9410-6c2118347b17",
+      "name": "Jira Trigger",
+      "webhookId": "9d6d04f6-dd67-4e48-9d02-7f641c7d8c03",
       "credentials": {
         "jiraSoftwareCloudApi": {
           "id": "8MFK8GhY79UNHP7W",
           "name": "Jira SW Cloud account 4"
         }
       }
-    },
-    {
-      "parameters": {
-        "authentication": "serviceAccount",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.gmail",
-      "typeVersion": 2.2,
-      "position": [
-        128,
-        -16
-      ],
-      "id": "41fc0a42-94cb-4d7a-9fe3-5720c0aebe15",
-      "name": "Send a message",
-      "webhookId": "ac36d8c3-d1ef-4060-a3cb-0dbe8fd807dd"
     }
   ],
   "origin": "n8n",
@@ -106,6 +104,6 @@
   "staticData": null,
   "tags": [],
   "triggerCount": 0,
-  "updatedAt": "2026-02-14T00:01:15.055Z",
-  "versionId": "4332efd2-7d74-447d-9433-7ad1bd62e1c1"
+  "updatedAt": "2026-02-14T00:45:53.282Z",
+  "versionId": "8724ae08-57db-49d8-afd5-aa49b67b3414"
 }
