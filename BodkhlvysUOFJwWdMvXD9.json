@@ -1,0 +1,36 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {},
+  "createdAt": "2026-02-03T21:41:25.186Z",
+  "id": "BodkhlvysUOFJwWdMvXD9",
+  "isArchived": false,
+  "meta": null,
+  "name": "Command Center Dashboard",
+  "nodes": [],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-03T21:41:25.188Z",
+      "createdAt": "2026-02-03T21:41:25.188Z",
+      "role": "workflow:owner",
+      "workflowId": "BodkhlvysUOFJwWdMvXD9",
+      "projectId": "PvZitumGnZP1AedJ"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-02-03T23:42:55.657Z",
+  "versionId": "41afd7aa-e613-428c-8388-7c3380e69a5e"
+}
