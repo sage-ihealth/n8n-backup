@@ -1,0 +1,102 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get a member",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a member": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-02-13T19:02:30.830Z",
+  "id": "M1D50MyrypxcKAwHpAhRP",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "My workflow 33",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "3b35579f-e4be-404a-8e7b-5934e076a181",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "resource": "member"
+      },
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        176,
+        0
+      ],
+      "id": "25941857-00e8-4240-83ac-79dda953da81",
+      "name": "Get a member",
+      "webhookId": "c8cd5ed8-f8a1-48c5-881e-5f8cb487e2a9"
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        384,
+        0
+      ],
+      "id": "d58d8c45-dbbe-4e72-af4e-21b89e7f3881",
+      "name": "Send a message",
+      "webhookId": "19cf7569-4fa4-44a7-bff2-dd2d384dbceb"
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-13T19:02:30.833Z",
+      "createdAt": "2026-02-13T19:02:30.833Z",
+      "role": "workflow:owner",
+      "workflowId": "M1D50MyrypxcKAwHpAhRP",
+      "projectId": "TXrEXgnyyewwH8sf"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-02-13T19:04:21.292Z",
+  "versionId": "23ae55ae-4cf9-4b66-84c1-aaceba8348c7"
+}
