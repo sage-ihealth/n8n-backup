@@ -59,17 +59,6 @@
         ]
       ]
     },
-    "Gemini Chat Model": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "AI Assessment",
-            "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Build Chat Message": {
       "main": [
         [
@@ -104,6 +93,17 @@
           {
             "node": "Send Error to Test Space",
             "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Assessment",
+            "type": "ai_languageModel",
             "index": 0
           }
         ]
@@ -218,26 +218,6 @@
     },
     {
       "parameters": {
-        "modelName": "models/gemini-2.0-flash",
-        "options": {}
-      },
-      "id": "gemini-model",
-      "name": "Gemini Chat Model",
-      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
-      "typeVersion": 1,
-      "position": [
-        968,
-        256
-      ],
-      "credentials": {
-        "googlePalmApi": {
-          "id": "LLF6MLepnlTsChok",
-          "name": "Google Gemini(PaLM) Api account 2"
-        }
-      }
-    },
-    {
-      "parameters": {
         "jsCode": "const aiResponse = $input.first().json.text || $input.first().json.response || '';\n\n// Parse JSON from AI response — handle markdown code blocks\nlet cleaned = aiResponse.trim();\nif (cleaned.startsWith('```')) {\n  cleaned = cleaned.replace(/^```(?:json)?\\n?/, '').replace(/\\n?```$/, '').trim();\n}\n\nlet meaningful = [];\ntry {\n  meaningful = JSON.parse(cleaned);\n} catch (e) {\n  // If JSON parse fails, return no features\n  return [{ json: { hasMeaningful: false, message: '' } }];\n}\n\nif (!Array.isArray(meaningful) || meaningful.length === 0) {\n  return [{ json: { hasMeaningful: false, message: '' } }];\n}\n\n// Build chat message\nlet message = '';\nfor (const v of meaningful) {\n  message += `\\ud83d\\ude80 *Claude Code v${v.version}* \\u2014 New Features\\n\\n`;\n  for (const f of v.features) {\n    message += `\\u2022 ${f}\\n`;\n  }\n  message += '\\n';\n}\nmessage += `\\ud83d\\udcc4 Full changelog: https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md`;\n\nreturn [{ json: { hasMeaningful: true, message } }];"
       },
       "id": "build-message",
@@ -326,7 +306,7 @@
       "typeVersion": 1,
       "position": [
         0,
-        360
+        368
       ]
     },
     {
@@ -344,8 +324,33 @@
       "typeVersion": 4.2,
       "position": [
         224,
-        360
+        368
       ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "claude-haiku-4-5-20251001",
+          "mode": "list",
+          "cachedResultName": "Claude Haiku 4.5"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        976,
+        256
+      ],
+      "id": "617992f9-face-47ff-ac7a-ca074b8fc57e",
+      "name": "Anthropic Chat Model",
+      "credentials": {
+        "anthropicApi": {
+          "id": "7xffbTDUCqwHleuN",
+          "name": "Anthropic account 2"
+        }
+      }
     }
   ],
   "origin": "n8n",
@@ -373,6 +378,6 @@
   "staticData": null,
   "tags": [],
   "triggerCount": 0,
-  "updatedAt": "2026-02-13T03:14:31.167Z",
-  "versionId": "a0dd02fa-f3d4-459d-a39f-aa44d31affad"
+  "updatedAt": "2026-02-14T00:56:31.522Z",
+  "versionId": "a688a996-6aec-49b9-bb99-5209945e7182"
 }
