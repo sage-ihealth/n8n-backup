@@ -1,0 +1,35 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {},
+  "createdAt": "2026-01-09T03:56:02.368Z",
+  "id": "punWUAD94rOIvepn",
+  "isArchived": false,
+  "meta": null,
+  "name": "Use Sheldon Answer Google Chat Messages",
+  "nodes": [],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-09T03:56:02.372Z",
+      "createdAt": "2026-01-09T03:56:02.372Z",
+      "role": "workflow:owner",
+      "workflowId": "punWUAD94rOIvepn",
+      "projectId": "IGL0EzJNN8XZ65mm"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-01-09T03:56:02.368Z",
+  "versionId": "b7838efa-6655-498c-b79e-e7f6f06b9049"
+}
