@@ -1,0 +1,299 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Schedule Trigger (9am PT daily)": {
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Sources (1 at a time)": {
+      "main": [
+        [
+          {
+            "node": "RSS Read",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Split Sources (1 at a time)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split New Items (1 at a time)": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Split New Items (1 at a time)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF Relevant?": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets Append Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-31T00:28:35.609Z",
+  "id": "z3UH394HhGpdfkVxiSo61",
+  "isArchived": false,
+  "meta": null,
+  "name": "Daily Medicare Policy & Regulations Monitor (CMS + Federal Register) → LLM Triage → Google Sheets",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "name": "Schedule Trigger (9am PT daily)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        -2640,
+        80
+      ],
+      "id": "c322a0b4-9ae6-47e0-a600-78fd96ee7056"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "sheetTab",
+              "value": "Medicare Updates"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        -2416,
+        80
+      ],
+      "id": "33ea7a3d-b27d-446e-a2c3-6322d39db17f"
+    },
+    {
+      "parameters": {},
+      "name": "Build Source List",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [
+        -2208,
+        80
+      ],
+      "id": "cedb6fba-206e-46cb-a114-7532b6a04a84"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "name": "Split Sources (1 at a time)",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -1984,
+        80
+      ],
+      "id": "f8d0a8e9-dc76-4843-805d-5e82f24a4b16"
+    },
+    {
+      "parameters": {
+        "url": "={{$json.url}}",
+        "options": {}
+      },
+      "name": "RSS Read",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1,
+      "position": [
+        -1760,
+        80
+      ],
+      "id": "676fd9d0-b8e5-46c9-9a58-faa46fa07cf0"
+    },
+    {
+      "parameters": {},
+      "name": "Normalize Items",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [
+        -1536,
+        80
+      ],
+      "id": "bff20a29-f7d2-4a2c-9703-1c269da4eda1"
+    },
+    {
+      "parameters": {},
+      "name": "Collect Items (merge streams)",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        -1328,
+        80
+      ],
+      "id": "36fb33c3-0e5c-4c84-af92-35ed0920151c"
+    },
+    {
+      "parameters": {},
+      "name": "Filter New Items Only",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [
+        -1104,
+        80
+      ],
+      "id": "892e9813-1461-4e4a-9620-ded6ac115f8d"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "name": "Split New Items (1 at a time)",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -880,
+        80
+      ],
+      "id": "be8af823-2bde-440e-a81e-726e6f8b7985"
+    },
+    {
+      "parameters": {},
+      "name": "LLM Summarize + Relevance Classify",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 4,
+      "position": [
+        -656,
+        80
+      ],
+      "id": "4e6d4b8b-b409-4cb9-ae1a-a5ae03bb388f",
+      "credentials": {}
+    },
+    {
+      "parameters": {},
+      "name": "Attach LLM Output",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [
+        -448,
+        80
+      ],
+      "id": "8f4fc870-0b4c-410f-b65f-eeb9a515734a"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{$json.llm.relevant}}",
+              "value2": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "IF Relevant?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -224,
+        80
+      ],
+      "id": "b113849b-c975-4828-bdd4-6c57e0fa5783"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": "REPLACE_WITH_YOUR_SHEET_ID",
+        "sheetName": "={{$items('Config')[0].json.sheetTab}}",
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{$json.pubDate}}",
+            "Source": "={{$json.sourceName}}",
+            "Title": "={{$json.title}}",
+            "Category": "={{$json.llm.category}}",
+            "RelevanceReason": "={{$json.llm.relevanceReason}}",
+            "Summary": "={{$json.llm.summary}}",
+            "Link": "={{$json.link}}",
+            "Confidence": "={{$json.llm.confidence}}",
+            "ItemID": "={{$json.guid}}"
+          }
+        },
+        "options": {}
+      },
+      "name": "Google Sheets Append Row",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "e7015733-5042-4cae-8499-7999761be2e2"
+    },
+    {
+      "parameters": {},
+      "name": "Mark GUID Seen",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [
+        0,
+        160
+      ],
+      "id": "4ba22307-18e8-4d44-a16e-df5793142bf4"
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-31T00:28:35.612Z",
+      "createdAt": "2026-01-31T00:28:35.612Z",
+      "role": "workflow:owner",
+      "workflowId": "z3UH394HhGpdfkVxiSo61",
+      "projectId": "kfGiyS08RIA0LqoI"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-01-31T00:28:35.609Z",
+  "versionId": "70a57468-87b3-4bcf-998a-d5d29baa7340"
+}
