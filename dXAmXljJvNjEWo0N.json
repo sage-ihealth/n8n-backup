@@ -1,0 +1,260 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Analyze document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a space": {
+      "main": [
+        []
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Messages": {
+      "main": [
+        [
+          {
+            "node": "Analyze with Claude",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze with Claude": {
+      "main": [
+        [
+          {
+            "node": "Save to Excel",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-09T00:02:14.477Z",
+  "id": "dXAmXljJvNjEWo0N",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "Google Chat - Get Latest 10 Messages",
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "document",
+        "modelId": {
+          "__rl": true,
+          "value": "claude-opus-4-5-20251101",
+          "mode": "list",
+          "cachedResultName": "claude-opus-4-5-20251101"
+        },
+        "documentUrls": "https://docs.google.com/spreadsheets/d/1xh11KMA6Jn4Lvw8cyTgtGlWNBmCGEb3YSdZDjQTlfeI/edit?gid=0#gid=0",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.anthropic",
+      "typeVersion": 1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "5610a46a-08d1-4303-a306-82412745fe4d",
+      "name": "Analyze document",
+      "credentials": {
+        "anthropicApi": {
+          "id": "JvTJW1grSbIcwc1m",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "18389b33-1bfd-4223-9512-d77dfb0d3986",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "space",
+        "spaceId": "spaces/AAQAEnnivow"
+      },
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -192
+      ],
+      "id": "0478f1f4-141e-4489-a262-f07c6037c86d",
+      "name": "Get a space",
+      "webhookId": "9d376d93-78f3-4636-8936-7412183cd332",
+      "credentials": {
+        "googleChatOAuth2Api": {
+          "id": "JWXrbxNG7Kq5QJ8H",
+          "name": "Chat account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        16,
+        272
+      ],
+      "id": "8a281f14-16e3-4260-98b6-434c0161fb90",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "operation": "getAll"
+      },
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        240,
+        272
+      ],
+      "id": "10828672-54a8-444a-a60a-bfb699c72e78",
+      "name": "Get Messages",
+      "webhookId": "86aa123b-f8e9-4edb-a91d-dae74c5b8cad",
+      "credentials": {
+        "googleChatOAuth2Api": {
+          "id": "JWXrbxNG7Kq5QJ8H",
+          "name": "Chat account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.4,
+      "position": [
+        464,
+        272
+      ],
+      "id": "082be3c1-b2b6-469d-beb6-a9d730fdf0ef",
+      "name": "Analyze with Claude"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.2,
+      "position": [
+        464,
+        480
+      ],
+      "id": "10791ff3-bd81-4fda-a427-089aa6983c35",
+      "name": "Anthropic Chat Model"
+    },
+    {
+      "parameters": {
+        "jsonSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"classification\": { \"type\": \"string\" },\n    \"severity\": { \"type\": \"string\" },\n    \"product_type\": { \"type\": \"string\" },\n    \"summary\": { \"type\": \"string\" },\n    \"fda_reportable\": { \"type\": \"string\" }\n  }\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.1,
+      "position": [
+        624,
+        480
+      ],
+      "id": "38e6a726-7744-4060-83ec-e741030ca8f8",
+      "name": "Force JSON Output"
+    },
+    {
+      "parameters": {
+        "operation": "append"
+      },
+      "type": "n8n-nodes-base.microsoftExcel",
+      "typeVersion": 2,
+      "position": [
+        848,
+        272
+      ],
+      "id": "f291ff65-f952-4942-92f0-123efee8346a",
+      "name": "Save to Excel"
+    },
+    {
+      "parameters": {
+        "url": "https://chat.googleapis.com/v1/spaces/AAQAEnnivow/messages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleChatOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        0,
+        -384
+      ],
+      "id": "cc247125-3cfd-4989-9e43-97340bbf8767",
+      "name": "HTTP Request - Latest 10 Messages",
+      "credentials": {
+        "googleChatOAuth2Api": {
+          "id": "JWXrbxNG7Kq5QJ8H",
+          "name": "Chat account"
+        }
+      }
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-09T00:02:14.486Z",
+      "createdAt": "2026-01-09T00:02:14.486Z",
+      "role": "workflow:owner",
+      "workflowId": "dXAmXljJvNjEWo0N",
+      "projectId": "IGL0EzJNN8XZ65mm"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-01-09T22:06:07.462Z",
+  "versionId": "73f9b05d-43b7-422d-82cf-0b70ae3c3f56"
+}
