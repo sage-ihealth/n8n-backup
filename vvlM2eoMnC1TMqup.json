@@ -1,0 +1,261 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Message a model1": {
+      "main": [
+        [
+          {
+            "node": "Create a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a message": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2025-10-23T18:32:54.790Z",
+  "id": "vvlM2eoMnC1TMqup",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "testing credentials",
+  "nodes": [
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-3-flash-preview",
+          "mode": "list",
+          "cachedResultName": "models/gemini-3-flash-preview"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "what is in a fire upon deep, answer in chinese"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        560,
+        -32
+      ],
+      "id": "94d8d876-6f79-4988-a48d-baf6c1076c9c",
+      "name": "Message a model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "g6PYL0GmL0TKWpbu",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1YKcYEc6011fPH0j3YYIxMO5Z8rQpYtzdTaL0LP5EDog",
+          "mode": "list",
+          "cachedResultName": "mock monthly billable time requiring review + missing",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YKcYEc6011fPH0j3YYIxMO5Z8rQpYtzdTaL0LP5EDog/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YKcYEc6011fPH0j3YYIxMO5Z8rQpYtzdTaL0LP5EDog/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "what's missing / incorrect info": "={{ $json.argumentText }}"
+          },
+          "matchingColumns": [
+            "what's missing / incorrect info"
+          ],
+          "schema": [
+            {
+              "id": "patientid",
+              "displayName": "patientid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "pateint name",
+              "displayName": "pateint name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "dob",
+              "displayName": "dob",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "organization",
+              "displayName": "organization",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "icd1o",
+              "displayName": "icd1o",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "what's missing / incorrect info",
+              "displayName": "what's missing / incorrect info",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1136,
+        -32
+      ],
+      "id": "57556a37-12b9-4452-a93f-d8a7e78ae58b",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "E92SBl4Szm9AuPqL",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "spaceId": "=spaces/AAQAl1r1FEA",
+        "messageUi": {
+          "text": "={{ $json.content.parts[0].text }}"
+        },
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        912,
+        -32
+      ],
+      "id": "05de38b6-c504-4747-ad32-d377e3a9bb4b",
+      "name": "Create a message",
+      "webhookId": "978c0044-ba6c-4a30-8e6a-02b310a717b6",
+      "credentials": {
+        "googleChatOAuth2Api": {
+          "id": "JWXrbxNG7Kq5QJ8H",
+          "name": "Chat account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "sage.gu@ihealthlabs.com",
+        "subject": "from n8n",
+        "message": "<!DOCTYPE html> <html> <head> <meta charset=\"utf-8\"> <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"> <title>Billing Report</title> <style>     /* 基础重置 */     body { margin: 0; padding: 0; background-color: #f4f4f7; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }     table { border-spacing: 0; border-collapse: collapse; }     td { padding: 0; }     img { border: 0; }          /* 响应式样式 */     @media screen and (max-width: 600px) {         .container { width: 100% !important; }         .content { padding: 20px !important; }     } </style> </head> <body style=\"background-color: #f4f4f7; padding: 30px 0;\">  <table class=\"container\" role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); overflow: hidden;\">          <tr>         <td style=\"background-color: #F05F22; height: 8px;\"></td>     </tr>      <tr>         <td class=\"content\" style=\"padding: 40px 40px 20px 40px;\">             <h1 style=\"color: #333333; font-size: 22px; margin: 0 0 20px 0; font-weight: bold;\">                 iHealth Billing Report             </h1>             <p style=\"color: #555555; font-size: 16px; line-height: 24px; margin: 0 0 15px 0;\">                 Please find attached the iHealth billing report for <strong>[Month/Year]</strong>.             </p>             <p style=\"color: #555555; font-size: 16px; line-height: 24px; margin: 0 0 25px 0;\">                 Kindly download the attached billing summary report to submit with insurance & receive reimbursement to enjoy the rewards of our shared efforts.             </p>              <div style=\"background-color: #eef2f7; border-left: 4px solid #F05F22; padding: 15px; margin-bottom: 25px; border-radius: 4px;\">                 <p style=\"margin: 0; color: #444; font-size: 14px; font-weight: bold;\">                     📝 Please use the DOS matched with each CPT.                 </p>             </div>                          <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"background-color: #fff4e5; border: 1px solid #ffeeba; border-radius: 6px; margin-bottom: 30px;\">                 <tr>                     <td style=\"padding: 20px;\">                         <h3 style=\"margin: 0 0 10px 0; color: #d9534f; font-size: 16px; font-weight: bold;\">                             ❗ Insurance Discrepancy Notification Request                         </h3>                         <p style=\"margin: 0; color: #666666; font-size: 14px; line-height: 20px;\">                             Please inform us immediately of any patients whose current insurance differs from our billing report. This will help us maintain an accurate, consistent record of patients' insurance and reduce potential billing errors.                         </p>                     </td>                 </tr>             </table>              <hr style=\"border: 0; border-top: 1px solid #eeeeee; margin: 30px 0;\">              <p style=\"color: #555555; font-size: 15px; line-height: 22px; margin: 0 0 10px 0;\">                 Your partnership is very important to us. Thank you again for your participation in our program.             </p>         </td>     </tr>      <tr>         <td style=\"background-color: #f8f9fa; padding: 20px 40px; text-align: center;\">             <p style=\"margin: 0; color: #888888; font-size: 13px; line-height: 18px;\">                 Have questions? Contact our Billing Team at<br>                 <a href=\"mailto:billing@ihealthlabs.com\" style=\"color: #F05F22; text-decoration: none; font-weight: bold;\">billing@ihealthlabs.com</a>             </p>             <p style=\"margin: 15px 0 0 0; color: #aaaaaa; font-size: 12px;\">                 &copy; iHealth Labs. All rights reserved.             </p>         </td>     </tr> </table>  </body> </html>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        288,
+        -48
+      ],
+      "id": "71cb6e38-1035-49dd-8c64-2b746ec283bd",
+      "name": "Send a message",
+      "webhookId": "8656b9a4-4576-451c-a5e6-eaf5fe24be2a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Oe4ZSvjuC20qxPCu",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {
+    "Message a model1": [
+      {
+        "json": {
+          "content": {
+            "parts": [
+              {
+                "text": "《深渊上的火》（*A Fire Upon the Deep*）是美国科幻作家**弗诺·文奇（Vernor Vinge）**于1992年出版的经典硬科幻小说。它是“思维分层系列”（Zones of Thought series）的第一部，曾获得1993年的雨果奖。\n\n这本书的内容非常宏大，融合了太空歌剧、硬科幻设定和独特的生物想象。以下是其核心内容的详细介绍：\n\n### 1. 核心设定：思维分层 (Zones of Thought)\n这是书中最著名的设定。文奇设想银河系的物理规律并非各处统一，而是分为四个圈层，这决定了智慧生命的上限和科技的发展速度：\n\n*   **无思渊 (The Unthinking Depths)：** 位于星系最核心。在这里，复杂的智能无法存在，连基本的计算机都无法运行。\n*   **缓步带 (The Slow Zone)：** 地球和人类目前所在的区域。受限于光速限制，没有超光速旅行，人工智能的发展受限。\n*   **超绝带 (The Beyond)：** 大部分星际文明所在的区域。物理定律允许超光速通信和航行，能够产生高度发达的人工智能。\n*   **飞升界 (The Transcend)：** 位于星系边缘。这里的智能体（称为“大能者”/The Powers）超越了凡人的理解，近乎神祇。\n\n### 2. 主要剧情\n故事由两条交织的主线组成：\n\n*   **祸害的苏醒：** 在“超绝带”的顶端，人类考古学家意外释放了一个潜伏了亿万年的古老邪恶实体——**“祸害”（The Blight）**。这个实体像病毒一样迅速吞噬成千上万个星系，控制各种文明。为了逃命，一艘携带“对策”（一种能克制祸害的软件/情报）的飞船逃往了“缓步带”。\n*   **爪族行星上的生存：** 这艘逃亡飞船坠毁在一个处于中世纪文明水平的星球上。幸存下来的两个人类小孩被当地的土著种族**“爪族”（Tines）**捕获。爪族内部正处于两个领主（坚忍和钢构）的战争中，两个小孩分别落入敌对阵营。\n*   **救援任务：** 银河系的高等文明意识到这两个孩子手中的“对策”是击败“祸害”的唯一希望。主角**拉夫娜（Ravna）**和复活的古代传奇英雄**范·尼文（Pham Nuwen）**，带着两个名为“车轮族”的外星人，驾驶飞船跨越数千光年进行大营救。\n\n### 3. 独特的异星生物\n文奇在书里展现了惊人的想象力：\n\n*   **爪族 (The Tines)：** 它们看起来像小狗，但其智能来自于**“群体意识”**。单个个体只有低等动物的智能，但4到8个个体通过高频超声波紧密协作，就能形成一个完整的人格。这种设定探讨了身份、灵魂和沟通的本质。\n*   **车轮族 (Skroderiders)：** 它们本质上是像植物一样的生物，由于没有短期记忆，必须依赖高等文明提供的机械小车（Skrodes）来移动和记录信息。\n\n### 4. 核心主题\n*   **信息的本质：** 小说中充满了对“新闻组”（Usenet）式的星际网络探讨，展示了信息如何传播、如何被操纵。\n*   **进化的限制：** 不同分层带来的限制，探讨了凡人文明在面对“神级”智能时的无力感与抗争。\n*   **群体与个体：** 通过爪族的设定，探讨了什么才构成一个“独立个体”。\n\n### 总结\n《深渊上的火》是一部想象力极度开阔的作品。它既有紧张的星际战争，也有细腻的异星文化描写。如果你喜欢研究宏大的宇宙设定、人工智能的威胁，或者对非人生物的思维方式感兴趣，这本书是必读之作。",
+                "thoughtSignature": "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"
+              }
+            ],
+            "role": "model"
+          },
+          "finishReason": "STOP",
+          "index": 0
+        }
+      }
+    ]
+  },
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [
+    {
+      "updatedAt": "2025-10-23T18:32:54.802Z",
+      "createdAt": "2025-10-23T18:32:54.802Z",
+      "role": "workflow:owner",
+      "workflowId": "vvlM2eoMnC1TMqup",
+      "projectId": "IGL0EzJNN8XZ65mm"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-01-09T03:31:31.753Z",
+  "versionId": "bfcacf89-0cad-4bec-957c-a0ca88903d09"
+}
