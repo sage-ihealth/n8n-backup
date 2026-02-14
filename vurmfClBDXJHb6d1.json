@@ -1,0 +1,218 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Set Config": {
+      "main": [
+        [
+          {
+            "node": "Google Drive - Download CSV",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive - Download CSV": {
+      "main": [
+        [
+          {
+            "node": "CSV -> JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CSV -> JSON": {
+      "main": [
+        [
+          {
+            "node": "Build Doc Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Doc Content": {
+      "main": [
+        [
+          {
+            "node": "Google Docs - Create",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Docs - Create": {
+      "main": [
+        [
+          {
+            "node": "Google Drive - Move to Folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2025-10-23T21:52:35.935Z",
+  "id": "vurmfClBDXJHb6d1",
+  "isArchived": true,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "My workflow 3",
+  "nodes": [
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "fileId",
+              "value": "1o-LnhhkFkFQVRXLlfNIbYIVFmgzvFyRz"
+            },
+            {
+              "name": "outputFolderId",
+              "value": "1Ts-x0PhI8ZsWfY2OQk4vmqj7EB6nm6Z7"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "954d4370-fbb5-46b7-a99b-43f3323675a8",
+      "name": "Set Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        1840,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": "={{$json.fileId}}",
+        "options": {}
+      },
+      "id": "1d951857-b8d2-4630-ac58-91d0786ebf70",
+      "name": "Google Drive - Download CSV",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 2,
+      "position": [
+        2096,
+        144
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "wMYD0s3jSTz9a2TY",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "toJson"
+      },
+      "id": "1e6a0804-84d6-4598-93ae-29dfc1d6ea5a",
+      "name": "CSV -> JSON",
+      "type": "n8n-nodes-base.spreadsheetFile",
+      "typeVersion": 1,
+      "position": [
+        2336,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "return items.map(item => {\n  const j = item.json || {};\n  const rawId = (j.patient_id !== undefined && j.patient_id !== null) ? String(j.patient_id).trim() : 'unknown_patient';\n  const id = rawId.replace(/[\\\\/]/g, '_').slice(0, 200); // sanitize for Google filename (slashes)\n  const section = (label, text) => `${label}\\n${text === undefined || text === null ? '' : String(text)}\\n\\n`;\n\n  const content =\n    `Patient ID: ${id}\\n\\n` +\n    section('Active Medications', j.active_meds_section) +\n    section('Background', j.background_section) +\n    section('Care Notes', j.care_notes_section) +\n    section('Core Medications', j.core_medications_section) +\n    section('Vitals', j.vitals_section);\n\n  item.json.docTitle = id;\n  item.json.docContent = content;\n  // pass through configured output folder if present upstream\n  if (item.pairedItem && item.pairedItem.item) {\n    // nothing needed here; fallback to env on move node\n  }\n  return item;\n});"
+      },
+      "id": "9c51f6cf-ad70-43db-aae2-7503bdd3fd55",
+      "name": "Build Doc Content",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        2576,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "folderId": "1Ts-x0PhI8ZsWfY2OQk4vmqj7EB6nm6Z7",
+        "title": "={{$json.docTitle}}"
+      },
+      "id": "4e1ea71a-dc0e-42e1-b2bf-62ef9208a726",
+      "name": "Google Docs - Create",
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 1,
+      "position": [
+        2816,
+        144
+      ],
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "9SEV6sdAWxPvWEC4",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "move"
+      },
+      "id": "b7ceb400-4b3a-4cae-9042-3fb440afdfb9",
+      "name": "Google Drive - Move to Folder",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 2,
+      "position": [
+        3088,
+        144
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "wMYD0s3jSTz9a2TY",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        1680,
+        144
+      ],
+      "id": "299eafac-02d5-4404-bc94-4cf08b8f149d",
+      "name": "When clicking ‘Execute workflow’"
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [
+    {
+      "updatedAt": "2025-10-23T21:52:35.945Z",
+      "createdAt": "2025-10-23T21:52:35.945Z",
+      "role": "workflow:owner",
+      "workflowId": "vurmfClBDXJHb6d1",
+      "projectId": "IXgyKSoq6RADLFoU"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2025-10-27T17:44:28.000Z",
+  "versionId": "65bb08de-4a8b-40b8-bf73-1c9ecec33185"
+}
