@@ -1,0 +1,561 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get All Courses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get All Courses": {
+      "main": [
+        [
+          {
+            "node": "Get Course Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Course Details": {
+      "main": [
+        [
+          {
+            "node": "Extract Test Units",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Test Units": {
+      "main": [
+        [
+          {
+            "node": "Has Tests?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Tests?": {
+      "main": [
+        [
+          {
+            "node": "Get Test Answers",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Tests Found",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Test Answers": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Test Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Test Results": {
+      "main": [
+        [
+          {
+            "node": "Format for AI Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format for AI Analysis": {
+      "main": [
+        [
+          {
+            "node": "Gemini Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Analysis": {
+      "main": [
+        [
+          {
+            "node": "Prepare Sheets Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Sheets Data": {
+      "main": [
+        [
+          {
+            "node": "Filter Course Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Filter Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Course Data": {
+      "main": [
+        [
+          {
+            "node": "Write Course Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Filter Summary": {
+      "main": [
+        [
+          {
+            "node": "Write Summary",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Write Summary": {
+      "main": [
+        [
+          {
+            "node": "Send Completion Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-16T02:14:51.614Z",
+  "id": "Po6EL7Fv34744GC5",
+  "isArchived": true,
+  "meta": null,
+  "name": "TalentLMS Test Analysis with AI",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://ihealthlabs.talentlms.com/api/v1/courses",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "options": {}
+      },
+      "id": "get-all-courses",
+      "name": "Get All Courses",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        0
+      ],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "talentlms-basic-auth",
+          "name": "TalentLMS API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://ihealthlabs.talentlms.com/api/v1/courses/id:{{ $json.id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "options": {}
+      },
+      "id": "get-course-details",
+      "name": "Get Course Details",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        0
+      ],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "talentlms-basic-auth",
+          "name": "TalentLMS API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract all test units and user combinations to fetch\nconst testRequests = [];\n\nfor (const item of $input.all()) {\n  const course = item.json;\n  const courseName = course.name;\n  const courseId = course.id;\n  \n  // Get test units from the course\n  if (course.units && Array.isArray(course.units)) {\n    for (const unit of course.units) {\n      // Check if this unit is a test\n      if (unit.type === 'test' || unit.type === 'Test') {\n        // Get users enrolled in this course\n        if (course.users && Array.isArray(course.users)) {\n          for (const user of course.users) {\n            // Only get learner test results\n            if (user.role === 'learner') {\n              testRequests.push({\n                json: {\n                  testId: unit.id,\n                  testName: unit.name,\n                  userId: user.id,\n                  userName: user.name,\n                  userEmail: user.email,\n                  courseId: courseId,\n                  courseName: courseName\n                }\n              });\n            }\n          }\n        }\n      }\n    }\n  }\n}\n\nreturn testRequests.length > 0 ? testRequests : [{json: {noTests: true}}];"
+      },
+      "id": "extract-test-units",
+      "name": "Extract Test Units",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "check-has-tests",
+              "leftValue": "={{ $json.noTests }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "check-tests-exist",
+      "name": "Has Tests?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        880,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://ihealthlabs.talentlms.com/api/v1/gettestanswers/test_id:{{ $json.testId }},user_id:{{ $json.userId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "get-test-answers",
+      "name": "Get Test Answers",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1100,
+        -100
+      ],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "talentlms-basic-auth",
+          "name": "TalentLMS API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Aggregate all test results and identify wrong answers\nconst items = $input.all();\nconst questionStats = {};\nconst courseStats = {};\nlet totalQuestions = 0;\nlet totalWrong = 0;\n\nfor (const item of items) {\n  const data = item.json;\n  \n  // Skip if no questions (API error or not taken)\n  if (!data.questions || !Array.isArray(data.questions)) {\n    continue;\n  }\n  \n  const courseName = data.courseName || 'Unknown Course';\n  const testName = data.testName || 'Unknown Test';\n  \n  // Initialize course stats if needed\n  if (!courseStats[courseName]) {\n    courseStats[courseName] = {\n      totalQuestions: 0,\n      wrongAnswers: 0,\n      tests: {}\n    };\n  }\n  \n  if (!courseStats[courseName].tests[testName]) {\n    courseStats[courseName].tests[testName] = {\n      totalQuestions: 0,\n      wrongAnswers: 0,\n      questions: {}\n    };\n  }\n  \n  for (const question of data.questions) {\n    totalQuestions++;\n    courseStats[courseName].totalQuestions++;\n    courseStats[courseName].tests[testName].totalQuestions++;\n    \n    const questionKey = `${courseName}|${testName}|${question.text}`;\n    \n    // Initialize question stats if needed\n    if (!questionStats[questionKey]) {\n      questionStats[questionKey] = {\n        courseName: courseName,\n        testName: testName,\n        questionText: question.text,\n        totalAttempts: 0,\n        wrongAttempts: 0,\n        wrongPercentage: 0\n      };\n    }\n    \n    questionStats[questionKey].totalAttempts++;\n    \n    // Check if answer was wrong\n    if (question.user_answer !== question.correct_answer && question.correct !== true) {\n      totalWrong++;\n      courseStats[courseName].wrongAnswers++;\n      courseStats[courseName].tests[testName].wrongAnswers++;\n      questionStats[questionKey].wrongAttempts++;\n    }\n    \n    // Calculate wrong percentage\n    questionStats[questionKey].wrongPercentage = \n      Math.round((questionStats[questionKey].wrongAttempts / questionStats[questionKey].totalAttempts) * 100);\n  }\n}\n\n// Calculate course-level percentages\nfor (const course in courseStats) {\n  courseStats[course].wrongPercentage = \n    courseStats[course].totalQuestions > 0 \n      ? Math.round((courseStats[course].wrongAnswers / courseStats[course].totalQuestions) * 100)\n      : 0;\n  \n  for (const test in courseStats[course].tests) {\n    const testData = courseStats[course].tests[test];\n    testData.wrongPercentage = \n      testData.totalQuestions > 0\n        ? Math.round((testData.wrongAnswers / testData.totalQuestions) * 100)\n        : 0;\n  }\n}\n\n// Sort questions by wrong percentage (highest first)\nconst sortedQuestions = Object.values(questionStats)\n  .filter(q => q.totalAttempts >= 3) // Only include questions with at least 3 attempts\n  .sort((a, b) => b.wrongPercentage - a.wrongPercentage)\n  .slice(0, 20); // Top 20 problem questions\n\n// Sort courses by wrong percentage\nconst sortedCourses = Object.entries(courseStats)\n  .map(([name, stats]) => ({ courseName: name, ...stats }))\n  .sort((a, b) => b.wrongPercentage - a.wrongPercentage);\n\nreturn [{\n  json: {\n    summary: {\n      totalQuestions: totalQuestions,\n      totalWrong: totalWrong,\n      overallWrongPercentage: totalQuestions > 0 ? Math.round((totalWrong / totalQuestions) * 100) : 0\n    },\n    problemQuestions: sortedQuestions,\n    courseAnalysis: sortedCourses,\n    questionStats: questionStats\n  }\n}];"
+      },
+      "id": "aggregate-results",
+      "name": "Aggregate Test Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1320,
+        -100
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format data for AI analysis\nconst data = $input.first().json;\n\nlet prompt = `You are a training analyst. Analyze the following test results data from our Learning Management System and provide actionable insights on which training areas need more focus.\\n\\n`;\n\nprompt += `## Overall Summary\\n`;\nprompt += `- Total Questions Answered: ${data.summary.totalQuestions}\\n`;\nprompt += `- Total Wrong Answers: ${data.summary.totalWrong}\\n`;\nprompt += `- Overall Wrong Answer Rate: ${data.summary.overallWrongPercentage}%\\n\\n`;\n\nprompt += `## Top Problem Questions (High Failure Rate)\\n`;\nfor (const q of data.problemQuestions) {\n  prompt += `- Course: \"${q.courseName}\" | Test: \"${q.testName}\"\\n`;\n  prompt += `  Question: \"${q.questionText}\"\\n`;\n  prompt += `  Wrong: ${q.wrongAttempts}/${q.totalAttempts} (${q.wrongPercentage}% failure rate)\\n\\n`;\n}\n\nprompt += `## Course Analysis\\n`;\nfor (const course of data.courseAnalysis) {\n  prompt += `- ${course.courseName}: ${course.wrongPercentage}% wrong (${course.wrongAnswers}/${course.totalQuestions})\\n`;\n  for (const [testName, testData] of Object.entries(course.tests)) {\n    prompt += `  - ${testName}: ${testData.wrongPercentage}% wrong\\n`;\n  }\n}\n\nprompt += `\\n## Please provide:\\n`;\nprompt += `1. The top 3-5 training areas that need immediate attention\\n`;\nprompt += `2. Specific recommendations for improving each area\\n`;\nprompt += `3. Any patterns you notice in the wrong answers\\n`;\nprompt += `4. Priority ranking of which courses/topics to focus on first\\n`;\n\nreturn [{ json: { prompt: prompt, rawData: data } }];"
+      },
+      "id": "format-for-ai",
+      "name": "Format for AI Analysis",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1540,
+        -100
+      ]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "models/gemini-1.5-flash"
+        },
+        "prompt": "={{ $json.prompt }}",
+        "options": {
+          "temperature": 0.7,
+          "maxOutputTokens": 2048
+        }
+      },
+      "id": "gemini-analysis",
+      "name": "Gemini Analysis",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1760,
+        -100
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "gemini-api",
+          "name": "Google Gemini API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Prepare data for Google Sheets export - one tab per course\n// Handle Gemini node response format\nconst geminiResponse = $input.first().json;\nlet aiResponse = 'No analysis available';\n\n// Extract text from Gemini response - handle different response formats\nif (typeof geminiResponse === 'string') {\n  aiResponse = geminiResponse;\n} else if (geminiResponse.text) {\n  aiResponse = geminiResponse.text;\n} else if (geminiResponse.response) {\n  aiResponse = geminiResponse.response;\n} else if (geminiResponse.content) {\n  aiResponse = geminiResponse.content;\n}\n\nconst rawData = $('Format for AI Analysis').first().json.rawData;\nconst runDate = new Date().toISOString();\n\n// Group questions by course\nconst courseData = {};\n\n// Process all questions and group by course\nfor (const [key, q] of Object.entries(rawData.questionStats)) {\n  const courseName = q.courseName;\n  \n  // Sanitize course name for sheet tab (remove invalid chars, limit length)\n  const safeCourseName = courseName\n    .replace(/[\\[\\]\\*\\?\\/\\\\:]/g, '-') // Replace invalid sheet name chars\n    .substring(0, 50); // Limit to 50 chars\n  \n  if (!courseData[safeCourseName]) {\n    courseData[safeCourseName] = {\n      originalName: courseName,\n      questions: [],\n      summary: null\n    };\n  }\n  \n  courseData[safeCourseName].questions.push({\n    testName: q.testName,\n    question: q.questionText,\n    totalAttempts: q.totalAttempts,\n    wrongAttempts: q.wrongAttempts,\n    failureRate: q.wrongPercentage\n  });\n}\n\n// Add course summaries\nfor (const course of rawData.courseAnalysis) {\n  const safeCourseName = course.courseName\n    .replace(/[\\[\\]\\*\\?\\/\\\\:]/g, '-')\n    .substring(0, 50);\n  \n  if (courseData[safeCourseName]) {\n    courseData[safeCourseName].summary = {\n      totalQuestions: course.totalQuestions,\n      wrongAnswers: course.wrongAnswers,\n      failureRate: course.wrongPercentage,\n      tests: course.tests\n    };\n  }\n}\n\n// Create output items - one per course tab + summary tab\nconst output = [];\n\n// Add course-specific data\nfor (const [sheetName, data] of Object.entries(courseData)) {\n  // Sort questions by failure rate (highest first)\n  const sortedQuestions = data.questions\n    .sort((a, b) => b.failureRate - a.failureRate);\n  \n  for (let i = 0; i < sortedQuestions.length; i++) {\n    const q = sortedQuestions[i];\n    output.push({\n      json: {\n        sheetType: 'course',\n        sheetName: sheetName,\n        Rank: i + 1,\n        Test: q.testName,\n        Question: q.question,\n        'Total Attempts': q.totalAttempts,\n        'Wrong Attempts': q.wrongAttempts,\n        'Failure Rate': q.failureRate + '%',\n        'Analysis Date': runDate\n      }\n    });\n  }\n}\n\n// Add summary/AI recommendations\noutput.push({\n  json: {\n    sheetType: 'summary',\n    sheetName: 'Summary',\n    'Analysis Date': runDate,\n    'Total Questions Analyzed': rawData.summary.totalQuestions,\n    'Overall Failure Rate': rawData.summary.overallWrongPercentage + '%',\n    'Course Breakdown': rawData.courseAnalysis.map(c => \n      `${c.courseName}: ${c.wrongPercentage}% failure rate`\n    ).join('\\n'),\n    'AI Recommendations': aiResponse\n  }\n});\n\nreturn output;"
+      },
+      "id": "prepare-sheets-data",
+      "name": "Prepare Sheets Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1980,
+        -100
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "filter-courses",
+              "leftValue": "={{ $json.sheetType }}",
+              "rightValue": "course",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "filter-course-data",
+      "name": "Filter Course Data",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2200,
+        -200
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "filter-summary",
+              "leftValue": "={{ $json.sheetType }}",
+              "rightValue": "summary",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "filter-summary",
+      "name": "Filter Summary",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2200,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $env.GOOGLE_SHEET_ID }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "={{ $json.sheetName }}"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {}
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED",
+          "handlingExtraData": "insertInNewColumn"
+        }
+      },
+      "id": "write-course-data",
+      "name": "Write Course Data",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2420,
+        -200
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "google-sheets-oauth",
+          "name": "Google Sheets OAuth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "={{ $env.GOOGLE_SHEET_ID }}"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Summary"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {}
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED",
+          "handlingExtraData": "insertInNewColumn"
+        }
+      },
+      "id": "write-summary",
+      "name": "Write Summary",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2420,
+        100
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "google-sheets-oauth",
+          "name": "Google Sheets OAuth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://chat.googleapis.com/v1/spaces/AAQArkdpCu4/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=73gOUomiJ0I3JIfi746DoVGZfN98WtxzqIT0IeI-0Mg",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ text: '*TalentLMS Test Analysis Complete*\\n\\nResults have been exported to Google Sheets with one tab per course.\\n\\n_Check the spreadsheet for detailed analysis and AI recommendations._' }) }}",
+        "options": {}
+      },
+      "id": "send-completion-notification",
+      "name": "Send Completion Notification",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2640,
+        100
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "no-tests",
+      "name": "No Tests Found",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1100,
+        100
+      ]
+    }
+  ],
+  "origin": "n8n",
+  "pinData": null,
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-16T02:14:51.618Z",
+      "createdAt": "2026-01-16T02:14:51.618Z",
+      "role": "workflow:owner",
+      "workflowId": "Po6EL7Fv34744GC5",
+      "projectId": "SzgLfYyy3lWDJHJA"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-02-11T00:06:18.000Z",
+  "versionId": "e7875deb-2727-415b-a64e-223ac92e0526"
+}
