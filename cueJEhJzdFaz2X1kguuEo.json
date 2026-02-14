@@ -1,0 +1,68 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {},
+  "createdAt": "2026-02-06T18:57:30.076Z",
+  "id": "cueJEhJzdFaz2X1kguuEo",
+  "isArchived": false,
+  "meta": null,
+  "name": "My workflow 24",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "event": "rowAdded",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "145e51be-77d0-4450-857e-f3fc8b0922d4",
+      "name": "Google Sheets Trigger"
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-06T18:57:30.079Z",
+      "createdAt": "2026-02-06T18:57:30.079Z",
+      "role": "workflow:owner",
+      "workflowId": "cueJEhJzdFaz2X1kguuEo",
+      "projectId": "VuNnZv6StgSBp0r9"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-02-06T18:57:52.291Z",
+  "versionId": "609daaf9-88fd-4922-9a51-06586db6e3ce"
+}
