@@ -1,0 +1,106 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Jira Trigger": {
+      "main": [
+        [
+          {
+            "node": "Map Jira Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map Jira Fields": {
+      "main": [
+        [
+          {
+            "node": "Send Onboarding Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-28T05:20:14.473Z",
+  "id": "ErHCG_9WLdEit1OtXiNLe",
+  "isArchived": false,
+  "meta": null,
+  "name": "JSM Hardware Request Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "events": [
+          "jira:issue_created"
+        ],
+        "additionalFields": {}
+      },
+      "id": "052341f0-e4d0-427f-93f1-9ca66f71438e",
+      "name": "Jira Trigger",
+      "type": "n8n-nodes-base.jiraTrigger",
+      "typeVersion": 1,
+      "position": [
+        -288,
+        -48
+      ],
+      "webhookId": "1c7967ad-4475-4d79-ab67-6e4eeb3db836"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Map custom field IDs to readable keys\n// PLEASE UPDATE THE IDs BELOW based on your test execution data\n\nconst fields = $json.fields;\n\nreturn {\n  candidateName: fields.customfield_10001 || fields.summary.split('-').pop().trim(), // Fallback to parsing summary\n  candidateEmail: fields.customfield_10002 || \"\", // Placeholder ID for Email\n  jobTitle: fields.customfield_10003 || \"Candidate\", // Placeholder ID for Job Title\n  requestedHardware: fields.customfield_10004 || \"Standard Equipment\", // Placeholder ID for Hardware\n  issueKey: $json.key\n};"
+      },
+      "id": "96dfcf3b-1899-4bca-802d-85cc006780bd",
+      "name": "Map Jira Fields",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -32,
+        -48
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.candidateEmail }}",
+        "subject": "=[iHealth IT] 关于您的硬件设备申请 - {{ $json.candidateName }}",
+        "options": {}
+      },
+      "id": "cb6dd96f-0764-443f-9dc2-15d7fd08fe0c",
+      "name": "Send Onboarding Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [
+        224,
+        -48
+      ],
+      "webhookId": "c4b46ee1-4fd7-4de0-a7f3-352afed1c843"
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-28T05:20:14.475Z",
+      "createdAt": "2026-01-28T05:20:14.475Z",
+      "role": "workflow:owner",
+      "workflowId": "ErHCG_9WLdEit1OtXiNLe",
+      "projectId": "IGL0EzJNN8XZ65mm"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-01-28T05:22:45.978Z",
+  "versionId": "5e26c1c1-1648-4fbb-aa95-c68e7bcac2e0"
+}
