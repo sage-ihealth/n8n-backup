@@ -1,0 +1,2082 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-01-12T15:18:24.913Z",
+    "createdAt": "2026-01-12T15:18:24.913Z",
+    "versionId": "3de98856-220f-4413-a4a7-b75f9ba9626a",
+    "workflowId": "gmNwCJR1yFGPQtL6",
+    "nodes": [
+      {
+        "parameters": {
+          "pollTimes": {
+            "item": [
+              {
+                "mode": "everyMinute"
+              }
+            ]
+          },
+          "documentId": {
+            "__rl": true,
+            "value": "1YKcYEc6011fPH0j3YYIxMO5Z8rQpYtzdTaL0LP5EDog",
+            "mode": "list",
+            "cachedResultName": "mock monthly billable time requiring review + missing",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YKcYEc6011fPH0j3YYIxMO5Z8rQpYtzdTaL0LP5EDog/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 398174568,
+            "mode": "list",
+            "cachedResultName": "Clinic-Specific Payer Coverage Check (WellMed - Texas Clinic)",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YKcYEc6011fPH0j3YYIxMO5Z8rQpYtzdTaL0LP5EDog/edit#gid=398174568"
+          },
+          "event": "rowAdded",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheetsTrigger",
+        "typeVersion": 1,
+        "position": [
+          -1344,
+          208
+        ],
+        "id": "dd06be64-4237-421b-a623-9a01c01d9d78",
+        "name": "Google Sheets Trigger",
+        "credentials": {
+          "googleSheetsTriggerOAuth2Api": {
+            "id": "MmkaraRpD6ZDC2Gb",
+            "name": "Google Sheets Trigger account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "authentication": "oAuth2",
+          "spaceId": "=spaces/AAQA9BNMqXw",
+          "messageUi": {
+            "text": "={{ $json.message }}"
+          },
+          "additionalFields": {}
+        },
+        "type": "n8n-nodes-base.googleChat",
+        "typeVersion": 1,
+        "position": [
+          528,
+          48
+        ],
+        "id": "78e4fce9-8b5b-43a3-9aaf-9b3719afc320",
+        "name": "Create a message",
+        "webhookId": "978c0044-ba6c-4a30-8e6a-02b310a717b6",
+        "credentials": {
+          "googleChatOAuth2Api": {
+            "id": "JWXrbxNG7Kq5QJ8H",
+            "name": "Chat account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "86213884-5e3e-4fa7-a7e6-edfdd9b0c82e",
+                "leftValue": "={{ $json.content.parts[0].text }}",
+                "rightValue": "approve",
+                "operator": {
+                  "type": "string",
+                  "operation": "notEquals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          -464,
+          208
+        ],
+        "id": "afa6ebd5-c337-483c-9379-5042dc9bd995",
+        "name": "If"
+      },
+      {
+        "parameters": {
+          "url": "=https://uc-prod.ihealth-eng.com/v1/uc/patient/{{ $('Google Sheets Trigger').item.json.patientid }}",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpHeaderAuth",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "accept",
+                "value": "application/json, text/plain, */*"
+              },
+              {
+                "name": "accept-language",
+                "value": "zh-CN,zh;q=0.9"
+              },
+              {
+                "name": "origin",
+                "value": "https://ucfe-dev.ihealth-eng.com"
+              },
+              {
+                "name": "priority",
+                "value": "u=1, i"
+              },
+              {
+                "name": "referer",
+                "value": "https://ucfe-dev.ihealth-eng.com/"
+              },
+              {
+                "name": "sec-ch-ua",
+                "value": "\"Google Chrome\";v=\"143\", \"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\""
+              },
+              {
+                "name": "sec-ch-ua-mobile",
+                "value": "?0"
+              },
+              {
+                "name": "sec-ch-ua-platform",
+                "value": "\"macOS\""
+              },
+              {
+                "name": "sec-fetch-dest",
+                "value": "empty"
+              },
+              {
+                "name": "sec-fetch-mode",
+                "value": "cors"
+              },
+              {
+                "name": "sec-fetch-site",
+                "value": "same-site"
+              },
+              {
+                "name": "user-agent",
+                "value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3,
+        "position": [
+          -1152,
+          208
+        ],
+        "id": "feba99a5-7382-4896-9994-7188299bf5c5",
+        "name": "Patient Info",
+        "credentials": {
+          "httpHeaderAuth": {
+            "id": "vclQZ2plyvKtgSUw",
+            "name": "Header Auth - iHealth Prod"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const assignedToCAUser = $json.data && $json.data.assignedToCAUser ? $json.data.assignedToCAUser : null;\nconst patientProfile = $json.data && $json.data.profile ? $json.data.profile : {};\nconst clinic = $json.data && $json.data.clinic ? $json.data.clinic : {};\n\nconst caEmail = assignedToCAUser ? assignedToCAUser.email : '';\nconst caName = assignedToCAUser ? `${assignedToCAUser.firstName || ''} ${assignedToCAUser.lastName || ''}`.trim() : '';\n\nconst patientName = `${patientProfile.firstName || ''} ${patientProfile.lastName || ''}`.trim();\nconst patientId = $json.data ? $json.data.id : '';\nconst patientBirthday = patientProfile.birthday || '';\nconst clinicId = clinic.id || '';\nconst clinicName = clinic.businessName || '';\nconst insuranceProvider = patientProfile.insuranceProvider || '';\nconst insuranceProvider2 = patientProfile.insuranceProvider2 || '';\n\nreturn {\n  caEmail,\n  caName,\n  patientId,\n  patientName,\n  patientBirthday,\n  clinicId,\n  clinicName,\n  insuranceProvider,\n  insuranceProvider2\n};"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -960,
+          208
+        ],
+        "id": "e965cc60-eda7-4930-9fbb-97df22a83724",
+        "name": "Extract fields"
+      },
+      {
+        "parameters": {
+          "modelId": {
+            "__rl": true,
+            "value": "models/gemini-3-flash-preview",
+            "mode": "list",
+            "cachedResultName": "models/gemini-3-flash-preview"
+          },
+          "messages": {
+            "values": [
+              {
+                "content": "=You are given the following patient information:\n- Clinic Name: {{$json[\"clinicName\"]}}\n- Service Month Insurance: {{ $('Google Sheets Trigger').item.json['Service Month Insurance'] }}\n- Latest Insurance: {{ $('Google Sheets Trigger').item.json['Latest Insurance'] }}\n\nRules:\n1. If clinicName contains \"Texas\" and Latest Insurance is \"WellMed\", respond with \"reject-discharge\".\n2. If clinicName contains \"Texas\" and Service Month Insurance is \"WellMed\", respond with \"reject\".\n3. If clinicName does not contains \"Texas\" or neither of Service Month Insurance and Latest Insurance is \"WellMed\", respond with \"approve\".\n\nOnly output \"approve\", \"reject\", or \"reject-discharge\". Do not explain."
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.googleGemini",
+        "typeVersion": 1,
+        "position": [
+          -768,
+          208
+        ],
+        "id": "d810a74a-6033-4bea-9d39-9a494f03f3b6",
+        "name": "Compare insurances",
+        "credentials": {
+          "googlePalmApi": {
+            "id": "g6PYL0GmL0TKWpbu",
+            "name": "Google Gemini(PaLM) Api account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "documentId": {
+            "__rl": true,
+            "value": "1YKcYEc6011fPH0j3YYIxMO5Z8rQpYtzdTaL0LP5EDog",
+            "mode": "list",
+            "cachedResultName": "mock monthly billable time requiring review + missing",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YKcYEc6011fPH0j3YYIxMO5Z8rQpYtzdTaL0LP5EDog/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 398174568,
+            "mode": "list",
+            "cachedResultName": "Clinic-Specific Payer Coverage Check (WellMed - Texas Clinic)",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YKcYEc6011fPH0j3YYIxMO5Z8rQpYtzdTaL0LP5EDog/edit#gid=398174568"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "patientid": "={{ $('Extract fields').item.json.patientId }}",
+              "patientName": "={{ $('Extract fields').item.json.patientName }}",
+              "DOB": "={{ $('Extract fields').item.json.patientBirthday }}",
+              "clinicId": "={{ $('Extract fields').item.json.clinicId }}",
+              "clinicName": "={{ $('Extract fields').item.json.clinicName }}",
+              "APPROVAL": "={{ $('Compare insurances').item.json.content.parts[0].text }}",
+              "notes": "=WellMed insurance - not accepted by clinic"
+            },
+            "matchingColumns": [
+              "patientid"
+            ],
+            "schema": [
+              {
+                "id": "patientid",
+                "displayName": "patientid",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Service Month Insurance",
+                "displayName": "Service Month Insurance",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "Latest Insurance",
+                "displayName": "Latest Insurance",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "patientName",
+                "displayName": "patientName",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "DOB",
+                "displayName": "DOB",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "clinicId",
+                "displayName": "clinicId",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "clinicName",
+                "displayName": "clinicName",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "APPROVAL",
+                "displayName": "APPROVAL",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "notes",
+                "displayName": "notes",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "UC insuranceProvider",
+                "displayName": "UC insuranceProvider",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "UC insuranceProvider2",
+                "displayName": "UC insuranceProvider2",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "CA Notified",
+                "displayName": "CA Notified",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "CA Notified At",
+                "displayName": "CA Notified At",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "CA Name Notified",
+                "displayName": "CA Name Notified",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "CA Email Notified",
+                "displayName": "CA Email Notified",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "row_number",
+                "displayName": "row_number",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "readOnly": true,
+                "removed": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          -176,
+          64
+        ],
+        "id": "12a1aa01-3fe1-43bf-81d3-f7ff2ff0a124",
+        "name": "reject - Update row in sheet",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "E92SBl4Szm9AuPqL",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "documentId": {
+            "__rl": true,
+            "value": "1YKcYEc6011fPH0j3YYIxMO5Z8rQpYtzdTaL0LP5EDog",
+            "mode": "list",
+            "cachedResultName": "mock monthly billable time requiring review + missing",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YKcYEc6011fPH0j3YYIxMO5Z8rQpYtzdTaL0LP5EDog/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 398174568,
+            "mode": "list",
+            "cachedResultName": "Clinic-Specific Payer Coverage Check (WellMed - Texas Clinic)",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YKcYEc6011fPH0j3YYIxMO5Z8rQpYtzdTaL0LP5EDog/edit#gid=398174568"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "patientid": "={{ $('Extract fields').item.json.patientId }}",
+              "patientName": "={{ $('Extract fields').item.json.patientName }}",
+              "DOB": "={{ $('Extract fields').item.json.patientBirthday }}",
+              "clinicId": "={{ $('Extract fields').item.json.clinicId }}",
+              "clinicName": "={{ $('Extract fields').item.json.clinicName }}",
+              "APPROVAL": "={{ $('Compare insurances').item.json.content.parts[0].text }}"
+            },
+            "matchingColumns": [
+              "patientid"
+            ],
+            "schema": [
+              {
+                "id": "patientid",
+                "displayName": "patientid",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Service Month Insurance",
+                "displayName": "Service Month Insurance",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "Latest Insurance",
+                "displayName": "Latest Insurance",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "patientName",
+                "displayName": "patientName",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "DOB",
+                "displayName": "DOB",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "clinicId",
+                "displayName": "clinicId",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "clinicName",
+                "displayName": "clinicName",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "APPROVAL",
+                "displayName": "APPROVAL",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "notes",
+                "displayName": "notes",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "UC insuranceProvider",
+                "displayName": "UC insuranceProvider",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "UC insuranceProvider2",
+                "displayName": "UC insuranceProvider2",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "CA Notified",
+                "displayName": "CA Notified",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "CA Notified At",
+                "displayName": "CA Notified At",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "CA Name Notified",
+                "displayName": "CA Name Notified",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "CA Email Notified",
+                "displayName": "CA Email Notified",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "row_number",
+                "displayName": "row_number",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "readOnly": true,
+                "removed": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          -176,
+          368
+        ],
+        "id": "bfc8e2de-90e4-4e0a-88e8-69c9aa1d5b11",
+        "name": "approve - Update row in sheet",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "E92SBl4Szm9AuPqL",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const caName = $('Extract fields').first().json.caName;\nconst patientId = $('Extract fields').first().json.patientId;\nconst patientName = $('Extract fields').first().json.patientName;\nconst clinicId = $('Extract fields').first().json.clinicId;\nconst clinicName = $('Extract fields').first().json.clinicName;\n\nconst message =\n  `Dear ${caName},\n \nPlease note that the insurance provider WellMed is not accepted by Texas clinic. \nPatient: ${patientName} (ID: ${patientId} from clinic \"${clinicName}\" (Clinic ID: ${clinicId}) is currently listed with WellMed as their insurance.\n \nPlease proceed to discharge all patients of Texas clinic with WellMed insurance from the Unified Care Portal, and update their records accordingly.\n \nThank you!`;\n\nreturn {\n  message\n};"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          320,
+          48
+        ],
+        "id": "5c830f56-5ce9-4ba1-b105-175838cc656f",
+        "name": "message"
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "documentId": {
+            "__rl": true,
+            "value": "1YKcYEc6011fPH0j3YYIxMO5Z8rQpYtzdTaL0LP5EDog",
+            "mode": "list",
+            "cachedResultName": "mock monthly billable time requiring review + missing",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YKcYEc6011fPH0j3YYIxMO5Z8rQpYtzdTaL0LP5EDog/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 398174568,
+            "mode": "list",
+            "cachedResultName": "Clinic-Specific Payer Coverage Check (WellMed - Texas Clinic)",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YKcYEc6011fPH0j3YYIxMO5Z8rQpYtzdTaL0LP5EDog/edit#gid=398174568"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "patientid": "={{ $('Extract fields').item.json.patientId }}",
+              "UC insuranceProvider": "={{ $('Extract fields').item.json.insuranceProvider }}",
+              "CA Notified": "Y",
+              "CA Notified At": "={{ $now.format('yyyy-MM-dd hh:ss') }}",
+              "CA Name Notified": "={{ $('Extract fields').item.json.caName }}",
+              "CA Email Notified": "={{ $('Extract fields').item.json.caEmail }}"
+            },
+            "matchingColumns": [
+              "patientid"
+            ],
+            "schema": [
+              {
+                "id": "patientid",
+                "displayName": "patientid",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Service Month Insurance",
+                "displayName": "Service Month Insurance",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "Latest Insurance",
+                "displayName": "Latest Insurance",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "patientName",
+                "displayName": "patientName",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "DOB",
+                "displayName": "DOB",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "clinicId",
+                "displayName": "clinicId",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "clinicName",
+                "displayName": "clinicName",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "APPROVAL",
+                "displayName": "APPROVAL",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "notes",
+                "displayName": "notes",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "UC insuranceProvider",
+                "displayName": "UC insuranceProvider",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "CA Notified",
+                "displayName": "CA Notified",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "CA Notified At",
+                "displayName": "CA Notified At",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "CA Name Notified",
+                "displayName": "CA Name Notified",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "CA Email Notified",
+                "displayName": "CA Email Notified",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "row_number",
+                "displayName": "row_number",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "readOnly": true,
+                "removed": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          736,
+          48
+        ],
+        "id": "da905ad4-856e-416c-ba2a-9fa6c358c0c4",
+        "name": "Update row in sheet",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "E92SBl4Szm9AuPqL",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "86213884-5e3e-4fa7-a7e6-edfdd9b0c82e",
+                "leftValue": "={{ $('Compare insurances').item.json.content.parts[0].text }}",
+                "rightValue": "discharge",
+                "operator": {
+                  "type": "string",
+                  "operation": "contains"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          32,
+          64
+        ],
+        "id": "71540de9-3d26-4418-89b7-8b30a2340802",
+        "name": "If1"
+      }
+    ],
+    "connections": {
+      "Google Sheets Trigger": {
+        "main": [
+          [
+            {
+              "node": "Patient Info",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create a message": {
+        "main": [
+          [
+            {
+              "node": "Update row in sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If": {
+        "main": [
+          [
+            {
+              "node": "reject - Update row in sheet",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "approve - Update row in sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Patient Info": {
+        "main": [
+          [
+            {
+              "node": "Extract fields",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Extract fields": {
+        "main": [
+          [
+            {
+              "node": "Compare insurances",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Compare insurances": {
+        "main": [
+          [
+            {
+              "node": "If",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "reject - Update row in sheet": {
+        "main": [
+          [
+            {
+              "node": "If1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "message": {
+        "main": [
+          [
+            {
+              "node": "Create a message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If1": {
+        "main": [
+          [
+            {
+              "node": "message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "sage gu",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "activeVersionId": "3de98856-220f-4413-a4a7-b75f9ba9626a",
+  "connections": {
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "Patient Info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a message": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "reject - Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "approve - Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Patient Info": {
+      "main": [
+        [
+          {
+            "node": "Extract fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract fields": {
+      "main": [
+        [
+          {
+            "node": "Compare insurances",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compare insurances": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "reject - Update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "message": {
+      "main": [
+        [
+          {
+            "node": "Create a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-12T14:37:02.265Z",
+  "id": "gmNwCJR1yFGPQtL6",
+  "isArchived": false,
+  "meta": null,
+  "name": "Clinic-Specific Payer Coverage Check (WellMed - Texas Clinic)",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1YKcYEc6011fPH0j3YYIxMO5Z8rQpYtzdTaL0LP5EDog",
+          "mode": "list",
+          "cachedResultName": "mock monthly billable time requiring review + missing",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YKcYEc6011fPH0j3YYIxMO5Z8rQpYtzdTaL0LP5EDog/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 398174568,
+          "mode": "list",
+          "cachedResultName": "Clinic-Specific Payer Coverage Check (WellMed - Texas Clinic)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YKcYEc6011fPH0j3YYIxMO5Z8rQpYtzdTaL0LP5EDog/edit#gid=398174568"
+        },
+        "event": "rowAdded",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1344,
+        208
+      ],
+      "id": "dd06be64-4237-421b-a623-9a01c01d9d78",
+      "name": "Google Sheets Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "MmkaraRpD6ZDC2Gb",
+          "name": "Google Sheets Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "spaceId": "=spaces/AAQA9BNMqXw",
+        "messageUi": {
+          "text": "={{ $json.message }}"
+        },
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        528,
+        48
+      ],
+      "id": "78e4fce9-8b5b-43a3-9aaf-9b3719afc320",
+      "name": "Create a message",
+      "webhookId": "978c0044-ba6c-4a30-8e6a-02b310a717b6",
+      "credentials": {
+        "googleChatOAuth2Api": {
+          "id": "JWXrbxNG7Kq5QJ8H",
+          "name": "Chat account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "86213884-5e3e-4fa7-a7e6-edfdd9b0c82e",
+              "leftValue": "={{ $json.content.parts[0].text }}",
+              "rightValue": "approve",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -464,
+        208
+      ],
+      "id": "afa6ebd5-c337-483c-9379-5042dc9bd995",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "url": "=https://uc-prod.ihealth-eng.com/v1/uc/patient/{{ $('Google Sheets Trigger').item.json.patientid }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json, text/plain, */*"
+            },
+            {
+              "name": "accept-language",
+              "value": "zh-CN,zh;q=0.9"
+            },
+            {
+              "name": "origin",
+              "value": "https://ucfe-dev.ihealth-eng.com"
+            },
+            {
+              "name": "priority",
+              "value": "u=1, i"
+            },
+            {
+              "name": "referer",
+              "value": "https://ucfe-dev.ihealth-eng.com/"
+            },
+            {
+              "name": "sec-ch-ua",
+              "value": "\"Google Chrome\";v=\"143\", \"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\""
+            },
+            {
+              "name": "sec-ch-ua-mobile",
+              "value": "?0"
+            },
+            {
+              "name": "sec-ch-ua-platform",
+              "value": "\"macOS\""
+            },
+            {
+              "name": "sec-fetch-dest",
+              "value": "empty"
+            },
+            {
+              "name": "sec-fetch-mode",
+              "value": "cors"
+            },
+            {
+              "name": "sec-fetch-site",
+              "value": "same-site"
+            },
+            {
+              "name": "user-agent",
+              "value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -1152,
+        208
+      ],
+      "id": "feba99a5-7382-4896-9994-7188299bf5c5",
+      "name": "Patient Info",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "vclQZ2plyvKtgSUw",
+          "name": "Header Auth - iHealth Prod"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const assignedToCAUser = $json.data && $json.data.assignedToCAUser ? $json.data.assignedToCAUser : null;\nconst patientProfile = $json.data && $json.data.profile ? $json.data.profile : {};\nconst clinic = $json.data && $json.data.clinic ? $json.data.clinic : {};\n\nconst caEmail = assignedToCAUser ? assignedToCAUser.email : '';\nconst caName = assignedToCAUser ? `${assignedToCAUser.firstName || ''} ${assignedToCAUser.lastName || ''}`.trim() : '';\n\nconst patientName = `${patientProfile.firstName || ''} ${patientProfile.lastName || ''}`.trim();\nconst patientId = $json.data ? $json.data.id : '';\nconst patientBirthday = patientProfile.birthday || '';\nconst clinicId = clinic.id || '';\nconst clinicName = clinic.businessName || '';\nconst insuranceProvider = patientProfile.insuranceProvider || '';\nconst insuranceProvider2 = patientProfile.insuranceProvider2 || '';\n\nreturn {\n  caEmail,\n  caName,\n  patientId,\n  patientName,\n  patientBirthday,\n  clinicId,\n  clinicName,\n  insuranceProvider,\n  insuranceProvider2\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -960,
+        208
+      ],
+      "id": "e965cc60-eda7-4930-9fbb-97df22a83724",
+      "name": "Extract fields"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-3-flash-preview",
+          "mode": "list",
+          "cachedResultName": "models/gemini-3-flash-preview"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are given the following patient information:\n- Clinic Name: {{$json[\"clinicName\"]}}\n- Service Month Insurance: {{ $('Google Sheets Trigger').item.json['Service Month Insurance'] }}\n- Latest Insurance: {{ $('Google Sheets Trigger').item.json['Latest Insurance'] }}\n\nRules:\n1. If clinicName contains \"Texas\" and Latest Insurance is \"WellMed\", respond with \"reject-discharge\".\n2. If clinicName contains \"Texas\" and Service Month Insurance is \"WellMed\", respond with \"reject\".\n3. If clinicName does not contains \"Texas\" or neither of Service Month Insurance and Latest Insurance is \"WellMed\", respond with \"approve\".\n\nOnly output \"approve\", \"reject\", or \"reject-discharge\". Do not explain."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -768,
+        208
+      ],
+      "id": "d810a74a-6033-4bea-9d39-9a494f03f3b6",
+      "name": "Compare insurances",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "g6PYL0GmL0TKWpbu",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1YKcYEc6011fPH0j3YYIxMO5Z8rQpYtzdTaL0LP5EDog",
+          "mode": "list",
+          "cachedResultName": "mock monthly billable time requiring review + missing",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YKcYEc6011fPH0j3YYIxMO5Z8rQpYtzdTaL0LP5EDog/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 398174568,
+          "mode": "list",
+          "cachedResultName": "Clinic-Specific Payer Coverage Check (WellMed - Texas Clinic)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YKcYEc6011fPH0j3YYIxMO5Z8rQpYtzdTaL0LP5EDog/edit#gid=398174568"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "patientid": "={{ $('Extract fields').item.json.patientId }}",
+            "patientName": "={{ $('Extract fields').item.json.patientName }}",
+            "DOB": "={{ $('Extract fields').item.json.patientBirthday }}",
+            "clinicId": "={{ $('Extract fields').item.json.clinicId }}",
+            "clinicName": "={{ $('Extract fields').item.json.clinicName }}",
+            "APPROVAL": "={{ $('Compare insurances').item.json.content.parts[0].text }}",
+            "notes": "=WellMed insurance - not accepted by clinic"
+          },
+          "matchingColumns": [
+            "patientid"
+          ],
+          "schema": [
+            {
+              "id": "patientid",
+              "displayName": "patientid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Service Month Insurance",
+              "displayName": "Service Month Insurance",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Latest Insurance",
+              "displayName": "Latest Insurance",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "patientName",
+              "displayName": "patientName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DOB",
+              "displayName": "DOB",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "clinicId",
+              "displayName": "clinicId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "clinicName",
+              "displayName": "clinicName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "APPROVAL",
+              "displayName": "APPROVAL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "notes",
+              "displayName": "notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "UC insuranceProvider",
+              "displayName": "UC insuranceProvider",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "UC insuranceProvider2",
+              "displayName": "UC insuranceProvider2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "CA Notified",
+              "displayName": "CA Notified",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "CA Notified At",
+              "displayName": "CA Notified At",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "CA Name Notified",
+              "displayName": "CA Name Notified",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "CA Email Notified",
+              "displayName": "CA Email Notified",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -176,
+        64
+      ],
+      "id": "12a1aa01-3fe1-43bf-81d3-f7ff2ff0a124",
+      "name": "reject - Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "E92SBl4Szm9AuPqL",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1YKcYEc6011fPH0j3YYIxMO5Z8rQpYtzdTaL0LP5EDog",
+          "mode": "list",
+          "cachedResultName": "mock monthly billable time requiring review + missing",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YKcYEc6011fPH0j3YYIxMO5Z8rQpYtzdTaL0LP5EDog/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 398174568,
+          "mode": "list",
+          "cachedResultName": "Clinic-Specific Payer Coverage Check (WellMed - Texas Clinic)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YKcYEc6011fPH0j3YYIxMO5Z8rQpYtzdTaL0LP5EDog/edit#gid=398174568"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "patientid": "={{ $('Extract fields').item.json.patientId }}",
+            "patientName": "={{ $('Extract fields').item.json.patientName }}",
+            "DOB": "={{ $('Extract fields').item.json.patientBirthday }}",
+            "clinicId": "={{ $('Extract fields').item.json.clinicId }}",
+            "clinicName": "={{ $('Extract fields').item.json.clinicName }}",
+            "APPROVAL": "={{ $('Compare insurances').item.json.content.parts[0].text }}"
+          },
+          "matchingColumns": [
+            "patientid"
+          ],
+          "schema": [
+            {
+              "id": "patientid",
+              "displayName": "patientid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Service Month Insurance",
+              "displayName": "Service Month Insurance",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Latest Insurance",
+              "displayName": "Latest Insurance",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "patientName",
+              "displayName": "patientName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DOB",
+              "displayName": "DOB",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "clinicId",
+              "displayName": "clinicId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "clinicName",
+              "displayName": "clinicName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "APPROVAL",
+              "displayName": "APPROVAL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "notes",
+              "displayName": "notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "UC insuranceProvider",
+              "displayName": "UC insuranceProvider",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "UC insuranceProvider2",
+              "displayName": "UC insuranceProvider2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "CA Notified",
+              "displayName": "CA Notified",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "CA Notified At",
+              "displayName": "CA Notified At",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "CA Name Notified",
+              "displayName": "CA Name Notified",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "CA Email Notified",
+              "displayName": "CA Email Notified",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -176,
+        368
+      ],
+      "id": "bfc8e2de-90e4-4e0a-88e8-69c9aa1d5b11",
+      "name": "approve - Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "E92SBl4Szm9AuPqL",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const caName = $('Extract fields').first().json.caName;\nconst patientId = $('Extract fields').first().json.patientId;\nconst patientName = $('Extract fields').first().json.patientName;\nconst clinicId = $('Extract fields').first().json.clinicId;\nconst clinicName = $('Extract fields').first().json.clinicName;\n\nconst message =\n  `Dear ${caName},\n \nPlease note that the insurance provider WellMed is not accepted by Texas clinic. \nPatient: ${patientName} (ID: ${patientId} from clinic \"${clinicName}\" (Clinic ID: ${clinicId}) is currently listed with WellMed as their insurance.\n \nPlease proceed to discharge all patients of Texas clinic with WellMed insurance from the Unified Care Portal, and update their records accordingly.\n \nThank you!`;\n\nreturn {\n  message\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        320,
+        48
+      ],
+      "id": "5c830f56-5ce9-4ba1-b105-175838cc656f",
+      "name": "message"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1YKcYEc6011fPH0j3YYIxMO5Z8rQpYtzdTaL0LP5EDog",
+          "mode": "list",
+          "cachedResultName": "mock monthly billable time requiring review + missing",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YKcYEc6011fPH0j3YYIxMO5Z8rQpYtzdTaL0LP5EDog/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 398174568,
+          "mode": "list",
+          "cachedResultName": "Clinic-Specific Payer Coverage Check (WellMed - Texas Clinic)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1YKcYEc6011fPH0j3YYIxMO5Z8rQpYtzdTaL0LP5EDog/edit#gid=398174568"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "patientid": "={{ $('Extract fields').item.json.patientId }}",
+            "UC insuranceProvider": "={{ $('Extract fields').item.json.insuranceProvider }}",
+            "CA Notified": "Y",
+            "CA Notified At": "={{ $now.format('yyyy-MM-dd hh:ss') }}",
+            "CA Name Notified": "={{ $('Extract fields').item.json.caName }}",
+            "CA Email Notified": "={{ $('Extract fields').item.json.caEmail }}"
+          },
+          "matchingColumns": [
+            "patientid"
+          ],
+          "schema": [
+            {
+              "id": "patientid",
+              "displayName": "patientid",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Service Month Insurance",
+              "displayName": "Service Month Insurance",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Latest Insurance",
+              "displayName": "Latest Insurance",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "patientName",
+              "displayName": "patientName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "DOB",
+              "displayName": "DOB",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "clinicId",
+              "displayName": "clinicId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "clinicName",
+              "displayName": "clinicName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "APPROVAL",
+              "displayName": "APPROVAL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "notes",
+              "displayName": "notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "UC insuranceProvider",
+              "displayName": "UC insuranceProvider",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CA Notified",
+              "displayName": "CA Notified",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CA Notified At",
+              "displayName": "CA Notified At",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CA Name Notified",
+              "displayName": "CA Name Notified",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CA Email Notified",
+              "displayName": "CA Email Notified",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        736,
+        48
+      ],
+      "id": "da905ad4-856e-416c-ba2a-9fa6c358c0c4",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "E92SBl4Szm9AuPqL",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "86213884-5e3e-4fa7-a7e6-edfdd9b0c82e",
+              "leftValue": "={{ $('Compare insurances').item.json.content.parts[0].text }}",
+              "rightValue": "discharge",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        32,
+        64
+      ],
+      "id": "71540de9-3d26-4418-89b7-8b30a2340802",
+      "name": "If1"
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {
+    "Compare insurances": [
+      {
+        "json": {
+          "content": {
+            "parts": [
+              {
+                "text": "reject",
+                "thoughtSignature": "EuIQCt8QAXLI2nz56x1lQWQS5QBjQu1PQgbeHWecdYb5NPd9DMrNHzMOE8yC+F7USXU2GUML7eBAM4tIS/2hF5QH/pPLt66e64MQTxZPSgrKsTKxpPWN3wBS6Yr2+6bhcmXo4OgpFOrRY5lsEvd8PvHXSA+nl0OofYiR8c0MWBXk9HYyvA60shBW62x1va3xCN8jT011UMZKv8Z0V3m6VfGYMZMWyTMv1bfjpYPpqUPco4V5uJbY5Wmy586z881Y48vHm2FO9T2ts1AZrsHbEtKkUyOdN+UEEkeX76xQH6089z5vrd63A6FTSK32h48aKXHfMoGf2/sK2i9J4XGBjYCq21TY6mpP6IZ50hBAqsG5nyUpBhVnQBL6j8IjIMIPf6w8yjXAgZS/zUaTqcD+gWZcQ/80IicB/OZFUh2Ir+GItNfbWeOgJs1L9HswZtaYoymscqPHYJPfcDmyaO1kr+3C8UVcHEZZMKIiRI8lZaO81WMXxvWreVoCX/Ezr8qf2imxu34cY1vicz0LLSxK16rkNvMpRIEh9csEOqF75cLzvKkKpOMI9viRXGZi80wFIjWWPr5juvVG9S8shfKK418mqrpIr829A8hpNy0lde9mLoHKZbstZCiXK5YC72jg8q9JKAV9Ts1rKv0EKwYzKizMqwBJ91wvMPYwMDYkrr3aa1Uu/rZxVu+20Sy1+HWbIoDW9so2jPnBEs7wyzWuriCaScIYBivt8H0n8rDHgH6yhdoQKvtyPwWgM53x9/9Nkzex9XshGRNAdJ07mDLwO0c/mrWz2/a4hRiQZIxJOntjyZ8u9RNlIVziId1QFDjpVdeqOGXR6ObBlIXEfcADwW6jS8gS2863hgOJYdqIFrcPJKtC+J+6HN5/m7zb8ZKEKh9E5lVKu2R9KSf/zPiPqMRm/Sbfoig/IMHTyw8e5+gxPCUEY6ZWEBnBF1/WldchH6JolsZU4cNsbJLvgdLd+UigYdy3pzB8i9kIJm87Q9QZErbMAEG8sXB/9aVX4oIQMfYVd/N0zom3Dh9YtaCDHLKJvJY9s36D91y+ceDNNi7LVYAOUikaSSPgdVWR/7PwbN5hyu6TqndzoAD75o4ck3QEmKWgLDlUAoVM2b9JlyGvYdd0wFjR5NDlG9uwVfVF08Ds5MbfvuO4qYjnV8AnaGBlVtP/i9C10NC+SBoao8ESAlKmfy5OmykWNOQ321eJefHjnrwXhooG3T32r0G2BI8BL9bNyn5p+BZnULrGJikyrdRTWk1XFEzl/oI+PMg3bBP90p98g78Y6Obqr0bVO8Vp3KAV4/z+VxVQI1aq/KkHmE6HRRpiCyWCG19/aX/RsPv5biqRAlcnY0TLoVdVZa/HayhA+uORjLChtbBt4wlxbKce8TYCtc96EXDlZSog3PKfsBRHQvDbNidCnujdr2anNl38sjXT2jlSx0ocJ7NGaRFNdmBSxJdGBoUa0KEE9fPpDln5SEfDaTyodYGYzy98cB+IauFWpt+i+2DbMXxS63PQ/zVc0Bz6Gswfm48m/FQDpHmv0y+/DsedB3Tm/ohbyD6tZ9ZomoG24HcN5TdFx+9xB2oLfy1IL7mrZjKZuApzjHI3hOJfLOSraCcmb7NNtMGutVl+aPwjJvmUOsbQMigSdtjQL1HcGw50BYndn+m8MCDc9O5J0l8RWLag8ir0TmVYT9KCMHYniBrsPuJC389Dgq78mTo5tyw2SpEGQpqsLvCn3364Cd61+FqPN8mrjZFaZFRcz7dDGgtoAT/iRlV7Fkptb2z2QzO5avbJPBlZuhuMBNZSRtfbtf7Bop2cVXkKb16JUaQDXntiDYWCjV90XP6qECCyaMwU3F2osngmAYl9ZKtKboBPbjgg1r7kksEz288FXmF7yFw3W778x8w2AEorHrE5HJEUfebwmCm0gVKfMHeYv8t/SgA5Bq7zQuGOJh3agVQDZHwdUOl6f8ghbQ36QUkrBHx4pyQefOTlsi5s0Rpa+bflhvCU6ujqyVmALOrbVREPqEIOwuaZ5mZDcUvdZqwR7rMzFZ18XUrW64/mxkky3ta0kAfHGsC1vxrUQrsysVHqwgzjjQXpLnk+aqmCBQK4hqHme3vaWZ5nApm28MSlb1Iq4GIo4uatOQtlLSBtbJgih2VJ06I/M7rYcKQV/HlPEFMH/0dRTlasz3nurF1O0Dib+MEBxj+2qXuAeFy/g8Z2toruoOugq5/ExtuPM2nUR/15RktrcswdLx0tThhIL2uzJkTEuDDwJc8utXyWwbOZ23+zVEvDk6DYoYCmK9Yrxcv6HCZpCmN5pbIMBmqqaowie9OPJAISn0X4vuUb9g+zq3H65qr194GSj2Pkua/ESQlaW1W9Rad9k3NjAGV7CO31zDxCUCEYl6OKANhGfXzb3BwGOo+xvuzvmWKryM1iNf7dL39PFg1xYj8f9QUSCwnagsyd73EXNaQZtu/baoIvlJPJxOQOqcE3nwG0j3hjEF1tYKzB46ZePmZGFF4tV8E0sjYft/u1M6uZPfQW7ZORIszqD6j2ejX215xO7LV6q1wPu5i4J7YS6kFkNYloZOEw6+lUNJ8CaWXRU8cxM5VR4xlkvCGOmkforuElfS3Cs8BzAmuobCry+9jUGRRBSKYZ9GQ+n1/XOWVIJGEDWr67tYYXj8qmBLOKsjGXuZUU3iwRHvK83yhCQoEXZB6nPs85IjRaA3EQ3l9UaPzRdaXKMVgGUAEgOvam+qFtWpq9GXwuZiUmBoIAz+ZUtllqCAO7OyHOMS+FFIttNKkx0Yko8xCZMKsRqfOauMOFULocG+rmDLcsCuo3Ea7RwJB5ySvAUosx3e9GZHnYvxukGuGW+sCw6V0yhzJIBA=="
+              }
+            ],
+            "role": "model"
+          },
+          "finishReason": "STOP",
+          "index": 0
+        }
+      }
+    ],
+    "reject - Update row in sheet": [
+      {
+        "json": {
+          "patientid": "65305128eef17d0013d112a4",
+          "patientName": "HAZEL B. JACOBY",
+          "DOB": "1948-07-19",
+          "clinicId": "60a40917823ab800139e5232",
+          "clinicName": "Nabil Abudayeh, MD",
+          "APPROVAL": "reject",
+          "notes": "Insurance changed from MEDICARE to Anthem. Biller must manually submit to MEDICARE"
+        }
+      }
+    ],
+    "Google Sheets Trigger": [
+      {
+        "json": {
+          "patientid": "65305128eef17d0013d112a4",
+          "Service Month Insurance": "WellMed",
+          "Latest Insurance": "WellMed",
+          "patientName": "",
+          "DOB": "",
+          "clinicId": "",
+          "clinicName": "",
+          "APPROVAL": "",
+          "notes": "",
+          "UC insuranceProvider": "",
+          "CA Notified": "",
+          "CA Notified At": "",
+          "CA Name Notified": "",
+          "CA Email Notified": ""
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-12T14:37:02.280Z",
+      "createdAt": "2026-01-12T14:37:02.280Z",
+      "role": "workflow:owner",
+      "workflowId": "gmNwCJR1yFGPQtL6",
+      "projectId": "IGL0EzJNN8XZ65mm"
+    }
+  ],
+  "staticData": {
+    "node:Google Sheets Trigger": {
+      "documentId": "1YKcYEc6011fPH0j3YYIxMO5Z8rQpYtzdTaL0LP5EDog",
+      "sheetId": 398174568,
+      "lastIndexChecked": 1
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2026-01-12T19:21:16.796Z",
+  "versionId": "3de98856-220f-4413-a4a7-b75f9ba9626a"
+}
