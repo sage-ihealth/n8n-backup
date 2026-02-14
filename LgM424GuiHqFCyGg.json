@@ -1,0 +1,1537 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-02-12T21:55:15.876Z",
+    "createdAt": "2026-02-12T21:55:15.876Z",
+    "versionId": "8d25a1d5-4ff9-46ab-93d1-25597ffb4448",
+    "workflowId": "LgM424GuiHqFCyGg",
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "cronExpression",
+                "expression": "0 * * * 1-5"
+              }
+            ]
+          }
+        },
+        "id": "cron-trigger",
+        "name": "Schedule Trigger",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          224,
+          304
+        ]
+      },
+      {
+        "parameters": {
+          "url": "https://ihealthlabs.talentlms.com/api/v1/getcustomregistrationfields",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpHeaderAuth",
+          "options": {}
+        },
+        "id": "get-custom-fields",
+        "name": "Get Custom Field Mappings",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          448,
+          304
+        ],
+        "credentials": {
+          "httpHeaderAuth": {
+            "id": "zjdo1NyXWx7o3LVy",
+            "name": "TalentLMS Header Auth"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Get custom field mappings\nconst fields = $input.all()[0].json;\nconst mapping = {};\n\nif (Array.isArray(fields)) {\n  for (const field of fields) {\n    const name = field.name.toLowerCase();\n    if (name.includes('role') || name.includes('title')) {\n      mapping.roleTitle = field.key;\n    } else if (name.includes('department')) {\n      mapping.department = field.key;\n    } else if (name.includes('hire')) {\n      mapping.hireDate = field.key;\n    } else if (name.includes('start')) {\n      mapping.startDate = field.key;\n    }\n  }\n}\n\nreturn [{ json: { fieldMapping: mapping } }];"
+        },
+        "id": "map-fields",
+        "name": "Map Custom Fields",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          672,
+          304
+        ]
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1SgvK3lM0Yyn6hmaQUqiEfo7ea5UCfyodTShfMb3DGVE",
+            "mode": "list",
+            "cachedResultName": "TalentLMS Mastersheet",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SgvK3lM0Yyn6hmaQUqiEfo7ea5UCfyodTShfMb3DGVE/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "mode": "name",
+            "value": "Orientation Feedback"
+          },
+          "options": {}
+        },
+        "id": "read-existing-sheet",
+        "name": "Read Existing Entries",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.5,
+        "position": [
+          880,
+          304
+        ],
+        "alwaysOutputData": true,
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "vdcRQ7DzD7EJYCNd",
+            "name": "Google Sheets account 3"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "url": "https://ihealthlabs.talentlms.com/api/v1/courses/id:210",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpHeaderAuth",
+          "options": {}
+        },
+        "id": "get-course",
+        "name": "Get Course Details",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1104,
+          304
+        ],
+        "credentials": {
+          "httpHeaderAuth": {
+            "id": "zjdo1NyXWx7o3LVy",
+            "name": "TalentLMS Header Auth"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const course = $input.all()[0].json;\nconst fieldMapping = $('Map Custom Fields').item.json.fieldMapping;\n\nlet surveyId = '2363';\nif (course.units) {\n  const surveyUnit = course.units.find(u => u.type === 'Survey' || u.type === 'survey');\n  if (surveyUnit) surveyId = surveyUnit.id;\n}\n\n// Exclude test/admin accounts\nconst excludedUserIds = ['1'];\n\nconst completedUsers = [];\nif (course.users) {\n  for (const user of course.users) {\n    if (excludedUserIds.includes(String(user.id))) continue;\n    const isCompleted = user.completion_percentage === '100' || user.completion_percentage === 100;\n    if (!isCompleted) continue;\n    completedUsers.push({\n      userId: user.id,\n      userName: user.name,\n      surveyId: surveyId,\n      fieldMapping: fieldMapping,\n      completedOn: user.completed_on || ''\n    });\n  }\n}\n\nif (completedUsers.length === 0) {\n  return [{ json: { hasNewUsers: false, message: 'No completed users found' } }];\n}\n\n// Dedup handled by Google Sheets appendOrUpdate with Email matching\nreturn completedUsers.map(u => ({ json: { ...u, hasNewUsers: true } }));"
+        },
+        "id": "extract-new-users",
+        "name": "Find New Completed Users",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1328,
+          304
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict"
+            },
+            "conditions": [
+              {
+                "id": "check-has-users",
+                "leftValue": "={{ $json.hasNewUsers }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "if-has-users",
+        "name": "Has New Users?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2,
+        "position": [
+          1552,
+          304
+        ]
+      },
+      {
+        "parameters": {
+          "url": "=https://ihealthlabs.talentlms.com/api/v1/getsurveyanswers/survey_id:{{ $json.surveyId }},user_id:{{ $json.userId }}",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpHeaderAuth",
+          "options": {
+            "response": {
+              "response": {
+                "neverError": true
+              }
+            }
+          }
+        },
+        "id": "get-survey-answers",
+        "name": "Get Survey Answers",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1760,
+          208
+        ],
+        "credentials": {
+          "httpHeaderAuth": {
+            "id": "zjdo1NyXWx7o3LVy",
+            "name": "TalentLMS Header Auth"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "url": "=https://ihealthlabs.talentlms.com/api/v1/users/id:{{ $('Has New Users?').item.json.userId }}",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpHeaderAuth",
+          "options": {}
+        },
+        "id": "get-user-details",
+        "name": "Get User Details",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1984,
+          208
+        ],
+        "credentials": {
+          "httpHeaderAuth": {
+            "id": "zjdo1NyXWx7o3LVy",
+            "name": "TalentLMS Header Auth"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "mode": "runOnceForEachItem",
+          "jsCode": "// Transform data for Google Sheet\nconst surveyAnswers = $('Get Survey Answers').item.json;\nconst userDetails = $input.item.json;\n\n// Skip users hired before Jan 1, 2026\nconst hireDateStr = userDetails.custom_field_31 || '';\nif (hireDateStr) {\n  const parts = hireDateStr.split('/');\n  if (parts.length === 3) {\n    const hireDate = new Date(parts[2], parts[0] - 1, parts[1]);\n    if (hireDate < new Date(2026, 0, 1)) {\n      return []; // Filter out this item\n    }\n  }\n}\n\nconst context = $('Has New Users?').item.json;\nconst fieldMapping = context.fieldMapping || {};\nconst completedOn = context.completedOn;\n\n// Flatten the nested question structure from TalentLMS\nconst flatQuestions = [];\n\nfunction extractQuestions(questions) {\n  if (!Array.isArray(questions)) return;\n  for (const q of questions) {\n    let answerText = '';\n    if (q.user_answers) {\n      if (Array.isArray(q.user_answers) && q.user_answers.length > 0) {\n        answerText = q.user_answers[0];\n      } else if (typeof q.user_answers === 'object') {\n        const values = Object.values(q.user_answers);\n        if (values.length > 0) answerText = values[0];\n      }\n    }\n    \n    if (q.text && answerText) {\n      flatQuestions.push({ text: q.text, answer: answerText });\n    }\n    \n    if (q.child_questions && q.child_questions.length > 0) {\n      extractQuestions(q.child_questions);\n    }\n  }\n}\n\nif (surveyAnswers && surveyAnswers.questions) {\n  extractQuestions(surveyAnswers.questions);\n}\n\nfunction findAnswer(keyword) {\n  const match = flatQuestions.find(q => \n    q.text.toLowerCase().includes(keyword.toLowerCase())\n  );\n  return match ? match.answer : '';\n}\n\nconst duration = surveyAnswers.total_time || '';\n\n// Use known TalentLMS custom field keys\nconst row = {\n  'User Name': `${userDetails.first_name || ''} ${userDetails.last_name || ''}`.trim(),\n  'Email': userDetails.email || '',\n  'Role/Title': userDetails.custom_field_23 || '',\n  'Department': userDetails.custom_field_25 || '',\n  'Hire Date': userDetails.custom_field_31 || '',\n  'Start Date': userDetails.custom_field_31 || '',\n  'Completion Date': completedOn || surveyAnswers.completed_on || '',\n  'Duration (minutes)': duration,\n  'Quality_Rating': findAnswer('rate the quality'),\n  'Satisfaction_Rating': findAnswer('how satisfied'),\n  'Mission_Understanding': findAnswer('mission'),\n  'Cross_Team_Connection': findAnswer('connects to other teams'),\n  'Readiness_to_Contribute': findAnswer('knowledge I need'),\n  'Most_Helpful': findAnswer('most helpful'),\n  'Unclear_Topics': findAnswer('still unclear'),\n  'Improvement_Suggestions': findAnswer('improve')\n};\n\nreturn { json: row };"
+        },
+        "id": "transform-data",
+        "name": "Transform Data for Sheet",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2208,
+          208
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "appendOrUpdate",
+          "documentId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "1SgvK3lM0Yyn6hmaQUqiEfo7ea5UCfyodTShfMb3DGVE"
+          },
+          "sheetName": {
+            "__rl": true,
+            "mode": "name",
+            "value": "Orientation Feedback"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "User Name": "={{ $json['User Name'] }}",
+              "Email": "={{ $json['Email'] }}",
+              "Role/Title": "={{ $json['Role/Title'] }}",
+              "Department": "={{ $json['Department'] }}",
+              "Hire Date": "={{ $json['Hire Date'] }}",
+              "Start Date": "={{ $json['Start Date'] }}",
+              "Completion Date": "={{ $json['Completion Date'] }}",
+              "Duration (minutes)": "={{ $json['Duration (minutes)'] }}",
+              "Quality_Rating": "={{ $json['Quality_Rating'] }}",
+              "Satisfaction_Rating": "={{ $json['Satisfaction_Rating'] }}",
+              "Mission_Understanding": "={{ $json['Mission_Understanding'] }}",
+              "Cross_Team_Connection": "={{ $json['Cross_Team_Connection'] }}",
+              "Readiness_to_Contribute": "={{ $json['Readiness_to_Contribute'] }}",
+              "Most_Helpful": "={{ $json['Most_Helpful'] }}",
+              "Unclear_Topics": "={{ $json['Unclear_Topics'] }}",
+              "Improvement_Suggestions": "={{ $json['Improvement_Suggestions'] }}"
+            },
+            "matchingColumns": [
+              "Email"
+            ],
+            "schema": [
+              {
+                "id": "User Name",
+                "displayName": "User Name",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Email",
+                "displayName": "Email",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Role/Title",
+                "displayName": "Role/Title",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Department",
+                "displayName": "Department",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Hire Date",
+                "displayName": "Hire Date",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Start Date",
+                "displayName": "Start Date",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Completion Date",
+                "displayName": "Completion Date",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Duration (minutes)",
+                "displayName": "Duration (minutes)",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Quality_Rating",
+                "displayName": "Quality_Rating",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Satisfaction_Rating",
+                "displayName": "Satisfaction_Rating",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Mission_Understanding",
+                "displayName": "Mission_Understanding",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Cross_Team_Connection",
+                "displayName": "Cross_Team_Connection",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Readiness_to_Contribute",
+                "displayName": "Readiness_to_Contribute",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Most_Helpful",
+                "displayName": "Most_Helpful",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Unclear_Topics",
+                "displayName": "Unclear_Topics",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Improvement_Suggestions",
+                "displayName": "Improvement_Suggestions",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "append-to-sheet",
+        "name": "Append to Google Sheet",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.5,
+        "position": [
+          2432,
+          208
+        ],
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "vdcRQ7DzD7EJYCNd",
+            "name": "Google Sheets account 3"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// No new users to add\nconst input = $input.all()[0].json;\nreturn [{ json: { \n  message: 'No new completed users to add to sheet', \n  skipped: true,\n  debug: input._debug || 'No debug info'\n} }];"
+        },
+        "id": "no-users",
+        "name": "No New Users",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1760,
+          400
+        ]
+      },
+      {
+        "parameters": {},
+        "id": "error-trigger",
+        "name": "Error Trigger",
+        "type": "n8n-nodes-base.errorTrigger",
+        "typeVersion": 1,
+        "position": [
+          224,
+          544
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://chat.googleapis.com/v1/spaces/AAQA4Ksbm-M/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=UPaxjAUjYdJowRki8zCMCrbLprOL-C_dQpcW5BxyFno",
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "text",
+                "value": "=⚠️ *Orientation Survey Sync Failed*\n\nWorkflow: Orientation Survey Sync\nTime: {{ $now.format('YYYY-MM-DD HH:mm:ss') }} PST\nError: {{ $json.error.message }}\n\nPlease check n8n for details."
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "error-notification",
+        "name": "Send Error to Google Chat",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          448,
+          544
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "// Get emails already in sheet BEFORE this run\nconst existingEntries = $('Read Existing Entries').all();\nconst existingEmails = new Set();\nfor (const entry of existingEntries) {\n  const email = (entry.json['Email'] || '').toLowerCase().trim();\n  if (email) existingEmails.add(email);\n}\n\n// Filter to only truly new entries\nconst allRows = $input.all();\nconst newRows = allRows.filter(item => {\n  const email = (item.json['Email'] || '').toLowerCase().trim();\n  return email && !existingEmails.has(email);\n});\n\nif (newRows.length === 0) {\n  return [{ json: { text: '', hasNew: false } }];\n}\n\nconst pstDate = new Date().toLocaleDateString('en-US', {\n  timeZone: 'America/Los_Angeles',\n  month: 'short', day: 'numeric', year: 'numeric'\n});\n\nlet message = `\\ud83d\\udccb Orientation Survey Sync - ${pstDate}\\n\\n`;\nmessage += `*${newRows.length} new response(s) synced to sheet*\\n\\n`;\n\nfor (const item of newRows) {\n  const r = item.json;\n  message += `\\u2705 *${r['User Name']}*\\n`;\n  message += `   ${r['Role/Title'] || 'N/A'} | ${r['Department'] || 'N/A'}\\n`;\n  message += `   Completed: ${r['Completion Date'] || 'N/A'}\\n`;\n  message += `   Satisfaction: ${r['Satisfaction_Rating'] || 'N/A'} | Quality: ${r['Quality_Rating'] || 'N/A'}\\n\\n`;\n}\n\nmessage += `Full data \\u2192 https://docs.google.com/spreadsheets/d/1SgvK3lM0Yyn6hmaQUqiEfo7ea5UCfyodTShfMb3DGVE`;\n\nreturn [{ json: { text: message, hasNew: true } }];"
+        },
+        "id": "build-chat-msg",
+        "name": "Build Chat Message",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2640,
+          208
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://chat.googleapis.com/v1/spaces/AAQA4Ksbm-M/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=UPaxjAUjYdJowRki8zCMCrbLprOL-C_dQpcW5BxyFno",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ text: $json.text }) }}",
+          "options": {}
+        },
+        "id": "send-chat-test",
+        "name": "Send to UC Onboarding Chat",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          3088,
+          208
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict"
+            },
+            "conditions": [
+              {
+                "id": "check-new",
+                "leftValue": "={{ $json.hasNew }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "if-has-new",
+        "name": "Has New Entries?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2,
+        "position": [
+          2864,
+          208
+        ]
+      },
+      {
+        "id": "hire_date_filter",
+        "name": "Hire Date Filter",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          2096,
+          208
+        ],
+        "parameters": {
+          "conditions": {
+            "options": {
+              "version": 2,
+              "leftValue": "",
+              "caseSensitive": true,
+              "typeValidation": "strict"
+            },
+            "conditions": [
+              {
+                "id": "hire-date-check",
+                "leftValue": "={{ (() => { const d = ($json.custom_field_31 || '').split('/'); if (d.length !== 3) return false; return new Date(d[2], d[0]-1, d[1]) >= new Date(2026, 0, 1); })() }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        }
+      }
+    ],
+    "connections": {
+      "Schedule Trigger": {
+        "main": [
+          [
+            {
+              "node": "Get Custom Field Mappings",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Custom Field Mappings": {
+        "main": [
+          [
+            {
+              "node": "Map Custom Fields",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Map Custom Fields": {
+        "main": [
+          [
+            {
+              "node": "Read Existing Entries",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Read Existing Entries": {
+        "main": [
+          [
+            {
+              "node": "Get Course Details",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Course Details": {
+        "main": [
+          [
+            {
+              "node": "Find New Completed Users",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Find New Completed Users": {
+        "main": [
+          [
+            {
+              "node": "Has New Users?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Has New Users?": {
+        "main": [
+          [
+            {
+              "node": "Get Survey Answers",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "No New Users",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Survey Answers": {
+        "main": [
+          [
+            {
+              "node": "Get User Details",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Transform Data for Sheet": {
+        "main": [
+          [
+            {
+              "node": "Append to Google Sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Error Trigger": {
+        "main": [
+          [
+            {
+              "node": "Send Error to Google Chat",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Append to Google Sheet": {
+        "main": [
+          [
+            {
+              "node": "Build Chat Message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Chat Message": {
+        "main": [
+          [
+            {
+              "node": "Has New Entries?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Has New Entries?": {
+        "main": [
+          [
+            {
+              "node": "Send to UC Onboarding Chat",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get User Details": {
+        "main": [
+          [
+            {
+              "node": "Hire Date Filter",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Hire Date Filter": {
+        "main": [
+          [
+            {
+              "node": "Transform Data for Sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Phoebe You",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "activeVersionId": "8d25a1d5-4ff9-46ab-93d1-25597ffb4448",
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Custom Field Mappings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Custom Field Mappings": {
+      "main": [
+        [
+          {
+            "node": "Map Custom Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map Custom Fields": {
+      "main": [
+        [
+          {
+            "node": "Read Existing Entries",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Existing Entries": {
+      "main": [
+        [
+          {
+            "node": "Get Course Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Course Details": {
+      "main": [
+        [
+          {
+            "node": "Find New Completed Users",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find New Completed Users": {
+      "main": [
+        [
+          {
+            "node": "Has New Users?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has New Users?": {
+      "main": [
+        [
+          {
+            "node": "Get Survey Answers",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No New Users",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Survey Answers": {
+      "main": [
+        [
+          {
+            "node": "Get User Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform Data for Sheet": {
+      "main": [
+        [
+          {
+            "node": "Append to Google Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Send Error to Google Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append to Google Sheet": {
+      "main": [
+        [
+          {
+            "node": "Build Chat Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Chat Message": {
+      "main": [
+        [
+          {
+            "node": "Has New Entries?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has New Entries?": {
+      "main": [
+        [
+          {
+            "node": "Send to UC Onboarding Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get User Details": {
+      "main": [
+        [
+          {
+            "node": "Hire Date Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hire Date Filter": {
+      "main": [
+        [
+          {
+            "node": "Transform Data for Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-02-03T21:40:06.909Z",
+  "id": "LgM424GuiHqFCyGg",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "Orientation Survey Sync",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 * * * 1-5"
+            }
+          ]
+        }
+      },
+      "id": "cron-trigger",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        224,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://ihealthlabs.talentlms.com/api/v1/getcustomregistrationfields",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "get-custom-fields",
+      "name": "Get Custom Field Mappings",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        448,
+        304
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "zjdo1NyXWx7o3LVy",
+          "name": "TalentLMS Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get custom field mappings\nconst fields = $input.all()[0].json;\nconst mapping = {};\n\nif (Array.isArray(fields)) {\n  for (const field of fields) {\n    const name = field.name.toLowerCase();\n    if (name.includes('role') || name.includes('title')) {\n      mapping.roleTitle = field.key;\n    } else if (name.includes('department')) {\n      mapping.department = field.key;\n    } else if (name.includes('hire')) {\n      mapping.hireDate = field.key;\n    } else if (name.includes('start')) {\n      mapping.startDate = field.key;\n    }\n  }\n}\n\nreturn [{ json: { fieldMapping: mapping } }];"
+      },
+      "id": "map-fields",
+      "name": "Map Custom Fields",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1SgvK3lM0Yyn6hmaQUqiEfo7ea5UCfyodTShfMb3DGVE",
+          "mode": "list",
+          "cachedResultName": "TalentLMS Mastersheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SgvK3lM0Yyn6hmaQUqiEfo7ea5UCfyodTShfMb3DGVE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Orientation Feedback"
+        },
+        "options": {}
+      },
+      "id": "read-existing-sheet",
+      "name": "Read Existing Entries",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        896,
+        304
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "vdcRQ7DzD7EJYCNd",
+          "name": "Google Sheets account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://ihealthlabs.talentlms.com/api/v1/courses/id:210",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "get-course",
+      "name": "Get Course Details",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1120,
+        304
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "zjdo1NyXWx7o3LVy",
+          "name": "TalentLMS Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const course = $input.all()[0].json;\nconst fieldMapping = $('Map Custom Fields').item.json.fieldMapping;\n\nlet surveyId = '2363';\nif (course.units) {\n  const surveyUnit = course.units.find(u => u.type === 'Survey' || u.type === 'survey');\n  if (surveyUnit) surveyId = surveyUnit.id;\n}\n\n// Exclude test/admin accounts\nconst excludedUserIds = ['1'];\n\nconst completedUsers = [];\nif (course.users) {\n  for (const user of course.users) {\n    if (excludedUserIds.includes(String(user.id))) continue;\n    const isCompleted = user.completion_percentage === '100' || user.completion_percentage === 100;\n    if (!isCompleted) continue;\n    completedUsers.push({\n      userId: user.id,\n      userName: user.name,\n      surveyId: surveyId,\n      fieldMapping: fieldMapping,\n      completedOn: user.completed_on || ''\n    });\n  }\n}\n\nif (completedUsers.length === 0) {\n  return [{ json: { hasNewUsers: false, message: 'No completed users found' } }];\n}\n\n// Dedup handled by Google Sheets appendOrUpdate with Email matching\nreturn completedUsers.map(u => ({ json: { ...u, hasNewUsers: true } }));"
+      },
+      "id": "extract-new-users",
+      "name": "Find New Completed Users",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1344,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "check-has-users",
+              "leftValue": "={{ $json.hasNewUsers }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-has-users",
+      "name": "Has New Users?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1568,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://ihealthlabs.talentlms.com/api/v1/getsurveyanswers/survey_id:{{ $json.surveyId }},user_id:{{ $json.userId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "get-survey-answers",
+      "name": "Get Survey Answers",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1792,
+        208
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "zjdo1NyXWx7o3LVy",
+          "name": "TalentLMS Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://ihealthlabs.talentlms.com/api/v1/users/id:{{ $('Has New Users?').item.json.userId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "get-user-details",
+      "name": "Get User Details",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2016,
+        208
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "zjdo1NyXWx7o3LVy",
+          "name": "TalentLMS Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Transform data for Google Sheet\nconst surveyAnswers = $('Get Survey Answers').item.json;\nconst userDetails = $input.item.json;\n\n// Skip users hired before Jan 1, 2026\nconst hireDateStr = userDetails.custom_field_31 || '';\nif (hireDateStr) {\n  const parts = hireDateStr.split('/');\n  if (parts.length === 3) {\n    const hireDate = new Date(parts[2], parts[0] - 1, parts[1]);\n    if (hireDate < new Date(2026, 0, 1)) {\n      return []; // Filter out this item\n    }\n  }\n}\n\nconst context = $('Has New Users?').item.json;\nconst fieldMapping = context.fieldMapping || {};\nconst completedOn = context.completedOn;\n\n// Flatten the nested question structure from TalentLMS\nconst flatQuestions = [];\n\nfunction extractQuestions(questions) {\n  if (!Array.isArray(questions)) return;\n  for (const q of questions) {\n    let answerText = '';\n    if (q.user_answers) {\n      if (Array.isArray(q.user_answers) && q.user_answers.length > 0) {\n        answerText = q.user_answers[0];\n      } else if (typeof q.user_answers === 'object') {\n        const values = Object.values(q.user_answers);\n        if (values.length > 0) answerText = values[0];\n      }\n    }\n    \n    if (q.text && answerText) {\n      flatQuestions.push({ text: q.text, answer: answerText });\n    }\n    \n    if (q.child_questions && q.child_questions.length > 0) {\n      extractQuestions(q.child_questions);\n    }\n  }\n}\n\nif (surveyAnswers && surveyAnswers.questions) {\n  extractQuestions(surveyAnswers.questions);\n}\n\nfunction findAnswer(keyword) {\n  const match = flatQuestions.find(q => \n    q.text.toLowerCase().includes(keyword.toLowerCase())\n  );\n  return match ? match.answer : '';\n}\n\nconst duration = surveyAnswers.total_time || '';\n\n// Use known TalentLMS custom field keys\nconst row = {\n  'User Name': `${userDetails.first_name || ''} ${userDetails.last_name || ''}`.trim(),\n  'Email': userDetails.email || '',\n  'Role/Title': userDetails.custom_field_23 || '',\n  'Department': userDetails.custom_field_25 || '',\n  'Hire Date': userDetails.custom_field_31 || '',\n  'Start Date': userDetails.custom_field_31 || '',\n  'Completion Date': completedOn || surveyAnswers.completed_on || '',\n  'Duration (minutes)': duration,\n  'Quality_Rating': findAnswer('rate the quality'),\n  'Satisfaction_Rating': findAnswer('how satisfied'),\n  'Mission_Understanding': findAnswer('mission'),\n  'Cross_Team_Connection': findAnswer('connects to other teams'),\n  'Readiness_to_Contribute': findAnswer('knowledge I need'),\n  'Most_Helpful': findAnswer('most helpful'),\n  'Unclear_Topics': findAnswer('still unclear'),\n  'Improvement_Suggestions': findAnswer('improve')\n};\n\nreturn { json: row };"
+      },
+      "id": "transform-data",
+      "name": "Transform Data for Sheet",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2464,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1SgvK3lM0Yyn6hmaQUqiEfo7ea5UCfyodTShfMb3DGVE"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Orientation Feedback"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "User Name": "={{ $json['User Name'] }}",
+            "Email": "={{ $json['Email'] }}",
+            "Role/Title": "={{ $json['Role/Title'] }}",
+            "Department": "={{ $json['Department'] }}",
+            "Hire Date": "={{ $json['Hire Date'] }}",
+            "Start Date": "={{ $json['Start Date'] }}",
+            "Completion Date": "={{ $json['Completion Date'] }}",
+            "Duration (minutes)": "={{ $json['Duration (minutes)'] }}",
+            "Quality_Rating": "={{ $json['Quality_Rating'] }}",
+            "Satisfaction_Rating": "={{ $json['Satisfaction_Rating'] }}",
+            "Mission_Understanding": "={{ $json['Mission_Understanding'] }}",
+            "Cross_Team_Connection": "={{ $json['Cross_Team_Connection'] }}",
+            "Readiness_to_Contribute": "={{ $json['Readiness_to_Contribute'] }}",
+            "Most_Helpful": "={{ $json['Most_Helpful'] }}",
+            "Unclear_Topics": "={{ $json['Unclear_Topics'] }}",
+            "Improvement_Suggestions": "={{ $json['Improvement_Suggestions'] }}"
+          },
+          "matchingColumns": [
+            "Email"
+          ],
+          "schema": [
+            {
+              "id": "User Name",
+              "displayName": "User Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Role/Title",
+              "displayName": "Role/Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Department",
+              "displayName": "Department",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hire Date",
+              "displayName": "Hire Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Start Date",
+              "displayName": "Start Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Completion Date",
+              "displayName": "Completion Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Duration (minutes)",
+              "displayName": "Duration (minutes)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Quality_Rating",
+              "displayName": "Quality_Rating",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Satisfaction_Rating",
+              "displayName": "Satisfaction_Rating",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Mission_Understanding",
+              "displayName": "Mission_Understanding",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Cross_Team_Connection",
+              "displayName": "Cross_Team_Connection",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Readiness_to_Contribute",
+              "displayName": "Readiness_to_Contribute",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Most_Helpful",
+              "displayName": "Most_Helpful",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Unclear_Topics",
+              "displayName": "Unclear_Topics",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Improvement_Suggestions",
+              "displayName": "Improvement_Suggestions",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "append-to-sheet",
+      "name": "Append to Google Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2688,
+        208
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "vdcRQ7DzD7EJYCNd",
+          "name": "Google Sheets account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// No new users to add\nconst input = $input.all()[0].json;\nreturn [{ json: { \n  message: 'No new completed users to add to sheet', \n  skipped: true,\n  debug: input._debug || 'No debug info'\n} }];"
+      },
+      "id": "no-users",
+      "name": "No New Users",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1792,
+        400
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "error-trigger",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        224,
+        624
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://chat.googleapis.com/v1/spaces/AAQA4Ksbm-M/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=UPaxjAUjYdJowRki8zCMCrbLprOL-C_dQpcW5BxyFno",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "=⚠️ *Orientation Survey Sync Failed*\n\nWorkflow: Orientation Survey Sync\nTime: {{ $now.format('YYYY-MM-DD HH:mm:ss') }} PST\nError: {{ $json.error.message }}\n\nPlease check n8n for details."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "error-notification",
+      "name": "Send Error to Google Chat",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        448,
+        624
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get emails already in sheet BEFORE this run\nconst existingEntries = $('Read Existing Entries').all();\nconst existingEmails = new Set();\nfor (const entry of existingEntries) {\n  const email = (entry.json['Email'] || '').toLowerCase().trim();\n  if (email) existingEmails.add(email);\n}\n\n// Filter to only truly new entries\nconst allRows = $input.all();\nconst newRows = allRows.filter(item => {\n  const email = (item.json['Email'] || '').toLowerCase().trim();\n  return email && !existingEmails.has(email);\n});\n\nif (newRows.length === 0) {\n  return [{ json: { text: '', hasNew: false } }];\n}\n\nconst pstDate = new Date().toLocaleDateString('en-US', {\n  timeZone: 'America/Los_Angeles',\n  month: 'short', day: 'numeric', year: 'numeric'\n});\n\nlet message = `\\ud83d\\udccb Orientation Survey Sync - ${pstDate}\\n\\n`;\nmessage += `*${newRows.length} new response(s) synced to sheet*\\n\\n`;\n\nfor (const item of newRows) {\n  const r = item.json;\n  message += `\\u2705 *${r['User Name']}*\\n`;\n  message += `   ${r['Role/Title'] || 'N/A'} | ${r['Department'] || 'N/A'}\\n`;\n  message += `   Completed: ${r['Completion Date'] || 'N/A'}\\n`;\n  message += `   Satisfaction: ${r['Satisfaction_Rating'] || 'N/A'} | Quality: ${r['Quality_Rating'] || 'N/A'}\\n\\n`;\n}\n\nmessage += `Full data \\u2192 https://docs.google.com/spreadsheets/d/1SgvK3lM0Yyn6hmaQUqiEfo7ea5UCfyodTShfMb3DGVE`;\n\nreturn [{ json: { text: message, hasNew: true } }];"
+      },
+      "id": "build-chat-msg",
+      "name": "Build Chat Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2912,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://chat.googleapis.com/v1/spaces/AAQA4Ksbm-M/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=UPaxjAUjYdJowRki8zCMCrbLprOL-C_dQpcW5BxyFno",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ text: $json.text }) }}",
+        "options": {}
+      },
+      "id": "send-chat-test",
+      "name": "Send to UC Onboarding Chat",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3360,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "check-new",
+              "leftValue": "={{ $json.hasNew }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-has-new",
+      "name": "Has New Entries?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        3136,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "hire-date-check",
+              "leftValue": "={{ (() => { const d = ($json.custom_field_31 || '').split('/'); if (d.length !== 3) return false; return new Date(d[2], d[0]-1, d[1]) >= new Date(2026, 0, 1); })() }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "hire_date_filter",
+      "name": "Hire Date Filter",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2240,
+        208
+      ]
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "timezone": "America/Los_Angeles",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "timeSavedPerExecution": 15
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-03T21:40:06.913Z",
+      "createdAt": "2026-02-03T21:40:06.913Z",
+      "role": "workflow:owner",
+      "workflowId": "LgM424GuiHqFCyGg",
+      "projectId": "SzgLfYyy3lWDJHJA"
+    }
+  ],
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    }
+  },
+  "tags": [
+    {
+      "updatedAt": "2026-02-11T01:57:02.890Z",
+      "createdAt": "2026-02-11T01:57:02.890Z",
+      "id": "aOUk5y2lWjpAIKLe",
+      "name": "Training"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2026-02-12T22:06:09.216Z",
+  "versionId": "7ac627fe-e8ba-4c3a-b51e-41d44545d8fb"
+}
