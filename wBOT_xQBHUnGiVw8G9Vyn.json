@@ -1,0 +1,434 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-02-14T06:49:37.066Z",
+  "id": "wBOT_xQBHUnGiVw8G9Vyn",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "My workflow 34",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b2adf096-ed71-414c-9bd1-10ebf3abd1cb",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://chat.googleapis.com/v1/spaces/AAQAEnnivow/messages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "pageSize",
+              "value": "100"
+            },
+            {
+              "name": "filter",
+              "value": "=createTime > \"{{$now.minus({ days: 1 }).toISO()}}\""
+            },
+            {
+              "name": "fields",
+              "value": "messages(name,text,createTime,sender(name,displayName),thread(name),space(name,displayName),threadReply,emojiReactionSummaries(emoji,reactionCount),attachment)"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        224,
+        0
+      ],
+      "id": "63ede49f-7366-4fad-a816-bf7fa8f9d73c",
+      "name": "HTTP Request",
+      "credentials": {
+        "googleChatOAuth2Api": {
+          "id": "7kOD7fHCBCrouWm4",
+          "name": "Chat account 8"
+        },
+        "googleOAuth2Api": {
+          "id": "yVP2xwMrWsXzO3Cj",
+          "name": "Google account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://chat.googleapis.com/v1/spaces/AAAARF04xcA/messages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "pageSize",
+              "value": "100"
+            },
+            {
+              "name": "filter",
+              "value": "=createTime > \"{{$now.minus({ days: 1 }).toISO()}}\""
+            },
+            {
+              "name": "fields",
+              "value": "messages(name,text,createTime,sender(name,displayName),thread(name),space(name,displayName),threadReply,emojiReactionSummaries(emoji,reactionCount),attachment)"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        224,
+        160
+      ],
+      "id": "7eec7e02-54cc-4066-9d81-aaaa22527db3",
+      "name": "HTTP Request1",
+      "credentials": {
+        "googleChatOAuth2Api": {
+          "id": "7kOD7fHCBCrouWm4",
+          "name": "Chat account 8"
+        },
+        "googleOAuth2Api": {
+          "id": "yVP2xwMrWsXzO3Cj",
+          "name": "Google account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://chat.googleapis.com/v1/spaces/AAAASabJM_Y/messages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "pageSize",
+              "value": "100"
+            },
+            {
+              "name": "filter",
+              "value": "=createTime > \"{{$now.minus({ days: 1 }).toISO()}}\""
+            },
+            {
+              "name": "fields",
+              "value": "messages(name,text,createTime,sender(name,displayName),thread(name),space(name,displayName),threadReply,emojiReactionSummaries(emoji,reactionCount),attachment)"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        224,
+        320
+      ],
+      "id": "acc51086-f059-4a59-a5ef-1054d173bfff",
+      "name": "HTTP Request2",
+      "credentials": {
+        "googleChatOAuth2Api": {
+          "id": "7kOD7fHCBCrouWm4",
+          "name": "Chat account 8"
+        },
+        "googleOAuth2Api": {
+          "id": "yVP2xwMrWsXzO3Cj",
+          "name": "Google account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        624,
+        160
+      ],
+      "id": "ecc008d4-2a90-4e97-a947-85b295804b82",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "const out = [];\n\nfor (const item of items) {\n  const msgs = item.json.messages || [];\n  for (const m of msgs) {\n    if (!m.text) continue;\n\n    out.push({\n      json: {\n        message_id: m.name,\n        channel_name: m.space?.name || \"\",\n        reported_by: m.sender?.displayName ?? m.sender?.name ?? \"\",\n        date_reported: m.createTime,\n        text: m.text,\n        reaction_count: (m.emojiReactionSummaries || [])\n          .reduce((s,r)=>s+(r.reactionCount||0),0)\n      }\n    });\n  }\n}\n\nreturn out;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        832,
+        176
+      ],
+      "id": "5f511675-7d4f-4df7-809c-ccb3aa633538",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1myPTKlYM8PdF4_I1qRdyKxQh5ZzdeR97BuvaropBzG8/edit?usp=sharing",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet1",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "message_id": "={{$json.message_id}}",
+            "channel_name": "={{$json.channel_name}}",
+            "reported_by": "={{$json.reported_by}}",
+            "reaction_count": "={{$json.reaction_count}}",
+            "date_reported": "={{$json.date_reported}}",
+            "text": "={{$json.text}}",
+            "ingested_at": "={{$now}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "message_id",
+              "displayName": "message_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "channel_name",
+              "displayName": "channel_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "product_area",
+              "displayName": "product_area",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "category",
+              "displayName": "category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "reported_by",
+              "displayName": "reported_by",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "reaction_count",
+              "displayName": "reaction_count",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "thread_comment_count",
+              "displayName": "thread_comment_count",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "date_reported",
+              "displayName": "date_reported",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "text",
+              "displayName": "text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "request_summary",
+              "displayName": "request_summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ingested_at",
+              "displayName": "ingested_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1040,
+        176
+      ],
+      "id": "3d32efa7-bb94-4ffc-a4be-af8d3230c54e",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "FWLytwkTXchVJO4B",
+          "name": "Google Sheets account 8"
+        }
+      }
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-14T06:49:37.072Z",
+      "createdAt": "2026-02-14T06:49:37.072Z",
+      "role": "workflow:owner",
+      "workflowId": "wBOT_xQBHUnGiVw8G9Vyn",
+      "projectId": "T5sZVx43pwpZp7qg"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-02-14T08:27:49.262Z",
+  "versionId": "580bc553-4c7b-4d24-b94b-bba5a82d0f56"
+}
