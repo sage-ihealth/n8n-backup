@@ -1,0 +1,329 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Upload file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get message id": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Filter for PDFs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Email": {
+      "main": [
+        [
+          {
+            "node": "Get Binary Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Binary Data": {
+      "main": [
+        [
+          {
+            "node": "Get message id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter for PDFs": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-02-04T21:43:10.909Z",
+  "id": "Q246wMvfn4dwcPwO",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "My workflow 21 copy 2",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "323d111a-60cf-40ee-9885-23d9c3643699",
+              "name": "attachments",
+              "value": "={{ $('Filter for PDFs').item.binary.keys() }}",
+              "type": "array"
+            },
+            {
+              "id": "a452e0d5-d9d2-463c-85dd-90b2acc8c5d9",
+              "name": "message_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1232,
+        -224
+      ],
+      "id": "4fbef122-1af6-492b-a078-2d7a3b8b4760",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "attachments",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1440,
+        -224
+      ],
+      "id": "84f2778b-cce5-4694-95fe-3ff2c6ec374f",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "advanced": true,
+        "mergeByFields": {
+          "values": [
+            {
+              "field1": "message_id",
+              "field2": "id"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1664,
+        -16
+      ],
+      "id": "bdbf0e0b-827e-4003-b6b8-62d0701bb84e",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "inputDataFieldName": "={{ $json.attachments }}",
+        "name": "={{ $('Get message id').item.json.subject }}_{{ $('Merge').item.json.attachments }}",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1u7da2v7S3VLQBqmP8mt3oiNZ4GYi4XqG",
+          "mode": "list",
+          "cachedResultName": "2026-02",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1u7da2v7S3VLQBqmP8mt3oiNZ4GYi4XqG"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        2080,
+        -16
+      ],
+      "id": "e13d0785-1970-4156-b255-e37e5159acbf",
+      "name": "Upload file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "qmCJM2jyvSM9o5FQ",
+          "name": "Google Drive account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "messageId": "={{ $json.id }}",
+        "simple": false,
+        "options": {
+          "downloadAttachments": true
+        },
+        "path": "7a371cf9-9fab-46c2-9d2a-69ead3774107"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        832,
+        0
+      ],
+      "id": "790014bf-6002-4cb9-9a45-d7a47a11493d",
+      "name": "Get message id",
+      "webhookId": "7a371cf9-9fab-46c2-9d2a-69ead3774107",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "bsd68rFO96U4ZCjM",
+          "name": "Gmail account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {
+          "sender": "no-reply@quicksight.aws"
+        },
+        "options": {
+          "downloadAttachments": true
+        }
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        384,
+        0
+      ],
+      "id": "13e91801-4ffd-4e9f-b84f-ae704b7998f9",
+      "name": "Read Email",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "bsd68rFO96U4ZCjM",
+          "name": "Gmail account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "7cdbf83e-33cb-43d8-9763-c4b8bae0b5d6",
+              "leftValue": "={{ $('Read Email').item.binary }}",
+              "rightValue": "application/pdf",
+              "operator": {
+                "type": "object",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        624,
+        0
+      ],
+      "id": "bc2f0ae0-06b5-47d8-9f60-8a4977b64a2d",
+      "name": "Get Binary Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "const newItems = [];\n\nfor (const item of items) {\n  for (const [key, binary] of Object.entries(item.binary)) {\n    if (binary.mimeType === 'application/pdf') {\n      newItems.push({\n        json: item.json,\n        binary: {\n          [key]: binary\n        }\n      });\n    }\n  }\n}\n\nreturn newItems;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        0
+      ],
+      "id": "d11fde2f-2fd7-47f6-b4d6-6b16c8a8576c",
+      "name": "Filter for PDFs"
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-04T21:43:10.912Z",
+      "createdAt": "2026-02-04T21:43:10.912Z",
+      "role": "workflow:owner",
+      "workflowId": "Q246wMvfn4dwcPwO",
+      "projectId": "kugITzN49x98FAtM"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-02-04T21:43:10.909Z",
+  "versionId": "808e5333-425c-465d-a6fa-e78c584ed643"
+}
