@@ -1,0 +1,674 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Search HR Welcome Emails",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search HR Welcome Emails": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Emails",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Emails": {
+      "main": [
+        [
+          {
+            "node": "Check Duplicate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Continue Loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Duplicate": {
+      "main": [
+        [
+          {
+            "node": "Not Duplicate?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Not Duplicate?": {
+      "main": [
+        [
+          {
+            "node": "Extract New Hire Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Skip Duplicate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract New Hire Data": {
+      "main": [
+        [
+          {
+            "node": "Search Jira Ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Jira Ticket": {
+      "main": [
+        [
+          {
+            "node": "Parse Jira Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Jira Results": {
+      "main": [
+        [
+          {
+            "node": "Jira Ticket Found?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Jira Ticket Found?": {
+      "main": [
+        [
+          {
+            "node": "Fetch Email Template",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Calculate Business Days",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Business Days": {
+      "main": [
+        [
+          {
+            "node": "Should Send Warning?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Should Send Warning?": {
+      "main": [
+        [
+          {
+            "node": "Send Warning to Chat",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Skip (> 2 Days)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Warning to Chat": {
+      "main": [
+        [
+          {
+            "node": "Continue Loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Skip (> 2 Days)": {
+      "main": [
+        [
+          {
+            "node": "Continue Loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Email Template": {
+      "main": [
+        [
+          {
+            "node": "Populate Template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Populate Template": {
+      "main": [
+        [
+          {
+            "node": "Build Recipient List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Recipient List": {
+      "main": [
+        []
+      ]
+    },
+    "Send Welcome Email": {
+      "main": [
+        [
+          {
+            "node": "Mark as Processed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark as Processed": {
+      "main": [
+        [
+          {
+            "node": "Send Confirmation to Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Confirmation to Chat": {
+      "main": [
+        [
+          {
+            "node": "Continue Loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Skip Duplicate": {
+      "main": [
+        [
+          {
+            "node": "Continue Loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Continue Loop": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Emails",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-17T03:19:06.711Z",
+  "id": "o2Vb4vQ2dV5NIjSU",
+  "isArchived": false,
+  "meta": null,
+  "name": "UC Onboarding Welcome Email Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 */30 8-20 * * 1-5"
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        304
+      ],
+      "notes": "Every 30 minutes, Mon-Fri, 8AM-8PM PST"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "filters": {
+          "q": "from:hr@ihealthlabs.com subject:\"[Action Needed] Welcome to iHealth Labs!\" newer_than:30d"
+        }
+      },
+      "id": "search-gmail",
+      "name": "Search HR Welcome Emails",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        224,
+        304
+      ],
+      "webhookId": "7734e138-0258-4105-bc21-9697957a029f",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ctcxHDJ9lfivsYvG",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "loop-emails",
+      "name": "Loop Over Emails",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        448,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Check if email has already been processed\nconst staticData = $getWorkflowStaticData('global');\n\n// Initialize if not exists\nif (!staticData.processedEmails) {\n  staticData.processedEmails = {};\n}\n\nconst emailId = $input.first().json.id;\nconst threadId = $input.first().json.threadId;\n\n// Check if already processed\nif (staticData.processedEmails[emailId] || staticData.processedEmails[threadId]) {\n  return [{ json: { isDuplicate: true, emailId: emailId } }];\n}\n\nreturn [{ json: { isDuplicate: false, emailId: emailId, threadId: threadId, ...($input.first().json) } }];"
+      },
+      "id": "check-duplicate",
+      "name": "Check Duplicate",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "is-not-duplicate",
+              "leftValue": "={{ $json.isDuplicate }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-not-duplicate",
+      "name": "Not Duplicate?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        880,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract new hire data from HR welcome email\nconst emailData = $input.first().json;\nconst body = emailData.text || emailData.snippet || '';\nconst htmlBody = emailData.html || '';\nconst toHeader = emailData.to || '';\nconst ccHeader = emailData.cc || '';\n\n// Extract first name and full name from greeting\n// Pattern: \"Dear [First Name],\" or \"Hello [First Name],\"\nlet firstName = '';\nlet fullName = '';\n\nconst greetingMatch = body.match(/(?:Dear|Hello|Hi)\\s+([A-Z][a-z]+)(?:\\s+([A-Z][a-z]+))?[,!]/i);\nif (greetingMatch) {\n  firstName = greetingMatch[1];\n  if (greetingMatch[2]) {\n    fullName = `${greetingMatch[1]} ${greetingMatch[2]}`;\n  }\n}\n\n// If no full name from greeting, try to find in body\nif (!fullName) {\n  // Look for \"New Employee: [Name]\" pattern\n  const nameMatch = body.match(/(?:New Employee|Employee Name)[:\\s]+([A-Z][a-z]+(?:\\s+[A-Z][a-z]+)+)/i);\n  if (nameMatch) {\n    fullName = nameMatch[1];\n    firstName = fullName.split(' ')[0];\n  } else {\n    fullName = firstName; // Fallback\n  }\n}\n\n// Extract job title\nlet jobTitle = '';\nconst titleMatch = body.match(/(?:Title|Position|Role)[:\\s]+([^\\n\\r]+)/i);\nif (titleMatch) {\n  jobTitle = titleMatch[1].trim();\n}\n\n// Extract start date\nlet startDate = '';\nconst dateMatch = body.match(/(?:Start Date|Starting)[:\\s]+([A-Za-z]+\\s+\\d{1,2},?\\s+\\d{4}|\\d{1,2}\\/\\d{1,2}\\/\\d{4}|\\d{4}-\\d{2}-\\d{2})/i);\nif (dateMatch) {\n  startDate = dateMatch[1].trim();\n}\n\n// Extract personal email from TO field (the recipient of the HR email)\n// The TO field contains the new hire's personal email\nlet personalEmail = '';\nif (toHeader) {\n  // Handle format: \"Name <email@domain.com>\" or just \"email@domain.com\"\n  const emailMatch = toHeader.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}/g);\n  if (emailMatch) {\n    // Find the non-iHealthLabs email (personal email)\n    personalEmail = emailMatch.find(e => !e.toLowerCase().includes('ihealthlabs')) || emailMatch[0];\n  }\n}\n\n// Determine location from address in email\nlet location = 'REMOTE'; // Default\nconst bodyLower = body.toLowerCase();\nif (bodyLower.includes('sacramento') || bodyLower.includes('sac ')) {\n  location = 'SAC';\n} else if (bodyLower.includes('sunnyvale') || bodyLower.includes('headquarters') || bodyLower.includes(' hq')) {\n  location = 'HQ';\n} else if (bodyLower.includes('550 ellis') || bodyLower.includes('mountain view')) {\n  location = 'HQ';\n}\n\n// Extract CC recipients\nlet ccRecipients = [];\nif (ccHeader) {\n  const ccEmails = ccHeader.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}/g);\n  if (ccEmails) {\n    ccRecipients = ccEmails;\n  }\n}\n\n// Get the email received date\nconst receivedDate = emailData.date || new Date().toISOString();\n\nreturn [{\n  json: {\n    emailId: emailData.emailId || emailData.id,\n    threadId: emailData.threadId,\n    firstName: firstName,\n    fullName: fullName,\n    jobTitle: jobTitle,\n    startDate: startDate,\n    personalEmail: personalEmail,\n    location: location,\n    ccRecipients: ccRecipients,\n    receivedDate: receivedDate,\n    rawBody: body.substring(0, 500) // For debugging\n  }\n}];"
+      },
+      "id": "extract-data",
+      "name": "Extract New Hire Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1104,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": 5,
+        "options": {}
+      },
+      "id": "search-jira",
+      "name": "Search Jira Ticket",
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        1328,
+        208
+      ],
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "SGLKNIA8mth1mDeG",
+          "name": "Jira SW Cloud account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse Jira search results to extract name, company email and supervisor\n// Native Jira node returns each issue as a separate item\nconst allItems = $input.all();\nconst hireData = $('Extract New Hire Data').first().json;\n\nlet fullName = hireData.fullName || '';\nlet firstName = hireData.firstName || '';\nlet companyEmail = '';\nlet supervisorName = '';\nlet jiraTicketFound = false;\nlet jiraTicketKey = '';\n\n// Check if we got any results\nif (allItems.length > 0 && allItems[0].json.key) {\n  jiraTicketFound = true;\n  const ticket = allItems[0].json;\n  jiraTicketKey = ticket.key;\n  \n  const fields = ticket.fields || ticket;\n  const summary = fields.summary || '';\n  \n  // Extract full name from ticket summary\n  // Pattern: \"New Hire Onboard Request - Joshua Lee\"\n  const namePatterns = [\n    /New Hire Onboard Request\\s*-\\s*(.+)$/i,\n    /(?:onboarding|onboard|new hire)[^-]*-\\s*(.+)$/i,\n    /^(.+?)\\s*-\\s*(?:onboarding|onboard|new hire)/i,\n    /^([A-Z][a-z]+(?:\\s+[A-Z][a-z]+)+)$/i\n  ];\n  \n  for (const pattern of namePatterns) {\n    const match = summary.match(pattern);\n    if (match) {\n      fullName = match[1].trim();\n      firstName = fullName.split(' ')[0];\n      break;\n    }\n  }\n  \n  // If still no name, try the summary directly (might just be the name)\n  if (!fullName && summary) {\n    const words = summary.split(/[\\s-]+/).filter(w => /^[A-Z][a-z]+$/.test(w));\n    if (words.length >= 2) {\n      fullName = words.slice(0, 2).join(' ');\n      firstName = words[0];\n    }\n  }\n  \n  // Try to extract company email from custom fields\n  if (fields.customfield_10070) {\n    companyEmail = fields.customfield_10070;\n  } else if (fields.customfield_10071) {\n    companyEmail = fields.customfield_10071;\n  }\n  \n  // Get description text\n  let descText = '';\n  if (fields.description) {\n    if (typeof fields.description === 'string') {\n      descText = fields.description;\n    } else if (fields.description.content) {\n      const extractText = (node) => {\n        if (!node) return '';\n        if (typeof node === 'string') return node;\n        if (node.text) return node.text;\n        if (node.content) return node.content.map(extractText).join(' ');\n        return '';\n      };\n      descText = extractText(fields.description);\n    }\n  }\n  \n  // Look for company email in description\n  if (!companyEmail && descText) {\n    const emailMatch = descText.match(/([a-zA-Z0-9._%+-]+@ihealthlabs\\.com)/i);\n    if (emailMatch) {\n      companyEmail = emailMatch[1];\n    }\n  }\n  \n  // Search comments for email if still not found\n  if (!companyEmail) {\n    const comments = fields.comment?.comments || [];\n    for (const comment of comments) {\n      let commentText = typeof comment.body === 'string' ? comment.body : JSON.stringify(comment.body || '');\n      const emailMatch = commentText.match(/([a-zA-Z0-9._%+-]+@ihealthlabs\\.com)/i);\n      if (emailMatch) {\n        companyEmail = emailMatch[1];\n        break;\n      }\n    }\n  }\n  \n  // Extract supervisor/manager name from description\n  const supervisorMatch = descText.match(/(?:supervisor|manager|reports to)[:\\s]+([A-Z][a-z]+(?:\\s+[A-Z][a-z]+)+)/i);\n  if (supervisorMatch) {\n    supervisorName = supervisorMatch[1];\n  }\n}\n\n// If no company email found, construct one from name\nif (!companyEmail && fullName) {\n  const nameParts = fullName.toLowerCase().split(' ');\n  if (nameParts.length >= 2) {\n    companyEmail = `${nameParts[0]}.${nameParts[nameParts.length - 1]}@ihealthlabs.com`;\n  } else if (nameParts.length === 1) {\n    companyEmail = `${nameParts[0]}@ihealthlabs.com`;\n  }\n}\n\nreturn [{\n  json: {\n    ...hireData,\n    fullName: fullName,\n    firstName: firstName,\n    jiraTicketFound: jiraTicketFound,\n    jiraTicketKey: jiraTicketKey,\n    companyEmail: companyEmail,\n    supervisorName: supervisorName\n  }\n}];"
+      },
+      "id": "parse-jira",
+      "name": "Parse Jira Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1552,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "jira-found",
+              "leftValue": "={{ $json.jiraTicketFound }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-jira-found",
+      "name": "Jira Ticket Found?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Calculate business days since HR email was received\n// If > 2 business days and no Jira ticket, skip silently\n// If <= 2 business days, send warning to Chat (max 1 per day per person)\n\nconst hireData = $input.first().json;\nconst receivedDate = new Date(hireData.receivedDate);\nconst now = new Date();\nconst today = now.toISOString().split('T')[0];\n\n// Get static data for tracking warnings\nconst staticData = $getWorkflowStaticData('global');\nif (!staticData.warningsSent) {\n  staticData.warningsSent = {};\n}\n\n// Create unique key for this person\nconst personKey = (hireData.personalEmail || hireData.fullName || '').toLowerCase();\n\n// Check if we already sent a warning today for this person\nconst lastWarningDate = staticData.warningsSent[personKey];\nconst alreadyWarnedToday = lastWarningDate === today;\n\n// Company holidays for 2026 (update annually)\nconst holidays = [\n  '2026-01-01', '2026-01-19', '2026-02-16', '2026-05-25',\n  '2026-07-03', '2026-09-07', '2026-11-26', '2026-11-27',\n  '2026-12-24', '2026-12-25', '2026-12-31'\n];\n\nfunction isBusinessDay(date) {\n  const day = date.getDay();\n  if (day === 0 || day === 6) return false;\n  const dateStr = date.toISOString().split('T')[0];\n  return !holidays.includes(dateStr);\n}\n\nfunction countBusinessDays(start, end) {\n  let count = 0;\n  const current = new Date(start);\n  current.setDate(current.getDate() + 1);\n  while (current <= end) {\n    if (isBusinessDay(current)) count++;\n    current.setDate(current.getDate() + 1);\n  }\n  return count;\n}\n\nconst businessDays = countBusinessDays(receivedDate, now);\n\n// Only send warning if <= 2 business days AND not already warned today\nconst shouldSendWarning = businessDays <= 2 && !alreadyWarnedToday;\n\n// Mark warning as sent today if we're going to send one\nif (shouldSendWarning && personKey) {\n  staticData.warningsSent[personKey] = today;\n}\n\n// Clean up old warning entries (older than 7 days)\nconst sevenDaysAgo = new Date();\nsevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);\nconst cutoffDate = sevenDaysAgo.toISOString().split('T')[0];\nfor (const key of Object.keys(staticData.warningsSent)) {\n  if (staticData.warningsSent[key] < cutoffDate) {\n    delete staticData.warningsSent[key];\n  }\n}\n\nreturn [{\n  json: {\n    ...hireData,\n    businessDaysSinceHREmail: businessDays,\n    shouldSendWarning: shouldSendWarning,\n    shouldSkip: businessDays > 2,\n    alreadyWarnedToday: alreadyWarnedToday\n  }\n}];"
+      },
+      "id": "calc-business-days",
+      "name": "Calculate Business Days",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1984,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "should-warn",
+              "leftValue": "={{ $json.shouldSendWarning }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if-should-warn",
+      "name": "Should Send Warning?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2208,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://chat.googleapis.com/v1/spaces/AAQArkdpCu4/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=73gOUomiJ0I3JIfi746DoVGZfN98WtxzqIT0IeI-0Mg",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ text: '⚠️ *UC Onboarding Alert*\\n\\nNo Jira ticket found for new hire:\\n• Name: ' + $json.fullName + '\\n• Personal Email: ' + $json.personalEmail + '\\n• Start Date: ' + $json.startDate + '\\n• Location: ' + $json.location + '\\n\\nHR email received ' + $json.businessDaysSinceHREmail + ' business day(s) ago.\\n\\n_Please create ITM ticket or manually process this onboarding._' }) }}",
+        "options": {}
+      },
+      "id": "send-warning",
+      "name": "Send Warning to Chat",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2432,
+        304
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "skip-silently",
+      "name": "Skip (> 2 Days)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2432,
+        512
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "https://docs.google.com/document/d/14xyizKn7nhFy1DdjP4Rgjf0esWZwtTIvsAIFxCl98is/edit"
+      },
+      "id": "fetch-template",
+      "name": "Fetch Email Template",
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        1984,
+        112
+      ],
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "M2zVRJdd6mtAgbc0",
+          "name": "Google Docs account 2"
+        }
+      },
+      "notes": "Select Google Docs credential in n8n UI"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse Google Doc content and select appropriate template section\n// Then populate with new hire data\n\nconst docData = $input.first().json;\nconst hireData = $('Parse Jira Results').first().json;\n\n// Extract text content from Google Doc structure\nlet fullText = '';\nif (docData.body && docData.body.content) {\n  for (const element of docData.body.content) {\n    if (element.paragraph && element.paragraph.elements) {\n      for (const el of element.paragraph.elements) {\n        if (el.textRun && el.textRun.content) {\n          fullText += el.textRun.content;\n        }\n      }\n    }\n  }\n}\n\n// Find the appropriate section based on location\nconst location = hireData.location || 'REMOTE';\nlet templateContent = '';\n\n// Split by section markers (e.g., \"--- REMOTE ---\", \"--- HQ ---\", \"--- SAC ---\")\nconst sections = fullText.split(/---\\s*(REMOTE|HQ|SAC)\\s*---/i);\n\nif (sections.length > 1) {\n  // Find the section matching our location\n  for (let i = 0; i < sections.length; i++) {\n    if (sections[i].toUpperCase() === location) {\n      templateContent = sections[i + 1] || '';\n      break;\n    }\n  }\n}\n\n// If no section found, use the entire content\nif (!templateContent) {\n  templateContent = fullText;\n}\n\n// Replace placeholders with actual data\nconst links = {\n  TALENTLMS_MANUAL_LINK: 'https://docs.google.com/document/d/1LgUl7kPvAYNLkvHcyiOtuii1xv3cD_7P6nuV_-OpLgE/edit#heading=h.uzsz3eoag4yz',\n  TWO_FA_INSTRUCTIONS_LINK: 'https://docs.google.com/document/d/1YnrQ4OB7ZZvWMzFW3xZEcaiqGT8UO9mgtK6Ilm1skj4/edit?tab=t.0',\n  NINETY_DAY_TODO_LINK: 'https://docs.google.com/document/u/0/d/1GGqrWbX7X7RscjuCJ7FjHQ9OLDAv5Du--080b3xAj_s/edit'\n};\n\nlet emailBody = templateContent\n  .replace(/\\[FIRST_NAME\\]/gi, hireData.firstName || '')\n  .replace(/\\[FULL_NAME\\]/gi, hireData.fullName || '')\n  .replace(/\\[START_DATE\\]/gi, hireData.startDate || '')\n  .replace(/\\[MANAGER_NAME\\]/gi, hireData.supervisorName || '[Manager Name]')\n  .replace(/\\[SUPERVISOR_NAME\\]/gi, hireData.supervisorName || '[Supervisor Name]')\n  .replace(/\\[TALENTLMS_MANUAL_LINK\\]/gi, links.TALENTLMS_MANUAL_LINK)\n  .replace(/\\[2FA_INSTRUCTIONS_LINK\\]/gi, links.TWO_FA_INSTRUCTIONS_LINK)\n  .replace(/\\[90_DAY_TODO_LINK\\]/gi, links.NINETY_DAY_TODO_LINK)\n  .replace(/\\[NINETY_DAY_TODO_LINK\\]/gi, links.NINETY_DAY_TODO_LINK);\n\nreturn [{\n  json: {\n    ...hireData,\n    emailBody: emailBody,\n    emailSubject: 'Welcome to iHealth - Care Team Orientation Information'\n  }\n}];"
+      },
+      "id": "populate-template",
+      "name": "Populate Template",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2208,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build the recipient list for the welcome email\nconst data = $input.first().json;\n\n// TO: Company email + Personal email\nconst toList = [];\nif (data.companyEmail) toList.push(data.companyEmail);\nif (data.personalEmail) toList.push(data.personalEmail);\n\n// CC: Original CC recipients + Tia Hill (if SAC location)\nlet ccList = data.ccRecipients ? [...data.ccRecipients] : [];\n\n// Add Tia Hill for Sacramento hires\nif (data.location === 'SAC') {\n  const tiaEmail = 'tia.hill@ihealthlabs.com';\n  if (!ccList.includes(tiaEmail)) {\n    ccList.push(tiaEmail);\n  }\n}\n\n// Remove duplicates and filter out any empty values\nconst uniqueTo = [...new Set(toList.filter(e => e && e.trim()))].join(', ');\nconst uniqueCc = [...new Set(ccList.filter(e => e && e.trim()))].join(', ');\n\nreturn [{\n  json: {\n    ...data,\n    toRecipients: uniqueTo,\n    ccRecipients: uniqueCc\n  }\n}];"
+      },
+      "id": "build-recipients",
+      "name": "Build Recipient List",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2432,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.toRecipients }}",
+        "subject": "={{ $json.emailSubject }}",
+        "message": "={{ $json.emailBody }}",
+        "options": {
+          "senderName": "UC Onboarding",
+          "replyTo": "uc_onboarding@ihealthlabs.com"
+        }
+      },
+      "id": "send-email",
+      "name": "Send Welcome Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        2656,
+        -256
+      ],
+      "webhookId": "d4f6ff91-01b8-4ede-acd8-0d51f8d8edc0",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ctcxHDJ9lfivsYvG",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Mark email as processed in static data\nconst staticData = $getWorkflowStaticData('global');\nconst data = $input.first().json;\n\nif (!staticData.processedEmails) {\n  staticData.processedEmails = {};\n}\n\n// Mark both email ID and thread ID as processed\nif (data.emailId) {\n  staticData.processedEmails[data.emailId] = {\n    processedAt: new Date().toISOString(),\n    fullName: data.fullName\n  };\n}\nif (data.threadId) {\n  staticData.processedEmails[data.threadId] = {\n    processedAt: new Date().toISOString(),\n    fullName: data.fullName\n  };\n}\n\n// Clean up old entries (older than 30 days)\nconst thirtyDaysAgo = new Date();\nthirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);\n\nfor (const key of Object.keys(staticData.processedEmails)) {\n  const entry = staticData.processedEmails[key];\n  if (entry.processedAt && new Date(entry.processedAt) < thirtyDaysAgo) {\n    delete staticData.processedEmails[key];\n  }\n}\n\nreturn [{ json: data }];"
+      },
+      "id": "mark-processed",
+      "name": "Mark as Processed",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2864,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://chat.googleapis.com/v1/spaces/AAQArkdpCu4/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=73gOUomiJ0I3JIfi746DoVGZfN98WtxzqIT0IeI-0Mg",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ text: '✓ *Welcome email sent*\\n\\n• Name: ' + $json.fullName + '\\n• Company Email: ' + $json.companyEmail + '\\n• Location: ' + $json.location + '\\n• Start Date: ' + $json.startDate + '\\n• Jira Ticket: ' + ($json.jiraTicketKey || 'N/A') }) }}",
+        "options": {}
+      },
+      "id": "send-confirmation",
+      "name": "Send Confirmation to Chat",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3088,
+        112
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "back-to-loop",
+      "name": "Continue Loop",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        3312,
+        304
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "skip-duplicate",
+      "name": "Skip Duplicate",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1104,
+        400
+      ]
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Los_Angeles",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-17T03:19:06.716Z",
+      "createdAt": "2026-01-17T03:19:06.716Z",
+      "role": "workflow:owner",
+      "workflowId": "o2Vb4vQ2dV5NIjSU",
+      "projectId": "SzgLfYyy3lWDJHJA"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-02-05T01:29:16.388Z",
+  "versionId": "f90f4ffa-c7e5-407b-a628-e6b9a4188c89"
+}
