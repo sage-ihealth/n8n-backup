@@ -1,0 +1,732 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-02-14T02:01:45.850Z",
+    "createdAt": "2026-02-14T02:01:45.850Z",
+    "versionId": "2343e64b-06ee-45e0-b766-bf78cd9f52c1",
+    "workflowId": "xqpRKqwD7hwuxghp",
+    "nodes": [
+      {
+        "id": "mt",
+        "name": "Manual Trigger",
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          100,
+          300
+        ],
+        "parameters": {}
+      },
+      {
+        "id": "st",
+        "name": "Schedule Trigger",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          100,
+          500
+        ],
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "cronExpression",
+                "expression": "0 6 * * *"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "cfg",
+        "name": "Department Mapping Config",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          380,
+          400
+        ],
+        "parameters": {
+          "jsCode": "// ============================================\n// DEPARTMENT → GROUP MAPPING\n// Edit this object to add/change/remove mappings\n// ============================================\nconst staticData = $getWorkflowStaticData('global');\nstaticData.departmentToGroup = {\n  \"Billing\":               { groupId: \"8\", groupName: \"Billing\" },\n  \"Care & Growth\":         { groupId: \"3\", groupName: \"Care & Growth\" },\n  \"Care & Growth-Sac\":     { groupId: \"3\", groupName: \"Care & Growth\" },\n  \"Care & Growth-Sac-Ops\": { groupId: \"3\", groupName: \"Care & Growth\" },\n  \"Clinical Outcome\":      { groupId: \"2\", groupName: \"Clinical Outcome\" },\n  \"Engineer\":              { groupId: \"6\", groupName: \"IT/Engineering\" },\n  \"Product Team\":          { groupId: \"10\", groupName: \"Product/Solutions\" },\n};\nreturn $input.all();"
+        }
+      },
+      {
+        "id": "gu",
+        "name": "Get All Users",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          640,
+          400
+        ],
+        "parameters": {
+          "url": "https://ihealthlabs.talentlms.com/api/v1/users",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpHeaderAuth",
+          "options": {}
+        },
+        "credentials": {
+          "httpHeaderAuth": {
+            "id": "zjdo1NyXWx7o3LVy",
+            "name": "TalentLMS Header Auth"
+          }
+        }
+      },
+      {
+        "id": "bs",
+        "name": "Build Desired State",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          900,
+          400
+        ],
+        "parameters": {
+          "jsCode": "const staticData = $getWorkflowStaticData('global');\nconst mapping = staticData.departmentToGroup;\nconst users = $input.all().map(item => item.json);\n\n// Get unique managed group IDs\nconst managedGroups = {};\nfor (const [dept, info] of Object.entries(mapping)) {\n  managedGroups[info.groupId] = info.groupName;\n}\nconst managedGroupIds = Object.keys(managedGroups);\n\n// Build desired state: groupId -> [userIds]\nconst desiredState = {};\nconst flaggedUsers = [];\nfor (const gid of managedGroupIds) {\n  desiredState[gid] = [];\n}\n\nfor (const user of users) {\n  if (user.status !== 'active') continue;\n\n  const dept = (user.custom_field_25 || '').trim();\n  if (!dept) {\n    flaggedUsers.push({\n      id: String(user.id),\n      name: `${user.first_name} ${user.last_name}`,\n      email: user.email,\n      reason: 'no_department'\n    });\n    continue;\n  }\n\n  const group = mapping[dept];\n  if (!group) {\n    flaggedUsers.push({\n      id: String(user.id),\n      name: `${user.first_name} ${user.last_name}`,\n      email: user.email,\n      department: dept,\n      reason: 'unmapped_department'\n    });\n    continue;\n  }\n\n  desiredState[group.groupId].push(String(user.id));\n}\n\n// Store in static data for Reconcile node\nstaticData.desiredState = desiredState;\nstaticData.flaggedUsers = flaggedUsers;\nstaticData.allManagedUserIds = [...new Set(Object.values(desiredState).flat())];\nstaticData.managedGroups = managedGroups;\n\n// Output one item per managed group for HTTP Request\nreturn managedGroupIds.map(groupId => ({\n  json: { groupId }\n}));"
+        }
+      },
+      {
+        "id": "gg",
+        "name": "Get Group Members",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1160,
+          400
+        ],
+        "parameters": {
+          "url": "=https://ihealthlabs.talentlms.com/api/v1/groups/id:{{ $json.groupId }}",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpHeaderAuth",
+          "options": {}
+        },
+        "credentials": {
+          "httpHeaderAuth": {
+            "id": "zjdo1NyXWx7o3LVy",
+            "name": "TalentLMS Header Auth"
+          }
+        }
+      },
+      {
+        "id": "rc",
+        "name": "Reconcile",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1420,
+          400
+        ],
+        "parameters": {
+          "jsCode": "const staticData = $getWorkflowStaticData('global');\nconst desiredState = staticData.desiredState;\nconst flaggedUsers = staticData.flaggedUsers;\nconst allManagedUserIds = new Set(staticData.allManagedUserIds);\nconst managedGroups = staticData.managedGroups;\n\nconst items = $input.all();\nconst operations = [];\n\nfor (const item of items) {\n  const groupId = String(item.json.id);\n  const groupKey = item.json.key || '';\n  const groupName = item.json.name || managedGroups[groupId] || groupId;\n  const currentMembers = (item.json.users || []).map(u => String(u.id));\n\n  const desired = (desiredState[groupId] || []).map(String);\n  const desiredSet = new Set(desired);\n  const currentSet = new Set(currentMembers);\n\n  // Users to add: in desired but not in current\n  const toAdd = desired.filter(uid => !currentSet.has(uid));\n\n  // Users to remove: in current AND managed, but NOT desired for this group\n  const toRemove = currentMembers.filter(uid =>\n    allManagedUserIds.has(uid) && !desiredSet.has(uid)\n  );\n\n  // One item per user to add (API is singular)\n  for (const userId of toAdd) {\n    operations.push({\n      json: { type: 'add', groupId, groupKey, groupName, userId }\n    });\n  }\n\n  for (const userId of toRemove) {\n    operations.push({\n      json: { type: 'remove', groupId, groupName, userId }\n    });\n  }\n}\n\nif (flaggedUsers && flaggedUsers.length > 0) {\n  operations.push({\n    json: {\n      type: 'flagged',\n      users: flaggedUsers,\n      count: flaggedUsers.length\n    }\n  });\n}\n\nif (operations.length === 0) {\n  return [{ json: { type: 'no_changes', message: 'All group assignments are up to date' } }];\n}\n\nreturn operations;"
+        }
+      },
+      {
+        "id": "sw",
+        "name": "Route Operations",
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3,
+        "position": [
+          1680,
+          400
+        ],
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict"
+                  },
+                  "conditions": [
+                    {
+                      "id": "is-add",
+                      "leftValue": "={{ $json.type }}",
+                      "rightValue": "add",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "Add"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict"
+                  },
+                  "conditions": [
+                    {
+                      "id": "is-remove",
+                      "leftValue": "={{ $json.type }}",
+                      "rightValue": "remove",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "Remove"
+              }
+            ]
+          },
+          "options": {
+            "fallbackOutput": "extra"
+          }
+        }
+      },
+      {
+        "id": "add",
+        "name": "Add Users to Group",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1960,
+          280
+        ],
+        "continueOnFail": true,
+        "parameters": {
+          "method": "GET",
+          "url": "=https://ihealthlabs.talentlms.com/api/v1/addusertogroup/user_id:{{ $json.userId }},group_key:{{ $json.groupKey }}",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpHeaderAuth",
+          "sendBody": false,
+          "options": {}
+        },
+        "credentials": {
+          "httpHeaderAuth": {
+            "id": "zjdo1NyXWx7o3LVy",
+            "name": "TalentLMS Header Auth"
+          }
+        }
+      },
+      {
+        "id": "rm",
+        "name": "Remove User from Group",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1960,
+          520
+        ],
+        "continueOnFail": true,
+        "parameters": {
+          "method": "POST",
+          "url": "https://ihealthlabs.talentlms.com/api/v1/removeuserfromgroup",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpHeaderAuth",
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "group_id",
+                "value": "={{ $json.groupId }}"
+              },
+              {
+                "name": "user_id",
+                "value": "={{ $json.userId }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "credentials": {
+          "httpHeaderAuth": {
+            "id": "zjdo1NyXWx7o3LVy",
+            "name": "TalentLMS Header Auth"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Manual Trigger": {
+        "main": [
+          [
+            {
+              "node": "Department Mapping Config",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Schedule Trigger": {
+        "main": [
+          [
+            {
+              "node": "Department Mapping Config",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Department Mapping Config": {
+        "main": [
+          [
+            {
+              "node": "Get All Users",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get All Users": {
+        "main": [
+          [
+            {
+              "node": "Build Desired State",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Desired State": {
+        "main": [
+          [
+            {
+              "node": "Get Group Members",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Group Members": {
+        "main": [
+          [
+            {
+              "node": "Reconcile",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Reconcile": {
+        "main": [
+          [
+            {
+              "node": "Route Operations",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Route Operations": {
+        "main": [
+          [
+            {
+              "node": "Add Users to Group",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Remove User from Group",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          []
+        ]
+      }
+    },
+    "authors": "Phoebe You",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "activeVersionId": "2343e64b-06ee-45e0-b766-bf78cd9f52c1",
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Department Mapping Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Department Mapping Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Department Mapping Config": {
+      "main": [
+        [
+          {
+            "node": "Get All Users",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get All Users": {
+      "main": [
+        [
+          {
+            "node": "Build Desired State",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Desired State": {
+      "main": [
+        [
+          {
+            "node": "Get Group Members",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Group Members": {
+      "main": [
+        [
+          {
+            "node": "Reconcile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reconcile": {
+      "main": [
+        [
+          {
+            "node": "Route Operations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Operations": {
+      "main": [
+        [
+          {
+            "node": "Add Users to Group",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Remove User from Group",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    }
+  },
+  "createdAt": "2026-02-14T00:58:14.857Z",
+  "id": "xqpRKqwD7hwuxghp",
+  "isArchived": false,
+  "meta": null,
+  "name": "TalentLMS Auto-Assign Groups by Department",
+  "nodes": [
+    {
+      "id": "mt",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        100,
+        300
+      ],
+      "parameters": {}
+    },
+    {
+      "id": "st",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        100,
+        500
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 6 * * *"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "cfg",
+      "name": "Department Mapping Config",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        380,
+        400
+      ],
+      "parameters": {
+        "jsCode": "// ============================================\n// DEPARTMENT → GROUP MAPPING\n// Edit this object to add/change/remove mappings\n// ============================================\nconst staticData = $getWorkflowStaticData('global');\nstaticData.departmentToGroup = {\n  \"Billing\":               { groupId: \"8\", groupName: \"Billing\" },\n  \"Care & Growth\":         { groupId: \"3\", groupName: \"Care & Growth\" },\n  \"Care & Growth-Sac\":     { groupId: \"3\", groupName: \"Care & Growth\" },\n  \"Care & Growth-Sac-Ops\": { groupId: \"3\", groupName: \"Care & Growth\" },\n  \"Clinical Outcome\":      { groupId: \"2\", groupName: \"Clinical Outcome\" },\n  \"Engineer\":              { groupId: \"6\", groupName: \"IT/Engineering\" },\n  \"Product Team\":          { groupId: \"10\", groupName: \"Product/Solutions\" },\n};\nreturn $input.all();"
+      }
+    },
+    {
+      "id": "gu",
+      "name": "Get All Users",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        640,
+        400
+      ],
+      "parameters": {
+        "url": "https://ihealthlabs.talentlms.com/api/v1/users",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "zjdo1NyXWx7o3LVy",
+          "name": "TalentLMS Header Auth"
+        }
+      }
+    },
+    {
+      "id": "bs",
+      "name": "Build Desired State",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        900,
+        400
+      ],
+      "parameters": {
+        "jsCode": "const staticData = $getWorkflowStaticData('global');\nconst mapping = staticData.departmentToGroup;\nconst users = $input.all().map(item => item.json);\n\n// Get unique managed group IDs\nconst managedGroups = {};\nfor (const [dept, info] of Object.entries(mapping)) {\n  managedGroups[info.groupId] = info.groupName;\n}\nconst managedGroupIds = Object.keys(managedGroups);\n\n// Build desired state: groupId -> [userIds]\nconst desiredState = {};\nconst flaggedUsers = [];\nfor (const gid of managedGroupIds) {\n  desiredState[gid] = [];\n}\n\nfor (const user of users) {\n  if (user.status !== 'active') continue;\n\n  const dept = (user.custom_field_25 || '').trim();\n  if (!dept) {\n    flaggedUsers.push({\n      id: String(user.id),\n      name: `${user.first_name} ${user.last_name}`,\n      email: user.email,\n      reason: 'no_department'\n    });\n    continue;\n  }\n\n  const group = mapping[dept];\n  if (!group) {\n    flaggedUsers.push({\n      id: String(user.id),\n      name: `${user.first_name} ${user.last_name}`,\n      email: user.email,\n      department: dept,\n      reason: 'unmapped_department'\n    });\n    continue;\n  }\n\n  desiredState[group.groupId].push(String(user.id));\n}\n\n// Store in static data for Reconcile node\nstaticData.desiredState = desiredState;\nstaticData.flaggedUsers = flaggedUsers;\nstaticData.allManagedUserIds = [...new Set(Object.values(desiredState).flat())];\nstaticData.managedGroups = managedGroups;\n\n// Output one item per managed group for HTTP Request\nreturn managedGroupIds.map(groupId => ({\n  json: { groupId }\n}));"
+      }
+    },
+    {
+      "id": "gg",
+      "name": "Get Group Members",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1160,
+        400
+      ],
+      "parameters": {
+        "url": "=https://ihealthlabs.talentlms.com/api/v1/groups/id:{{ $json.groupId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "zjdo1NyXWx7o3LVy",
+          "name": "TalentLMS Header Auth"
+        }
+      }
+    },
+    {
+      "id": "rc",
+      "name": "Reconcile",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1420,
+        400
+      ],
+      "parameters": {
+        "jsCode": "const staticData = $getWorkflowStaticData('global');\nconst desiredState = staticData.desiredState;\nconst flaggedUsers = staticData.flaggedUsers;\nconst allManagedUserIds = new Set(staticData.allManagedUserIds);\nconst managedGroups = staticData.managedGroups;\n\nconst items = $input.all();\nconst operations = [];\n\nfor (const item of items) {\n  const groupId = String(item.json.id);\n  const groupKey = item.json.key || '';\n  const groupName = item.json.name || managedGroups[groupId] || groupId;\n  const currentMembers = (item.json.users || []).map(u => String(u.id));\n\n  const desired = (desiredState[groupId] || []).map(String);\n  const desiredSet = new Set(desired);\n  const currentSet = new Set(currentMembers);\n\n  // Users to add: in desired but not in current\n  const toAdd = desired.filter(uid => !currentSet.has(uid));\n\n  // Users to remove: in current AND managed, but NOT desired for this group\n  const toRemove = currentMembers.filter(uid =>\n    allManagedUserIds.has(uid) && !desiredSet.has(uid)\n  );\n\n  // One item per user to add (API is singular)\n  for (const userId of toAdd) {\n    operations.push({\n      json: { type: 'add', groupId, groupKey, groupName, userId }\n    });\n  }\n\n  for (const userId of toRemove) {\n    operations.push({\n      json: { type: 'remove', groupId, groupName, userId }\n    });\n  }\n}\n\nif (flaggedUsers && flaggedUsers.length > 0) {\n  operations.push({\n    json: {\n      type: 'flagged',\n      users: flaggedUsers,\n      count: flaggedUsers.length\n    }\n  });\n}\n\nif (operations.length === 0) {\n  return [{ json: { type: 'no_changes', message: 'All group assignments are up to date' } }];\n}\n\nreturn operations;"
+      }
+    },
+    {
+      "id": "sw",
+      "name": "Route Operations",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [
+        1680,
+        400
+      ],
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "is-add",
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "add",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Add"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict"
+                },
+                "conditions": [
+                  {
+                    "id": "is-remove",
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "remove",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Remove"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      }
+    },
+    {
+      "id": "add",
+      "name": "Add Users to Group",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1960,
+        280
+      ],
+      "continueOnFail": true,
+      "parameters": {
+        "method": "GET",
+        "url": "=https://ihealthlabs.talentlms.com/api/v1/addusertogroup/user_id:{{ $json.userId }},group_key:{{ $json.groupKey }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": false,
+        "options": {}
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "zjdo1NyXWx7o3LVy",
+          "name": "TalentLMS Header Auth"
+        }
+      }
+    },
+    {
+      "id": "rm",
+      "name": "Remove User from Group",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1960,
+        520
+      ],
+      "continueOnFail": true,
+      "parameters": {
+        "method": "POST",
+        "url": "https://ihealthlabs.talentlms.com/api/v1/removeuserfromgroup",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "group_id",
+              "value": "={{ $json.groupId }}"
+            },
+            {
+              "name": "user_id",
+              "value": "={{ $json.userId }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "zjdo1NyXWx7o3LVy",
+          "name": "TalentLMS Header Auth"
+        }
+      }
+    }
+  ],
+  "origin": "n8n",
+  "pinData": null,
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Los_Angeles",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-14T00:58:14.860Z",
+      "createdAt": "2026-02-14T00:58:14.860Z",
+      "role": "workflow:owner",
+      "workflowId": "xqpRKqwD7hwuxghp",
+      "projectId": "SzgLfYyy3lWDJHJA"
+    }
+  ],
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2026-02-14T02:01:45.847Z",
+  "versionId": "2343e64b-06ee-45e0-b766-bf78cd9f52c1"
+}
