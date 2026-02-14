@@ -1,0 +1,106 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Snowflake Test Query",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "List N8N Tables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-30T02:44:38.331Z",
+  "id": "depMVRnqcy3UPo9s",
+  "isArchived": true,
+  "meta": null,
+  "name": "Snowflake Connection Test",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "start-node",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT CURRENT_TIMESTAMP() as current_time, CURRENT_USER() as current_user, CURRENT_ROLE() as current_role, CURRENT_DATABASE() as current_database, CURRENT_SCHEMA() as current_schema"
+      },
+      "id": "snowflake-node",
+      "name": "Snowflake Test Query",
+      "type": "n8n-nodes-base.snowflake",
+      "typeVersion": 1,
+      "position": [
+        460,
+        300
+      ],
+      "credentials": {
+        "snowflake": {
+          "id": "hBsPJkXsLBk4Bo9W",
+          "name": "Snowflake N8N_USER"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SHOW TABLES IN ANALYTICS.N8N"
+      },
+      "id": "snowflake-tables",
+      "name": "List N8N Tables",
+      "type": "n8n-nodes-base.snowflake",
+      "typeVersion": 1,
+      "position": [
+        460,
+        480
+      ],
+      "credentials": {
+        "snowflake": {
+          "id": "hBsPJkXsLBk4Bo9W",
+          "name": "Snowflake N8N_USER"
+        }
+      }
+    }
+  ],
+  "origin": "n8n",
+  "pinData": null,
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-30T02:44:38.333Z",
+      "createdAt": "2026-01-30T02:44:38.333Z",
+      "role": "workflow:owner",
+      "workflowId": "depMVRnqcy3UPo9s",
+      "projectId": "SzgLfYyy3lWDJHJA"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-01-30T02:48:25.000Z",
+  "versionId": "eb4c4c7b-28dd-4a0b-8273-670f5a3575da"
+}
