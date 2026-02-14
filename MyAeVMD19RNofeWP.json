@@ -1,0 +1,237 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Config": {
+      "main": [
+        [
+          {
+            "node": "Google Drive - Download CSV",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive - Download CSV": {
+      "main": [
+        [
+          {
+            "node": "CSV -> JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CSV -> JSON": {
+      "main": [
+        [
+          {
+            "node": "Minimize Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Minimize Rows": {
+      "main": [
+        [
+          {
+            "node": "Build Doc Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Doc Content": {
+      "main": [
+        [
+          {
+            "node": "Google Docs - Create",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Docs - Create": {
+      "main": [
+        [
+          {
+            "node": "Google Drive - Move to Folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2025-10-24T00:57:35.987Z",
+  "id": "MyAeVMD19RNofeWP",
+  "isArchived": true,
+  "meta": null,
+  "name": "My workflow 4",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "6a995337-b0b1-4f2a-88c0-d9822ecaa8b6",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -848,
+        176
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "fileId",
+              "value": "1o-LnhhkFkFQVRXLlfNIbYIVFmgzvFyRz"
+            },
+            {
+              "name": "outputFolderId",
+              "value": "1Ts-x0PhI8ZsWfY2OQk4vmqj7EB6nm6Z7"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "216b3b13-e0cd-415a-80ce-ef05d3c8d960",
+      "name": "Set Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        -624,
+        176
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": "={{$json.fileId}}",
+        "options": {}
+      },
+      "id": "7f7d9895-b840-4085-b306-6bd2631969a9",
+      "name": "Google Drive - Download CSV",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 2,
+      "position": [
+        -368,
+        176
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "wMYD0s3jSTz9a2TY",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "toJson"
+      },
+      "id": "513df390-2852-41e8-8f15-1921bb849ef2",
+      "name": "CSV -> JSON",
+      "type": "n8n-nodes-base.spreadsheetFile",
+      "typeVersion": 1,
+      "position": [
+        -128,
+        176
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Keep only needed fields and drop binary to shrink execution data\nreturn items.map(item => {\n  const j = item.json || {};\n  return { json: {\n    patient_id: j.patient_id,\n    active_meds_section: j.active_meds_section,\n    background_section: j.background_section,\n    care_notes_section: j.care_notes_section,\n    core_medications_section: j.core_medications_section,\n    vitals_section: j.vitals_section\n  }};\n});"
+      },
+      "id": "60ce6cda-6965-4052-a6ff-45faef23cdc7",
+      "name": "Minimize Rows",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        176
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "return items.map(item => {\n  const j = item.json || {};\n  const rawId = (j.patient_id !== undefined && j.patient_id !== null) ? String(j.patient_id).trim() : 'unknown_patient';\n  const id = rawId.replace(/[\\\\/]/g, '_').slice(0, 200);\n  const section = (label, text) => `${label}\\n${text === undefined || text === null ? '' : String(text)}\\n\\n`;\n\n  const content =\n    `Patient ID: ${id}\\n\\n` +\n    section('Active Medications', j.active_meds_section) +\n    section('Background', j.background_section) +\n    section('Care Notes', j.care_notes_section) +\n    section('Core Medications', j.core_medications_section) +\n    section('Vitals', j.vitals_section);\n\n  return { json: { docTitle: id, docContent: content } };\n});"
+      },
+      "id": "fbfec130-d92a-46bf-aa54-cac48b7d14d7",
+      "name": "Build Doc Content",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        176,
+        176
+      ]
+    },
+    {
+      "parameters": {
+        "title": "={{$json.docTitle}}"
+      },
+      "id": "e36b321c-73a3-4430-bcc0-6cc744515c56",
+      "name": "Google Docs - Create",
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 1,
+      "position": [
+        352,
+        176
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "move"
+      },
+      "id": "68c98810-2d36-4d48-8596-11476ea8d3eb",
+      "name": "Google Drive - Move to Folder",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 2,
+      "position": [
+        672,
+        176
+      ]
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [
+    {
+      "updatedAt": "2025-10-24T00:57:36.009Z",
+      "createdAt": "2025-10-24T00:57:36.009Z",
+      "role": "workflow:owner",
+      "workflowId": "MyAeVMD19RNofeWP",
+      "projectId": "IXgyKSoq6RADLFoU"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2025-10-27T17:44:26.000Z",
+  "versionId": "6377624e-b06c-4b2d-879d-e3e6cb47f768"
+}
