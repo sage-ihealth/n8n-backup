@@ -1,0 +1,226 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Daily 6PM Pacific": {
+      "main": [
+        [
+          {
+            "node": "Search Original Emails",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Original Emails": {
+      "main": [
+        [
+          {
+            "node": "Add Pacific Date",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Pacific Date": {
+      "main": [
+        [
+          {
+            "node": "Search Team Replies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Team Replies": {
+      "main": [
+        [
+          {
+            "node": "Process & Match",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process & Match": {
+      "main": [
+        [
+          {
+            "node": "Append to Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-14T06:58:55.226Z",
+  "id": "HUCXgWM47BK7K18D",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "Call Center Email Tracking",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 18
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "schedule-trigger",
+      "name": "Daily 6PM Pacific"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "returnAll": true,
+        "filters": {
+          "q": "from:callcenterassistant@ihealthlabs.com after:2026/01/01"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        220,
+        0
+      ],
+      "id": "gmail-search",
+      "name": "Search Original Emails",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ctcxHDJ9lfivsYvG",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Add Pacific date to each email\nfunction getPacificDateStr(date) {\n  const options = { timeZone: 'America/Los_Angeles', year: 'numeric', month: 'numeric', day: 'numeric' };\n  return date.toLocaleDateString('en-US', options);\n}\n\nconst results = [];\nfor (const item of items) {\n  const email = item.json;\n  const receivedTimeUTC = email.internalDate \n    ? new Date(parseInt(email.internalDate)) \n    : new Date(email.date);\n  \n  const pacificDateStr = getPacificDateStr(receivedTimeUTC);\n  results.push({\n    json: {\n      ...email,\n      pacificDate: pacificDateStr,\n      receivedTimeUTC: receivedTimeUTC.toISOString()\n    }\n  });\n}\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        0
+      ],
+      "id": "filter-date",
+      "name": "Add Pacific Date"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "returnAll": true,
+        "filters": {
+          "q": "{to:callcenter@ihealthlabs.com cc:callcenter@ihealthlabs.com} from:@ihealthlabs.com -from:callcenterassistant@ihealthlabs.com after:2026/01/01"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        660,
+        0
+      ],
+      "id": "gmail-replies",
+      "name": "Search Team Replies",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ctcxHDJ9lfivsYvG",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Helper functions\nfunction formatTime(date) {\n  if (!date) return '';\n  return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'America/Los_Angeles' });\n}\n\nfunction extractName(email) {\n  if (!email) return '';\n  const match = email.match(/^([^<]+)</);\n  if (match) return match[1].trim();\n  const emailMatch = email.match(/([^@]+)@/);\n  if (emailMatch) {\n    return emailMatch[1].replace(/[._]/g, ' ').replace(/\\b\\w/g, c => c.toUpperCase());\n  }\n  return email;\n}\n\nfunction extractPhoneNumber(text) {\n  if (!text) return '';\n  const phoneMatch = text.match(/\\+?1?[\\s.-]?\\(?\\d{3}\\)?[\\s.-]?\\d{3}[\\s.-]?\\d{4}/);\n  return phoneMatch ? phoneMatch[0] : '';\n}\n\n// Normalize phone number for comparison (digits only)\nfunction normalizePhone(phone) {\n  if (!phone) return '';\n  return phone.replace(/\\D/g, '').slice(-10);\n}\n\n// Get original emails from Add Pacific Date node\nconst originalEmails = $('Add Pacific Date').all();\n\n// Get team replies from current input\nconst teamReplies = items;\n\n// Group replies by threadId AND by phone number\nconst repliesByThread = {};\nconst repliesByPhone = {};\n\nfor (const item of teamReplies) {\n  const reply = item.json;\n  \n  // Group by threadId\n  const threadId = reply.threadId;\n  if (!repliesByThread[threadId]) {\n    repliesByThread[threadId] = [];\n  }\n  repliesByThread[threadId].push(reply);\n  \n  // Group by phone number found in reply\n  const replyText = (reply.subject || '') + ' ' + (reply.text || reply.snippet || '');\n  const replyPhone = normalizePhone(extractPhoneNumber(replyText));\n  if (replyPhone) {\n    if (!repliesByPhone[replyPhone]) {\n      repliesByPhone[replyPhone] = [];\n    }\n    repliesByPhone[replyPhone].push(reply);\n  }\n}\n\nconst results = [];\n\nfor (const item of originalEmails) {\n  const email = item.json;\n  const receivedTimeUTC = new Date(email.receivedTimeUTC);\n  \n  const subject = email.subject || '';\n  const body = email.text || email.snippet || '';\n  const fullText = (subject + ' ' + body).toLowerCase();\n  const category = fullText.includes('voicemail') ? 'Voicemail' : \n                   fullText.includes('missed call') ? 'Missed call' : 'Unknown';\n  const phoneNumber = extractPhoneNumber(subject + ' ' + body);\n  const normalizedPhone = normalizePhone(phoneNumber);\n  \n  // Find forwards and responses\n  let forwardedTime = null;\n  let forwardedBy = '';\n  let forwardedTo = '';\n  let respondedTime = null;\n  let respondedBy = '';\n  \n  // Collect all potential replies: by threadId OR by phone number\n  const allReplies = [];\n  const seenIds = new Set();\n  \n  // Add replies from same thread\n  for (const reply of (repliesByThread[email.threadId] || [])) {\n    if (!seenIds.has(reply.id)) {\n      allReplies.push(reply);\n      seenIds.add(reply.id);\n    }\n  }\n  \n  // Add replies matching phone number (for CC'd responses)\n  if (normalizedPhone) {\n    for (const reply of (repliesByPhone[normalizedPhone] || [])) {\n      if (!seenIds.has(reply.id)) {\n        allReplies.push(reply);\n        seenIds.add(reply.id);\n      }\n    }\n  }\n  \n  for (const reply of allReplies) {\n    const replySubject = (reply.subject || '').toLowerCase();\n    const replyTime = reply.internalDate ? new Date(parseInt(reply.internalDate)) : new Date(reply.date);\n    const replyFrom = reply.From || reply.from || '';\n    const replyTo = reply.to || '';\n    \n    if (replySubject.includes('fwd:') || replySubject.includes('fw:')) {\n      if (!forwardedTime || replyTime < forwardedTime) {\n        forwardedTime = replyTime;\n        forwardedTo = extractName(replyTo);\n      }\n    }\n    \n    // Check for 'completed' response - this is the person who handled it\n    // Response must be AFTER the email was received\n    const replyContent = ((reply.subject || '') + ' ' + (reply.text || reply.snippet || '')).toLowerCase();\n    if (replyContent.includes('completed') || replyContent.includes('complete')) {\n      // Use getTime() for reliable numeric comparison\n      const replyTimeMs = replyTime.getTime();\n      const receivedTimeMs = receivedTimeUTC.getTime();\n      \n      if (replyTimeMs > receivedTimeMs && (!respondedTime || replyTimeMs < respondedTime.getTime())) {\n        respondedTime = replyTime;\n        respondedBy = extractName(replyFrom);\n      }\n    }\n  }\n  \n  let responseTimeMin = respondedTime ? Math.round((respondedTime - receivedTimeUTC) / 60000) : '';\n  \n  // Safeguard: If response time is negative, the match was incorrect\n  if (responseTimeMin !== '' && responseTimeMin < 0) {\n    respondedTime = null;\n    respondedBy = '';\n    responseTimeMin = '';\n  }\n  \n  results.push({\n    json: {\n      'Date': email.pacificDate,\n      'Category': category,\n      'Phone Number': phoneNumber,\n      'Received Time': formatTime(receivedTimeUTC),\n      'If Forwarded': forwardedTime ? 'Yes' : 'No',\n      'Forwarded To': forwardedTo,\n      'Forwarded Time': formatTime(forwardedTime),\n      'Responded By': respondedBy,\n      'Responded Time': formatTime(respondedTime),\n      'Response Time (min)': responseTimeMin\n    }\n  });\n}\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        880,
+        0
+      ],
+      "id": "process-emails",
+      "name": "Process & Match"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1PLjKVsEasOexkOZSamgOdd2rByicXkdj1caDRhtgBvQ",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {}
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1100,
+        0
+      ],
+      "id": "sheets-append",
+      "name": "Append to Sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "vdcRQ7DzD7EJYCNd",
+          "name": "Google Sheets account 3"
+        }
+      }
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Los_Angeles",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-14T06:58:55.231Z",
+      "createdAt": "2026-01-14T06:58:55.231Z",
+      "role": "workflow:owner",
+      "workflowId": "HUCXgWM47BK7K18D",
+      "projectId": "SzgLfYyy3lWDJHJA"
+    }
+  ],
+  "staticData": {
+    "node:Daily 6PM Pacific": {
+      "recurrenceRules": []
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2026-02-11T01:00:43.671Z",
+  "versionId": "d4b0adae-181b-4902-a6de-367b21da3528"
+}
