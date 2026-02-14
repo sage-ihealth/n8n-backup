@@ -1,0 +1,758 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Read Patient Spreadsheet1": {
+      "main": [
+        [
+          {
+            "node": "Filter Incomplete Insurance1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Incomplete Insurance1": {
+      "main": [
+        [
+          {
+            "node": "Check Reminder Date1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Reminder Date1": {
+      "main": [
+        [
+          {
+            "node": "Store Spreadsheet Data1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Patient Details from API1": {
+      "main": [
+        [
+          {
+            "node": "Store Spreadsheet Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily Trigger (9 AM)1": {
+      "main": [
+        [
+          {
+            "node": "Read Patient Spreadsheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Spreadsheet Data1": {
+      "main": [
+        [
+          {
+            "node": "Get Patient Details from API1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 1s": {
+      "main": [
+        [
+          {
+            "node": "Send DM Message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send DM Message2": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store Spreadsheet Data": {
+      "main": [
+        [
+          {
+            "node": "Format Google Chat Message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Google Chat Message1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Wait 1s1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 1s1": {
+      "main": [
+        [
+          {
+            "node": "Setup DM Space - ahna",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Setup DM Space - ahna": {
+      "main": [
+        [
+          {
+            "node": "Wait 1s",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-02-10T01:34:36.198Z",
+  "id": "ywgeJ0zSkQrIg9AT5_Ytr",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "Billing - Insurance Information Reminder Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1LtR4Dj7nmAwJNht6rrKJir8PLsnED--D3Ya_l1xaYXo",
+          "mode": "list",
+          "cachedResultName": "TEST of Monthly Billable Time Requiring Review + Missing (Weekly)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1LtR4Dj7nmAwJNht6rrKJir8PLsnED--D3Ya_l1xaYXo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "978445722",
+          "mode": "id"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "CT Comments "
+            },
+            {
+              "lookupColumn": "Discharged during billing cycle"
+            },
+            {
+              "lookupColumn": "1st GChat Auto Notification"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -400,
+        1120
+      ],
+      "id": "5e56746b-dc1e-4902-bec5-fb51fea04e7c",
+      "name": "Read Patient Spreadsheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "E92SBl4Szm9AuPqL",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json['what\\'s missing / incorrect info'] }}",
+              "value2": "incomplete insurance information"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        -176,
+        1120
+      ],
+      "id": "72cda0dd-10d8-4766-b1e5-6f5d0dba7d6a",
+      "name": "Filter Incomplete Insurance1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Check if we should send a reminder based on last reminder date\nconst items = [];\n\nfor (const item of $input.all()) {\n  const lastReminderDate = item.json['Last Reminder Sent'];\n  const patientId = item.json.PatientId;\n  \n  // If no reminder sent yet, or it's been 2+ days since last reminder\n  let shouldSend = false;\n  \n  if (!lastReminderDate) {\n    shouldSend = true;\n  } else {\n    const lastReminder = new Date(lastReminderDate);\n    const now = new Date();\n    const daysDiff = (now - lastReminder) / (1000 * 60 * 60 * 24);\n    \n    if (daysDiff >= 2) {\n      shouldSend = true;\n    }\n  }\n  \n  if (shouldSend && patientId) {\n    items.push(item);\n  }\n}\n\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        48,
+        1120
+      ],
+      "id": "efb39bfc-2119-460c-9d65-311c1da7a3b7",
+      "name": "Check Reminder Date1"
+    },
+    {
+      "parameters": {
+        "url": "=https://uc-prod.ihealth-eng.com/v1/uc/patient/{{ $json.spreadsheetRow.PatientId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        496,
+        1120
+      ],
+      "id": "8c3ef67e-305b-4344-8b1d-01f491805d66",
+      "name": "Get Patient Details from API1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "vclQZ2plyvKtgSUw",
+          "name": "Header Auth - iHealth Prod"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * *"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -624,
+        1120
+      ],
+      "id": "29fb0f1c-f777-492d-92c3-ae2bdfc9555a",
+      "name": "Daily Trigger (9 AM)1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "store-spreadsheet-row",
+              "name": "spreadsheetRow",
+              "value": "={{ $json }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        272,
+        1120
+      ],
+      "id": "8a9341b6-3116-4026-86ac-bbd6f16a5938",
+      "name": "Store Spreadsheet Data1"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1840,
+        1048
+      ],
+      "id": "73d7d416-afde-4bfd-8c79-17518952cf0a",
+      "name": "Wait 1s",
+      "webhookId": "c4054c7c-b65e-408c-ae9f-67547216735e"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://chat.googleapis.com/v1/{{ $json.name }}/messages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleChatOAuth2Api",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "={{ $('Loop Over Items').item.json.chatMessage }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2064,
+        1048
+      ],
+      "id": "317f572d-ed3e-47d2-bdd3-e30eddf71c2e",
+      "name": "Send DM Message2",
+      "credentials": {
+        "googleChatOAuth2Api": {
+          "id": "JWXrbxNG7Kq5QJ8H",
+          "name": "Chat account - Sage"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1LtR4Dj7nmAwJNht6rrKJir8PLsnED--D3Ya_l1xaYXo",
+          "mode": "list",
+          "cachedResultName": "TEST of Monthly Billable Time Requiring Review + Missing (Weekly)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1LtR4Dj7nmAwJNht6rrKJir8PLsnED--D3Ya_l1xaYXo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 978445722,
+          "mode": "list",
+          "cachedResultName": "For Sage -Detail5-incomplete insurance information",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1LtR4Dj7nmAwJNht6rrKJir8PLsnED--D3Ya_l1xaYXo/edit#gid=978445722"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "PatientId": "={{ $('Loop Over Items').item.json.spreadsheetRow.PatientId }}",
+            "1st GChat Auto Notification": "={{ $json.createTime }}"
+          },
+          "matchingColumns": [
+            "PatientId"
+          ],
+          "schema": [
+            {
+              "id": "PatientId",
+              "displayName": "PatientId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Patient Name",
+              "displayName": "Patient Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DOB",
+              "displayName": "DOB",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Organization",
+              "displayName": "Organization",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "icd10",
+              "displayName": "icd10",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "what's missing / incorrect info",
+              "displayName": "what's missing / incorrect info",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Programs Selected",
+              "displayName": "Programs Selected",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Program Participation By Clinic",
+              "displayName": "Program Participation By Clinic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "insurance",
+              "displayName": "insurance",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Enroll Date",
+              "displayName": "Enroll Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Measurement Days in Calendar Month",
+              "displayName": "Measurement Days in Calendar Month",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Billable Time",
+              "displayName": "Billable Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Assigned CA",
+              "displayName": "Assigned CA",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Hiatus Status",
+              "displayName": "Hiatus Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Discharged during billing cycle",
+              "displayName": "Discharged during billing cycle",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CT Comments ",
+              "displayName": "CT Comments ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CT Name ",
+              "displayName": "CT Name ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "1st GChat Auto Notification",
+              "displayName": "1st GChat Auto Notification",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "2nd GChat Auto Notification",
+              "displayName": "2nd GChat Auto Notification",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Updated ",
+              "displayName": "Updated ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2288,
+        1120
+      ],
+      "id": "2050f0f7-feb6-4a8d-bb97-aa77923dcbc7",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "E92SBl4Szm9AuPqL",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "store-spreadsheet-row",
+              "name": "spreadsheetRow[\"email\"]",
+              "value": "={{ $json.data.assignedToCAUser.email }}",
+              "type": "string"
+            },
+            {
+              "id": "5f00fda6-70b6-4466-992b-e7819e3f7e21",
+              "name": "spreadsheetRow[\"Measurement Days in Calendar Month\"]",
+              "value": "={{ $('Store Spreadsheet Data1').item.json.spreadsheetRow[\"Measurement Days in Calendar Month\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "a111d32a-2249-4eca-ac36-1f4ab884bff9",
+              "name": "spreadsheetRow.PatientId",
+              "value": "={{ $('Store Spreadsheet Data1').item.json.spreadsheetRow.PatientId }}",
+              "type": "string"
+            },
+            {
+              "id": "b82c6b32-2bda-427a-b975-069c44e50293",
+              "name": "spreadsheetRow[\"Enroll Date\"]",
+              "value": "={{ $('Store Spreadsheet Data1').item.json.spreadsheetRow[\"Enroll Date\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "c7f98c55-4f73-4f73-9e42-c074727241b4",
+              "name": "spreadsheetRow[\"Discharged during billing cycle\"]",
+              "value": "={{ $('Store Spreadsheet Data1').item.json.spreadsheetRow[\"Discharged during billing cycle\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "6864ee72-9e57-4250-9bb5-db85157e199c",
+              "name": "spreadsheetRow[\"Billable Time\"]",
+              "value": "={{ $('Store Spreadsheet Data1').item.json.spreadsheetRow[\"Billable Time\"] }}",
+              "type": "number"
+            },
+            {
+              "id": "07436334-9b87-4132-8bcc-1b8114448606",
+              "name": "spreadsheetRow[\"Patient Name\"]",
+              "value": "={{ $('Store Spreadsheet Data1').item.json.spreadsheetRow[\"Patient Name\"] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        720,
+        1120
+      ],
+      "id": "209b05ac-0076-43a5-a044-f9545d5b6bea",
+      "name": "Store Spreadsheet Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Create the message for Google Chat\nconst items = [];\n// $input.first().json.spreadsheetRow[\"Patient Name\"]\nfor (const item of $input.all()) {\n  const billableTime = item.json.spreadsheetRow[\"Billable Time\"] || 0;\n  const patientPortalUrl = `https://portal.ihealthunifiedcare.com/care-portal/patients/${item.json.spreadsheetRow[\"PatientId\"]}`;\n  \n  // Create friendly, encouraging message\n  const message = `💙 *Action Needed: Missing Insurance Info*\\n\\n` +\n    `Hi team! We need your help to capture revenue for the great work you've done:\\n\\n` +\n    `👤 *Patient:* ${item.json.spreadsheetRow[\"Patient Name\"]}\\n` +\n    // `🏥 *Clinic:* ${item.json.organization}\\n` +\n    // `📋 *Programs:* ${item.json.programs}\\n` +\n    `📅 *Enrolled:* ${item.json.spreadsheetRow[\"Enroll Date\"]}\\n` +\n    `⏱️ *Time Invested:* ${billableTime} minute${billableTime !== 1 ? 's' : ''}\\n\\n` +\n    `⚠️ *Revenue at Risk:* Without complete insurance information, we cannot bill for the ${billableTime} minute${billableTime !== 1 ? 's' : ''} of care you've already provided. Your hard work needs to be compensated!\\n\\n` +\n    `✅ *Quick Action:* Please update the insurance details in the patient portal:\\n` +\n    `🔗 ${patientPortalUrl}\\n\\n` +\n    `Thank you for your dedication to our patients! 🙏\\n\\n` +\n    `_Automated reminder from UC Workflow System_`;\n  \n  item.json.chatMessage = message;\n  items.push(item);\n}\n\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        944,
+        1120
+      ],
+      "id": "c9a48385-a166-4611-b25b-93b27e58a4e9",
+      "name": "Format Google Chat Message1"
+    },
+    {
+      "parameters": {
+        "batchSize": "=1",
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1168,
+        1120
+      ],
+      "id": "e9cc9a30-7faa-4ee8-b25c-4f6970e64648",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1392,
+        1048
+      ],
+      "id": "7684adf5-c73e-480d-9f37-7509368cbf07",
+      "name": "Wait 1s1",
+      "webhookId": "c4054c7c-b65e-408c-ae9f-67547216735e"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://chat.googleapis.com/v1/spaces:setup",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleChatOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"space\": {\n    \"spaceType\": \"DIRECT_MESSAGE\"\n  },\n  \"memberships\": [\n    {\n      \"member\": {\n        \"name\": \"users/{{ $json.spreadsheetRow.email }}\",\n        \"type\": \"HUMAN\"\n      }\n    }\n  ]\n}\n\n ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1616,
+        1048
+      ],
+      "id": "f0677565-3a17-4a10-83c3-3684a004f3f2",
+      "name": "Setup DM Space - ahna",
+      "credentials": {
+        "googleChatOAuth2Api": {
+          "id": "JWXrbxNG7Kq5QJ8H",
+          "name": "Chat account - Sage"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "# Insurance Reminder Workflow\n\nThis workflow automates the process of identifying patients with incomplete insurance information and sending reminders to the assigned Care Assistants via Google Chat.\n\n## Workflow Overview\n\nThe workflow runs daily to ensure that billing information is up-to-date, minimizing revenue loss due to unbillable care time.\n\n### Key Stages\n\n1.  **Trigger**:\n    *   **Daily Trigger (9 AM)**: The workflow is scheduled to run every morning at 9:00 AM.\n\n2.  **Data Retrieval & Filtering**:\n    *   **Read Patient Spreadsheet**: Fetches patient records from the \"Monthly Billable Time\" Google Sheet.\n    *   **Filter Incomplete Insurance**: Isolates records where the \"what's missing / incorrect info\" column specifies \"incomplete insurance information\".\n\n3.  **Reminder Throttling**:\n    *   **Check Reminder Date**: A code node that checks the \"Last Reminder Sent\" column. Reminders are only sent if no reminder has been sent before or if at least 2 days have passed since the last notification for that patient.\n\n4.  **Data Enrichment**:\n    *   **Store Spreadsheet Data1**: Momentarily stores the spreadsheet row data.\n    *   **Get Patient Details from API**: Calls the internal UC API (`/v1/uc/patient/{PatientId}`) to retrieve the Care Assistant's email and other details.\n    *   **Store Spreadsheet Data**: Combines the original spreadsheet data with the API response (e.g., CA email, patient name, billable time).\n\n5.  **Notification Pipeline**:\n    *   **Format Google Chat Message**: Generates a friendly and encouraging DM message highlighting the patient name, enrolled date, and billable time \"at risk\".\n    *   **Loop Over Items**: Iterates through each patient needing a reminder.\n    *   **Setup DM Space**: Creates or retrieves a Direct Message space with the Care Assistant.\n    *   **Send DM Message**: Delivers the formatted reminder to the Care Assistant via Google Chat.\n\n6.  **Progress Tracking**:\n    *   **Append or update row in sheet**: Updates the original Google Sheet with the timestamp of the notification in the \"1st GChat Auto Notification\" (or similar) column to ensure throttling works accurately in subsequent runs.\n\n## Important Links\n\n*   **Google Sheet**: [Patient Spreadsheet](https://docs.google.com/spreadsheets/d/1LtR4Dj7nmAwJNht6rrKJir8PLsnED--D3Ya_l1xaYXo/edit)\n*   **Patient Portal**: [Care Portal](https://portal.ihealthunifiedcare.com/care-portal/)\n",
+        "height": 1072,
+        "width": 1424
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -640,
+        -64
+      ],
+      "typeVersion": 1,
+      "id": "44217884-a3c2-4088-97b3-66fd57212efd",
+      "name": "Sticky Note"
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-10T01:34:36.201Z",
+      "createdAt": "2026-02-10T01:34:36.201Z",
+      "role": "workflow:owner",
+      "workflowId": "ywgeJ0zSkQrIg9AT5_Ytr",
+      "projectId": "IGL0EzJNN8XZ65mm"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-02-13T01:11:14.924Z",
+  "versionId": "9b46f5f7-6e07-4d64-bce1-ed3b379d92b8"
+}
