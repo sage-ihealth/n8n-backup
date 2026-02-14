@@ -1,0 +1,250 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "ListenChanges": {
+      "main": [
+        [
+          {
+            "node": "Delete documents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GetRowsFromSheet": {
+      "main": [
+        [
+          {
+            "node": "TransformData",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TransformData": {
+      "main": [
+        [
+          {
+            "node": "UpdatePayerKeywords",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "UpdatePayerKeywords": {
+      "main": [
+        []
+      ]
+    },
+    "Delete documents": {
+      "main": [
+        [
+          {
+            "node": "GetRowsFromSheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-02-11T01:20:30.189Z",
+  "id": "cf6QiZiuvx8RR43D",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "RPM99445/99470TrialPatientsUpdate",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyHour",
+              "minute": 45
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "137PiQJ5c4XCQIvS0VtBXaDbXrecKaRc9pQmsIgK-uDw",
+          "mode": "list",
+          "cachedResultName": "RPM99445/99470TrialPatientsList",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/137PiQJ5c4XCQIvS0VtBXaDbXrecKaRc9pQmsIgK-uDw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "patient list",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/137PiQJ5c4XCQIvS0VtBXaDbXrecKaRc9pQmsIgK-uDw/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        0
+      ],
+      "id": "91192c89-c9fc-4e7b-b660-1ccd891802ab",
+      "name": "ListenChanges",
+      "executeOnce": false,
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "69YZGMtkXsKBc0Mz",
+          "name": "N8N google client"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "137PiQJ5c4XCQIvS0VtBXaDbXrecKaRc9pQmsIgK-uDw",
+          "mode": "list",
+          "cachedResultName": "RPM99445/99470TrialPatientsList",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/137PiQJ5c4XCQIvS0VtBXaDbXrecKaRc9pQmsIgK-uDw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "patient list",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/137PiQJ5c4XCQIvS0VtBXaDbXrecKaRc9pQmsIgK-uDw/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        352,
+        0
+      ],
+      "id": "a7aa5198-b92b-4f35-99f6-5e8290348454",
+      "name": "GetRowsFromSheet",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "AkxcXiliPoTpkXRS",
+          "name": "N8N googlesheet"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all()\n  .map(item => item.json)\n  .filter(r =>\n    r[\"Patient Id\"]?.trim() &&\n    r[\"Name\"]?.trim() &&\n    r[\"DOB\"]?.trim()\n  ).map(\n    r => ({\n    json: {\n      seq: r.row_number,\n      patientId: r[\"Patient Id\"].trim(),\n      name: r[\"Name\"].trim(),\n      dob: r[\"DOB\"]?.trim(),\n    }\n  })\n  );"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        592,
+        0
+      ],
+      "id": "9939e436-fd23-41d4-ae5d-98f45a6db45e",
+      "name": "TransformData"
+    },
+    {
+      "parameters": {
+        "operation": "findOneAndReplace",
+        "collection": "rpm_trial_patients",
+        "updateKey": "seq",
+        "fields": "seq,patientId,name,dob",
+        "upsert": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        800,
+        0
+      ],
+      "id": "921c0242-8850-4e8c-8d57-a36d596f9528",
+      "name": "UpdatePayerKeywords",
+      "alwaysOutputData": false,
+      "credentials": {
+        "mongoDb": {
+          "id": "LUAtqhAorJGKWLeb",
+          "name": "UnifiedCare"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "collection": "payer_tag_keywords"
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        176,
+        0
+      ],
+      "id": "3bbfee9d-08ba-49af-a0ba-56028575cdda",
+      "name": "Delete documents",
+      "executeOnce": true,
+      "credentials": {
+        "mongoDb": {
+          "id": "LUAtqhAorJGKWLeb",
+          "name": "UnifiedCare"
+        }
+      }
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-11T01:20:30.192Z",
+      "createdAt": "2026-02-11T01:20:30.192Z",
+      "role": "workflow:owner",
+      "workflowId": "cf6QiZiuvx8RR43D",
+      "projectId": "eMUywwHEm5lrOsOi"
+    }
+  ],
+  "staticData": {
+    "node:Google Sheets Trigger": {
+      "documentId": "1C3ne5XoVsaFefZvsI2nWreQ-bqU-1grWLmCHFsAlo30",
+      "sheetId": 0,
+      "lastRevision": 71,
+      "lastRevisionLink": "https://docs.google.com/spreadsheets/export?id=1C3ne5XoVsaFefZvsI2nWreQ-bqU-1grWLmCHFsAlo30&revision=71&exportFormat=xlsx"
+    },
+    "node:ListenChanges": {
+      "documentId": "1C3ne5XoVsaFefZvsI2nWreQ-bqU-1grWLmCHFsAlo30",
+      "sheetId": 0,
+      "lastRevision": 149,
+      "lastRevisionLink": "https://docs.google.com/spreadsheets/export?id=1C3ne5XoVsaFefZvsI2nWreQ-bqU-1grWLmCHFsAlo30&revision=149&exportFormat=xlsx"
+    }
+  },
+  "tags": [
+    {
+      "updatedAt": "2026-01-16T22:51:47.521Z",
+      "createdAt": "2026-01-16T22:51:47.521Z",
+      "id": "2Yso2axgFawSJG9i",
+      "name": "billing"
+    },
+    {
+      "updatedAt": "2026-01-16T22:51:41.453Z",
+      "createdAt": "2026-01-16T22:51:41.453Z",
+      "id": "3n9C0kBs5J5Y9L9H",
+      "name": "configuration"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-02-11T01:30:51.393Z",
+  "versionId": "2e6b38cb-d8e8-49cc-aa42-261f67a012a7"
+}
