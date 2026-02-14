@@ -1,0 +1,181 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Fetch Incomplete Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Incomplete Status": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-02-03T19:52:49.130Z",
+  "id": "4r-tbZ__5RCDgxQVBZWCR",
+  "isArchived": false,
+  "meta": null,
+  "name": "Billing Incomplete Status Workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "9224ae80-4779-4a08-ac46-a6e350809296",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        -128
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://uc-prod.ihealth-eng.com/v1/uc/patient/incomplete-status-list",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json, text/plain, */*"
+            },
+            {
+              "name": "accept-language",
+              "value": "en,en-US;q=0.9,zh-CN;q=0.8,zh;q=0.7"
+            },
+            {
+              "name": "cache-control",
+              "value": "no-cache"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            },
+            {
+              "name": "origin",
+              "value": "https://portal.ihealthunifiedcare.com"
+            },
+            {
+              "name": "pragma",
+              "value": "no-cache"
+            },
+            {
+              "name": "priority",
+              "value": "u=1, i"
+            },
+            {
+              "name": "referer",
+              "value": "https://portal.ihealthunifiedcare.com/"
+            },
+            {
+              "name": "sec-ch-ua",
+              "value": "\"Not(A:Brand\";v=\"8\", \"Chromium\";v=\"144\", \"Google Chrome\";v=\"144\""
+            },
+            {
+              "name": "sec-ch-ua-mobile",
+              "value": "?0"
+            },
+            {
+              "name": "sec-ch-ua-platform",
+              "value": "\"macOS\""
+            },
+            {
+              "name": "sec-fetch-dest",
+              "value": "empty"
+            },
+            {
+              "name": "sec-fetch-mode",
+              "value": "cors"
+            },
+            {
+              "name": "sec-fetch-site",
+              "value": "cross-site"
+            },
+            {
+              "name": "user-agent",
+              "value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36"
+            },
+            {
+              "name": "x-session-token",
+              "value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uSWQiOiJkN2FhOTY2NTI4NDYwYmUwNmIwMWZiMzFiZWRmZTRjN2UwOTQ0MzNkNGExZTllNTQzMGE0YjU4ZWZjOTUyYTUwIiwidXNlclR5cGUiOiJFTVBMT1lFRSIsImV4cCI6MTc3MDIzMjM5NCwidXNlcklkIjoiNjE2ZmNhZDNlZjllMmEwMDEyMGJhZDMxIiwiaWF0IjoxNzcwMTQ1OTk0LCJlbWFpbCI6InNhZ2UuZ3VAaWhlYWx0aGxhYnMuY29tIn0.X20G4sISeJz0Xnzm5mKB3Iy3Hq5pQ2jj4TnooDX7qPA"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "filter",
+              "value": "{\"clinicIds\":[\"5b4d072f1d1b2fbe8ddc674f\",\"5bc7d750936b862640f070df\",\"5db762bd72a7ef0e520273a0\",\"5dcc8c4ae59fea41c9b226df\",\"5e3a07859e052800149a88f8\",\"5f4590bbe8f9890013dc3e26\",\"5f7f5609ebeed10015e53a6f\",\"5f9062c85d914b001434956c\",\"5fa9c37efbd9380013221261\",\"5fd1079f71874b00134cb04c\",\"5ffce3fb718247001480b7a0\",\"60946b65252aa50014c05040\",\"60a40917823ab800139e5232\",\"613760a44475f500121b9835\",\"6178ed79ef9e2a00120dd3a2\",\"62cf2aa1d1e56d00148f5089\",\"62f1d2e7ff15bf0013c56c58\",\"630fd37b9c1847001323dfed\",\"632a095b1ff9ac0013dfca65\",\"632c5b1b8473f80013a5d275\",\"63470211e3b38f0013d4633e\",\"6388e1f9c710e00013be4d7b\",\"638a94fe0870f900134d3bdd\",\"63936ad0af5b370013fb5171\",\"63e6c0d74b5ebb0013e849ba\",\"6427636651916300134df0e0\",\"64359a7593e76c0013207568\",\"64763db2ff0e8000138fccdf\",\"64874300da98140013d43b3d\",\"648a4e90ff0e800013c0c76b\",\"64efbebe5e1797001369af78\",\"651af07c2185df00135ab78d\",\"651b04688f3f4f0013d19a8a\",\"651c947809211b0013d252b9\",\"651df7ec4c28a60013e5a32b\",\"65286576d3bef600135b7a65\",\"652ee45d6751480013bda45b\",\"6536e58c17fea2001327a97e\",\"6578de4810802b0013d77622\",\"65a7215a793d4d353759b618\",\"65c9bea124af530013385688\",\"65caca53593cfa001371ddce\",\"65ce9148f1541f001365c6fc\",\"65fdcae6d0c8385b41523d9c\",\"66075804d3ef147656bc966a\",\"66356bc9e25b79452421c231\",\"66356d8ae25b79452421c2f7\",\"663c7fbfa472e564bbd4814d\",\"663c8015a472e564bbd48155\",\"664c3d50947ebf673fd0f2bb\",\"665620e391d4792d579fd99d\",\"666b5a7a3275e41c87557c5e\",\"6683443a7c85c2016bce60ce\",\"66955af647cf917c8ba5f82a\",\"66983bd2193aa2047421b11d\",\"66b05020ea2d9f5c5cbb8207\",\"66b5b7436a57267b093e8d26\",\"66db2de27463c55497eb47d8\",\"66de8b64360b0a254f895eed\",\"66e0860e3d64f74f199a124b\",\"66eb4ea0e0d59c5ba813dd73\",\"670dd99e2dcc347a1f6d4feb\",\"670ddc019d6e5166de671817\",\"671674e6c5820e6e5ae53549\",\"671f0f42cbddfc68d56452f0\",\"6723b06ecbddfc68d56544db\",\"6769d675ab47bf4bb21dbfc4\",\"67805ff6aafde53d887a16be\",\"67bea55e6f63895ded077d67\",\"67c5f36b19bcce12de773504\",\"67c5f3b86f63895ded09f1c6\",\"67f82f07c000ac46b727e9af\",\"681c2c4d24ab4f1a1b0b117b\",\"682d01fd9688d2515a344238\",\"684887f73d401140874efc99\",\"68717084e9b73371607afac8\",\"6883d84e3e40b112e29a5031\",\"6883d8823e40b112e29a503b\",\"68b0d9d0733e85329dbae373\",\"68b222c7e10dd600b2d935ce\",\"68daaf7ada9fba66559e83cf\",\"68e7310783f3107e37c07b38\",\"6938cb800b86487fff3cca36\"],\"assigneeIds\":[\"672c168dfc8aee0cde8fa381\",\"66c4d683b47a204fb3250a27\",\"665645883b6d8b0714b44b9d\",\"690a9d903ce95c08a0e7d4ee\",\"6706f27cacc4ea41a0331895\",\"6376af6d5d4d110013bfdb14\",\"68fab95ec7d9383560de5ffd\",\"67169b7170a81552e356e3ed\",\"6772f9aaab47bf4bb21fa605\",\"666a31f398dddf78ea4f516c\",\"649c70a2446be000130c0d66\",\"658c75065ae89c0013277403\",\"65effe9e7274a0644f4fb6b6\",\"68bf517d72cdc9113eb46964\",\"62152137357e24001401485e\",\"68700e24ec46de7e7f67119d\",\"67c6018019bcce12de774383\",\"688d57e4efc2b44e3d5b5d03\",\"668f197d07ac247e36492477\",\"674e531b81ef056bf80371da\",\"68fab6e79db92e3b38ae3b28\",\"66e8a8723d64f74f199b386a\",\"665f81c306c4f44bbde9d5e2\",\"68dd731bda9fba66559efae3\",\"65d8dd1f0e989300139320ed\",\"689139acefc2b44e3d5bc9e1\",\"670d4ec6c104943b9ba444bb\",\"6967eb733105a064ce2f2942\",\"6734f6dde456de2bab99e5ea\",\"67e1d9bbc661df598517eff6\",\"6564f6d5f7a6bd00139fb3ff\",\"62d83cff405004001248b481\",\"68f6d55cc7d9383560dda383\",\"62ded5fcc408620012e8095a\",\"66216583eabc926533a0dbf8\",\"6221814199894a00125f34b1\",\"60d4cd3f6dfe0c0012048063\",\"683f871657e97534427dfedd\",\"66983f87193aa2047421b2be\",\"65cbadc5a654db001338079f\",\"646e4f2fbc775e001385f886\",\"66e8902ce0d59c5ba8136ea9\",\"63e41d9e9e1fa40014b45559\",\"646e4ab9c33d0a00134e1d9d\",\"68d438cf960d6336fc20d69f\",\"690a9f9f3ce95c08a0e7d530\",\"67ec783d4c2d90530f843156\",\"65eff4637274a0644f4fb5ff\",\"620af5398e93c60012b8ed52\",\"660b081fd3ef147656bcb48e\",\"65effe807274a0644f4fb6b5\",\"641deca45608f5001370ac00\",\"630954d1e4faba0013f93f8f\",\"6620142a591abc70f7c5d908\",\"5f761c3889ae140013db6cdf\",\"645c2c42c33d0a00134b463c\",\"697ab5b5f6b0aa11023b8eb7\",\"68911c37058f8b6f8533d1f6\",\"65cc082efe78300013c61d65\",\"64a5fa93446be000136e274d\",\"67fd9b12ca15f6020474fdbb\",\"5ed7dbaa7214b300139c9d8d\",\"65efff3c7274a0644f4fb6bd\",\"66a9637b9cd99f18a2f04712\",\"60d36436d203b90012cbbcbe\"],\"billingEligibilityIn\":{\"in\":[true]}}"
+            },
+            {
+              "name": "pageInfo",
+              "value": "{\"page\":1,\"size\":20,\"sort\":[{\"direction\":\"DESC\",\"property\":\"enrollmentDate\"}],\"pagination\":true,\"countOnly\":false}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8432b8f8-198d-427e-9416-37a97ded24c3",
+      "name": "Fetch Incomplete Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        16,
+        -128
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const responseData = items[0].json;\nconst patientList = responseData.data || [];\n\n// Aggregate incomplete reasons\nconst aggregation = {};\n\n// Process each patient\nconst processedPatients = patientList.map(patient => {\n  const reasons = patient.incompleteStatusList || [];\n  \n  // Count aggregation\n  reasons.forEach(reason => {\n    if (aggregation[reason]) {\n      aggregation[reason]++;\n    } else {\n      aggregation[reason] = 1;\n    }\n  });\n\n  return {\n    patientId: patient.patientId,\n    clinicId: patient.clinicId,\n    incompleteReasons: reasons,\n    enrollmentDate: patient.enrollmentDate\n  };\n});\n\nreturn [\n  {\n    json: {\n      summary: aggregation,\n      totalPatients: patientList.length,\n      details: processedPatients\n    }\n  }\n];"
+      },
+      "id": "cb842b78-5338-4692-8f37-c944fa4f5c0e",
+      "name": "Aggregate Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        240,
+        -128
+      ]
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-03T19:52:49.132Z",
+      "createdAt": "2026-02-03T19:52:49.132Z",
+      "role": "workflow:owner",
+      "workflowId": "4r-tbZ__5RCDgxQVBZWCR",
+      "projectId": "Gtx3vMtqTSpomXFD"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-02-06T23:44:48.497Z",
+  "versionId": "434da36f-b658-452e-8e79-a4ce1aa22435"
+}
