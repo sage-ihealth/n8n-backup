@@ -1,0 +1,126 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Setup DM Space": {
+      "main": [
+        [
+          {
+            "node": "Wait 1s",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 1s": {
+      "main": [
+        [
+          {
+            "node": "Send DM Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-02-12T22:04:02.649Z",
+  "id": "l8YyjuTvxXbq6L6H5aluz",
+  "isArchived": false,
+  "meta": null,
+  "name": "My workflow 31",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://chat.googleapis.com/v1/spaces:setup",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleChatOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"space\": {\n    \"spaceType\": \"DIRECT_MESSAGE\"\n  },\n  \"memberships\": [\n    {\n      \"member\": {\n        \"name\": \"users/{{ $json.caEmail || 'aliana.deveza@ihealthlabs.com' }}\",\n        \"type\": \"HUMAN\"\n      }\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        192,
+        -96
+      ],
+      "id": "ac12eed8-377d-443d-ae94-38d4c14bb67b",
+      "name": "Setup DM Space",
+      "credentials": {
+        "googleChatOAuth2Api": {
+          "id": "JWXrbxNG7Kq5QJ8H",
+          "name": "Chat account - Sage"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        416,
+        -96
+      ],
+      "id": "7b9796fc-bb7d-48d5-bfc0-d02c17a09ca1",
+      "name": "Wait 1s",
+      "webhookId": "c4054c7c-b65e-408c-ae9f-67547216735e"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://chat.googleapis.com/v1/{{ $json.name }}/messages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleChatOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \"{{ $node[\\\"Format Google Chat Message1\\\"].json.chatMessage }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        640,
+        -96
+      ],
+      "id": "9e101ec3-f6b1-4b82-b7a9-d88976b8ab75",
+      "name": "Send DM Message",
+      "credentials": {
+        "googleChatOAuth2Api": {
+          "id": "JWXrbxNG7Kq5QJ8H",
+          "name": "Chat account - Sage"
+        }
+      }
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-12T22:04:02.654Z",
+      "createdAt": "2026-02-12T22:04:02.654Z",
+      "role": "workflow:owner",
+      "workflowId": "l8YyjuTvxXbq6L6H5aluz",
+      "projectId": "IGL0EzJNN8XZ65mm"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-02-12T22:04:02.649Z",
+  "versionId": "26758f9d-efa0-4425-9538-d8e4e747b925"
+}
