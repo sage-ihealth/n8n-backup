@@ -1,0 +1,638 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-01-21T19:34:17.650Z",
+    "createdAt": "2026-01-21T19:34:17.650Z",
+    "versionId": "07bf0ed4-a0d9-43b4-906f-c4025ce8458b",
+    "workflowId": "JmQ2ghTnbGAIAkgs",
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "cronExpression",
+                "expression": "*/30 8-20 * * 1-5"
+              }
+            ]
+          }
+        },
+        "id": "schedule",
+        "name": "Every 30min Mon-Fri 8am-8pm",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          250,
+          380
+        ]
+      },
+      {
+        "parameters": {
+          "method": "GET",
+          "url": "https://ihealthlabs.talentlms.com/api/v1/users",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpBasicAuth",
+          "options": {}
+        },
+        "id": "get_users",
+        "name": "Get All TalentLMS Users",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          480,
+          380
+        ],
+        "credentials": {
+          "httpBasicAuth": {
+            "id": "EsyepIMWisrkDo1g",
+            "name": "TalentLMS"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Filter for new hires (hire date within last 14 days)\nconst items = $input.all();\nconst now = new Date();\nconst cutoffDate = new Date(now.getTime() - (14 * 24 * 60 * 60 * 1000));\n\nconst newHires = [];\n\nfor (const item of items) {\n  const user = item.json;\n  const hireDateStr = user.custom_field_31;\n  if (!hireDateStr) continue;\n  \n  const parts = hireDateStr.split('/');\n  if (parts.length !== 3) continue;\n  \n  const hireDate = new Date(parts[2], parts[0] - 1, parts[1]);\n  \n  if (hireDate >= cutoffDate && user.status === 'active') {\n    newHires.push({\n      json: {\n        user_id: user.id,\n        name: `${user.first_name} ${user.last_name}`,\n        email: user.email,\n        hire_date: hireDateStr\n      }\n    });\n  }\n}\n\nif (newHires.length === 0) {\n  return [{ json: { skip: true, message: 'No new hires found' } }];\n}\n\nreturn newHires;"
+        },
+        "id": "filter_new_hires",
+        "name": "Filter New Hires (Last 14 Days)",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          700,
+          380
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict"
+            },
+            "conditions": [
+              {
+                "id": "skip_check",
+                "leftValue": "={{ $json.skip }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "notEquals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "if_has_new_hires",
+        "name": "Has New Hires?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2,
+        "position": [
+          920,
+          380
+        ]
+      },
+      {
+        "parameters": {
+          "method": "GET",
+          "url": "=https://ihealthlabs.talentlms.com/api/v1/users/id:{{ $json.user_id }}",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpBasicAuth",
+          "options": {}
+        },
+        "id": "get_user_courses",
+        "name": "Get User Courses",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1140,
+          300
+        ],
+        "credentials": {
+          "httpBasicAuth": {
+            "id": "EsyepIMWisrkDo1g",
+            "name": "TalentLMS"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Find courses completed in the last 24 hours (TESTING - change to 1 hour for prod)\nconst user = $input.first().json;\nconst courses = user.courses || [];\nconst userName = `${user.first_name} ${user.last_name}`;\n\nconst now = Date.now();\nconst timeWindow = now - (30 * 60 * 1000); // 30 minutes for production\n\nconst recentCompletions = [];\n\nfor (const course of courses) {\n  if (course.completion_status !== 'completed') continue;\n  \n  const completedTimestamp = parseInt(course.completed_on_timestamp) * 1000;\n  \n  if (completedTimestamp >= timeWindow) {\n    recentCompletions.push({\n      json: {\n        user_id: user.id,\n        user_name: userName,\n        course_id: course.id,\n        course_name: course.name.replace(/&amp;/g, '&'),\n        completed_on: course.completed_on,\n        total_time_seconds: course.total_time_seconds || 0\n      }\n    });\n  }\n}\n\nif (recentCompletions.length === 0) {\n  return [{ json: { skip: true, message: 'No recent completions' } }];\n}\n\nreturn recentCompletions;"
+        },
+        "id": "filter_recent_completions",
+        "name": "Filter Recent Completions",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1360,
+          300
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict"
+            },
+            "conditions": [
+              {
+                "id": "skip_check",
+                "leftValue": "={{ $json.skip }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "notEquals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "if_has_completions",
+        "name": "Has Completions?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2,
+        "position": [
+          1580,
+          300
+        ]
+      },
+      {
+        "parameters": {
+          "method": "GET",
+          "url": "https://chat.googleapis.com/v1/spaces/AAQA4Ksbm-M/messages",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "googleChatOAuth2Api",
+          "options": {
+            "qs": {
+              "values": [
+                {
+                  "name": "pageSize",
+                  "value": "100"
+                }
+              ]
+            }
+          }
+        },
+        "id": "get_chat_history",
+        "name": "Get Chat History",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1800,
+          300
+        ],
+        "credentials": {
+          "googleChatOAuth2Api": {
+            "id": "sz05GM9U2uo8stiL",
+            "name": "Chat account 3"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Process completions with duplicate check using chat history from previous node\nconst chatHistory = $input.first().json;\nconst completions = $('Has Completions?').all();\nconst webhookUrl = 'https://chat.googleapis.com/v1/spaces/AAQA4Ksbm-M/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=UPaxjAUjYdJowRki8zCMCrbLprOL-C_dQpcW5BxyFno';\nconst tlmsApiKey = 'BaZspQqVVZZrS2SX6vw9X9kgPF6MYT';\n\n// Extract existing message texts for duplicate check\nconst existingMessages = (chatHistory.messages || []).map(m => m.text || '');\n\nconst results = [];\n\nfor (const item of completions) {\n  const completion = item.json;\n  const userId = completion.user_id;\n  const courseId = completion.course_id;\n  const userName = completion.user_name;\n  const courseName = completion.course_name;\n  \n  // Check for duplicate\n  const searchKey = `${userName} completed \"${courseName}\"`;\n  const alreadySent = existingMessages.some(msg => msg.includes(searchKey));\n  \n  if (alreadySent) {\n    results.push({\n      json: {\n        user_name: userName,\n        course_name: courseName,\n        status: 'skipped',\n        reason: 'Already notified'\n      }\n    });\n    continue;\n  }\n  \n  // Fetch course details (score, start time, completion time)\n  let score = null;\n  let startTime = 'N/A';\n  let completionTime = 'N/A';\n  let totalSeconds = 0;\n  \n  try {\n    const courseResponse = await this.helpers.httpRequest({\n      method: 'GET',\n      url: `https://ihealthlabs.talentlms.com/api/v1/getuserstatusincourse/user_id:${userId},course_id:${courseId}`,\n      auth: { username: tlmsApiKey, password: '' }\n    });\n    \n    // Get score from Test unit\n    const units = courseResponse.units || [];\n    const testUnit = units.find(u => u.type === 'Test');\n    score = testUnit ? testUnit.score : null;\n    \n    // Get start and completion times\n    startTime = courseResponse.enrolled_on || 'N/A';\n    completionTime = courseResponse.completed_on || 'N/A';\n    totalSeconds = courseResponse.total_time_seconds || 0;\n  } catch (e) {}\n  \n  // Format duration\n  let durationDisplay = 'N/A';\n  if (totalSeconds > 0) {\n    const hours = Math.floor(totalSeconds / 3600);\n    const minutes = Math.floor((totalSeconds % 3600) / 60);\n    if (hours === 0) durationDisplay = `${minutes} min`;\n    else if (minutes === 0) durationDisplay = `${hours} hr`;\n    else durationDisplay = `${hours} hr ${minutes} min`;\n  }\n  \n  const scoreDisplay = score !== null ? `${score}%` : 'N/A';\n  const messageText = `📚 ${userName} completed \"${courseName}\"\\nStarted: ${startTime} | Completed: ${completionTime}\\nDuration: ${durationDisplay} | Score: ${scoreDisplay}`;\n  \n  // Send notification\n  try {\n    await this.helpers.httpRequest({\n      method: 'POST',\n      url: webhookUrl,\n      headers: { 'Content-Type': 'application/json' },\n      body: JSON.stringify({ text: messageText })\n    });\n    \n    existingMessages.push(messageText);\n    \n    results.push({\n      json: {\n        user_name: userName,\n        course_name: courseName,\n        status: 'sent',\n        message: messageText\n      }\n    });\n  } catch (e) {\n    results.push({\n      json: {\n        user_name: userName,\n        course_name: courseName,\n        status: 'failed',\n        error: e.message\n      }\n    });\n  }\n}\n\nreturn results.length > 0 ? results : [{ json: { message: 'No new completions to notify' } }];"
+        },
+        "id": "send_notifications",
+        "name": "Send Notifications",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2020,
+          300
+        ]
+      }
+    ],
+    "connections": {
+      "Every 30min Mon-Fri 8am-8pm": {
+        "main": [
+          [
+            {
+              "node": "Get All TalentLMS Users",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get All TalentLMS Users": {
+        "main": [
+          [
+            {
+              "node": "Filter New Hires (Last 14 Days)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Filter New Hires (Last 14 Days)": {
+        "main": [
+          [
+            {
+              "node": "Has New Hires?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Has New Hires?": {
+        "main": [
+          [
+            {
+              "node": "Get User Courses",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          []
+        ]
+      },
+      "Get User Courses": {
+        "main": [
+          [
+            {
+              "node": "Filter Recent Completions",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Filter Recent Completions": {
+        "main": [
+          [
+            {
+              "node": "Has Completions?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Has Completions?": {
+        "main": [
+          [
+            {
+              "node": "Get Chat History",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          []
+        ]
+      },
+      "Get Chat History": {
+        "main": [
+          [
+            {
+              "node": "Send Notifications",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Phoebe You",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "activeVersionId": "07bf0ed4-a0d9-43b4-906f-c4025ce8458b",
+  "connections": {
+    "Every 30min Mon-Fri 8am-8pm": {
+      "main": [
+        [
+          {
+            "node": "Get All TalentLMS Users",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get All TalentLMS Users": {
+      "main": [
+        [
+          {
+            "node": "Filter New Hires (Last 14 Days)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter New Hires (Last 14 Days)": {
+      "main": [
+        [
+          {
+            "node": "Has New Hires?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has New Hires?": {
+      "main": [
+        [
+          {
+            "node": "Get User Courses",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Get User Courses": {
+      "main": [
+        [
+          {
+            "node": "Filter Recent Completions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Recent Completions": {
+      "main": [
+        [
+          {
+            "node": "Has Completions?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Completions?": {
+      "main": [
+        [
+          {
+            "node": "Get Chat History",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Get Chat History": {
+      "main": [
+        [
+          {
+            "node": "Send Notifications",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-21T01:07:50.385Z",
+  "id": "JmQ2ghTnbGAIAkgs",
+  "isArchived": false,
+  "meta": null,
+  "name": "UC LMS Course Completion Notifications",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "*/30 8-20 * * 1-5"
+            }
+          ]
+        }
+      },
+      "id": "schedule",
+      "name": "Every 30min Mon-Fri 8am-8pm",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        256,
+        384
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://ihealthlabs.talentlms.com/api/v1/users",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "options": {}
+      },
+      "id": "get_users",
+      "name": "Get All TalentLMS Users",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        384
+      ],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "EsyepIMWisrkDo1g",
+          "name": "TalentLMS"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filter for new hires (hire date within last 14 days)\nconst items = $input.all();\nconst now = new Date();\nconst cutoffDate = new Date(now.getTime() - (14 * 24 * 60 * 60 * 1000));\n\nconst newHires = [];\n\nfor (const item of items) {\n  const user = item.json;\n  const hireDateStr = user.custom_field_31;\n  if (!hireDateStr) continue;\n  \n  const parts = hireDateStr.split('/');\n  if (parts.length !== 3) continue;\n  \n  const hireDate = new Date(parts[2], parts[0] - 1, parts[1]);\n  \n  if (hireDate >= cutoffDate && user.status === 'active') {\n    newHires.push({\n      json: {\n        user_id: user.id,\n        name: `${user.first_name} ${user.last_name}`,\n        email: user.email,\n        hire_date: hireDateStr\n      }\n    });\n  }\n}\n\nif (newHires.length === 0) {\n  return [{ json: { skip: true, message: 'No new hires found' } }];\n}\n\nreturn newHires;"
+      },
+      "id": "filter_new_hires",
+      "name": "Filter New Hires (Last 14 Days)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        704,
+        384
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "skip_check",
+              "leftValue": "={{ $json.skip }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if_has_new_hires",
+      "name": "Has New Hires?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        928,
+        384
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://ihealthlabs.talentlms.com/api/v1/users/id:{{ $json.user_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "options": {}
+      },
+      "id": "get_user_courses",
+      "name": "Get User Courses",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1152,
+        304
+      ],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "EsyepIMWisrkDo1g",
+          "name": "TalentLMS"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Find courses completed in the last 24 hours (TESTING - change to 1 hour for prod)\nconst user = $input.first().json;\nconst courses = user.courses || [];\nconst userName = `${user.first_name} ${user.last_name}`;\n\nconst now = Date.now();\nconst timeWindow = now - (30 * 60 * 1000); // 30 minutes for production\n\nconst recentCompletions = [];\n\nfor (const course of courses) {\n  if (course.completion_status !== 'completed') continue;\n  \n  const completedTimestamp = parseInt(course.completed_on_timestamp) * 1000;\n  \n  if (completedTimestamp >= timeWindow) {\n    recentCompletions.push({\n      json: {\n        user_id: user.id,\n        user_name: userName,\n        course_id: course.id,\n        course_name: course.name.replace(/&amp;/g, '&'),\n        completed_on: course.completed_on,\n        total_time_seconds: course.total_time_seconds || 0\n      }\n    });\n  }\n}\n\nif (recentCompletions.length === 0) {\n  return [{ json: { skip: true, message: 'No recent completions' } }];\n}\n\nreturn recentCompletions;"
+      },
+      "id": "filter_recent_completions",
+      "name": "Filter Recent Completions",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1360,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "skip_check",
+              "leftValue": "={{ $json.skip }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "if_has_completions",
+      "name": "Has Completions?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1584,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://chat.googleapis.com/v1/spaces/AAQA4Ksbm-M/messages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleChatOAuth2Api",
+        "options": {}
+      },
+      "id": "get_chat_history",
+      "name": "Get Chat History",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1808,
+        304
+      ],
+      "credentials": {
+        "googleChatOAuth2Api": {
+          "id": "sz05GM9U2uo8stiL",
+          "name": "Chat account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Process completions with duplicate check using chat history from previous node\nconst chatHistory = $input.first().json;\nconst completions = $('Has Completions?').all();\nconst webhookUrl = 'https://chat.googleapis.com/v1/spaces/AAQA4Ksbm-M/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=UPaxjAUjYdJowRki8zCMCrbLprOL-C_dQpcW5BxyFno';\nconst tlmsApiKey = 'BaZspQqVVZZrS2SX6vw9X9kgPF6MYT';\n\n// Extract existing message texts for duplicate check\nconst existingMessages = (chatHistory.messages || []).map(m => m.text || '');\n\nconst results = [];\n\nfor (const item of completions) {\n  const completion = item.json;\n  const userId = completion.user_id;\n  const courseId = completion.course_id;\n  const userName = completion.user_name;\n  const courseName = completion.course_name;\n  \n  // Check for duplicate\n  const searchKey = `${userName} completed \"${courseName}\"`;\n  const alreadySent = existingMessages.some(msg => msg.includes(searchKey));\n  \n  if (alreadySent) {\n    results.push({\n      json: {\n        user_name: userName,\n        course_name: courseName,\n        status: 'skipped',\n        reason: 'Already notified'\n      }\n    });\n    continue;\n  }\n  \n  // Fetch course details (score, start time, completion time)\n  let score = null;\n  let startTime = 'N/A';\n  let completionTime = 'N/A';\n  let totalSeconds = 0;\n  \n  try {\n    const courseResponse = await this.helpers.httpRequest({\n      method: 'GET',\n      url: `https://ihealthlabs.talentlms.com/api/v1/getuserstatusincourse/user_id:${userId},course_id:${courseId}`,\n      auth: { username: tlmsApiKey, password: '' }\n    });\n    \n    // Get score from Test unit\n    const units = courseResponse.units || [];\n    const testUnit = units.find(u => u.type === 'Test');\n    score = testUnit ? testUnit.score : null;\n    \n    // Get start and completion times\n    startTime = courseResponse.enrolled_on || 'N/A';\n    completionTime = courseResponse.completed_on || 'N/A';\n    totalSeconds = courseResponse.total_time_seconds || 0;\n  } catch (e) {}\n  \n  // Format duration\n  let durationDisplay = 'N/A';\n  if (totalSeconds > 0) {\n    const hours = Math.floor(totalSeconds / 3600);\n    const minutes = Math.floor((totalSeconds % 3600) / 60);\n    if (hours === 0) durationDisplay = `${minutes} min`;\n    else if (minutes === 0) durationDisplay = `${hours} hr`;\n    else durationDisplay = `${hours} hr ${minutes} min`;\n  }\n  \n  const scoreDisplay = score !== null ? `${score}%` : 'N/A';\n  const messageText = `📚 ${userName} completed \"${courseName}\"\\nStarted: ${startTime} | Completed: ${completionTime}\\nDuration: ${durationDisplay} | Score: ${scoreDisplay}`;\n  \n  // Send notification\n  try {\n    await this.helpers.httpRequest({\n      method: 'POST',\n      url: webhookUrl,\n      headers: { 'Content-Type': 'application/json' },\n      body: JSON.stringify({ text: messageText })\n    });\n    \n    existingMessages.push(messageText);\n    \n    results.push({\n      json: {\n        user_name: userName,\n        course_name: courseName,\n        status: 'sent',\n        message: messageText\n      }\n    });\n  } catch (e) {\n    results.push({\n      json: {\n        user_name: userName,\n        course_name: courseName,\n        status: 'failed',\n        error: e.message\n      }\n    });\n  }\n}\n\nreturn results.length > 0 ? results : [{ json: { message: 'No new completions to notify' } }];"
+      },
+      "id": "send_notifications",
+      "name": "Send Notifications",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2032,
+        304
+      ]
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "timeSavedPerExecution": 10
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-21T01:07:50.392Z",
+      "createdAt": "2026-01-21T01:07:50.392Z",
+      "role": "workflow:owner",
+      "workflowId": "JmQ2ghTnbGAIAkgs",
+      "projectId": "SzgLfYyy3lWDJHJA"
+    }
+  ],
+  "staticData": {
+    "node:Hourly Mon-Fri 8am-8pm": {
+      "recurrenceRules": []
+    },
+    "node:Every 30min Mon-Fri 8am-8pm": {
+      "recurrenceRules": []
+    }
+  },
+  "tags": [
+    {
+      "updatedAt": "2026-02-11T01:57:02.890Z",
+      "createdAt": "2026-02-11T01:57:02.890Z",
+      "id": "aOUk5y2lWjpAIKLe",
+      "name": "Training"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2026-02-11T01:58:47.627Z",
+  "versionId": "3905f37d-9819-4662-9c5b-44674a97773b"
+}
