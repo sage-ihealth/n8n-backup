@@ -1,0 +1,987 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request3": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-13T01:22:20.542Z",
+  "id": "jJ8NNdOsh0RQp0RT",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "who is the patient's CA",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "position": [
+        -32,
+        208
+      ],
+      "id": "703b3c71-fd18-4b44-a1d5-66b65dc01fbc",
+      "typeVersion": 1.4,
+      "webhookId": "a56176b6-8030-4f3b-b237-82d6618a4a12"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "你是一个医疗账单助手，可以帮助查询患者信息。\n\n当用户询问患者信息时，使用get_patient_info工具来获取数据。\n\n用户会提供Patient ID（24位十六进制字符串），你需要使用这个ID调用工具获取患者详细信息。"
+        }
+      },
+      "name": "AI Agent1",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        192,
+        96
+      ],
+      "id": "ff89160e-7bb9-46e1-9cc6-cf722491c5ae",
+      "typeVersion": 3
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5.2",
+          "mode": "list",
+          "cachedResultName": "gpt-5.2"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        192,
+        320
+      ],
+      "id": "6f5fad21-67da-4a5b-8033-26f951acc1e6",
+      "name": "OpenAI Chat Model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "cYOjTQrkcPZ8DHDh",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "Get patient details using their 24-character hex ID. Returns patient profile information.",
+        "url": "https://uc-prod.ihealth-eng.com/v1/uc/patient/{{ $fromAI(\"id \") }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json, text/plain, */*"
+            },
+            {
+              "name": "accept-language",
+              "value": "en,en-US;q=0.9,zh-CN;q=0.8,zh;q=0.7"
+            },
+            {
+              "name": "cache-control",
+              "value": "no-cache"
+            },
+            {
+              "name": "origin",
+              "value": "https://portal.ihealthunifiedcare.com"
+            },
+            {
+              "name": "pragma",
+              "value": "no-cache"
+            },
+            {
+              "name": "priority",
+              "value": "u=1, i"
+            },
+            {
+              "name": "referer",
+              "value": "https://portal.ihealthunifiedcare.com/"
+            },
+            {
+              "name": "sec-ch-ua",
+              "value": "\"Google Chrome\";v=\"141\", \"Not?A_Brand\";v=\"8\", \"Chromium\";v=\"141\""
+            },
+            {
+              "name": "sec-ch-ua-mobile",
+              "value": "?0"
+            },
+            {
+              "name": "sec-ch-ua-platform",
+              "value": "\"macOS\""
+            },
+            {
+              "name": "sec-fetch-dest",
+              "value": "empty"
+            },
+            {
+              "name": "sec-fetch-mode",
+              "value": "cors"
+            },
+            {
+              "name": "sec-fetch-site",
+              "value": "cross-site"
+            },
+            {
+              "name": "user-agent",
+              "value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.3,
+      "position": [
+        336,
+        320
+      ],
+      "id": "2e2b7efe-7610-43db-8a51-80d676fec08f",
+      "name": "HTTP Request3",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "vclQZ2plyvKtgSUw",
+          "name": "Header Auth - iHealth Prod"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://uc-prod.ihealth-eng.com/v1/uc/patient/657bb2604d6f20696a5d4e0d",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        544,
+        320
+      ],
+      "id": "2a486497-53e1-4c17-af49-9f3090facbde",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "vclQZ2plyvKtgSUw",
+          "name": "Header Auth - iHealth Prod"
+        }
+      }
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {
+    "HTTP Request": [
+      {
+        "json": {
+          "code": 200,
+          "data": {
+            "id": "657bb2604d6f20696a5d4e0d",
+            "createdAt": "2023-12-15T01:56:48.645",
+            "updatedAt": "2026-02-09T22:06:57.906",
+            "auth": {
+              "suspended": null,
+              "username": "arthurwfluitt"
+            },
+            "hasPassword": false,
+            "salt": null,
+            "isDefaultPassword": null,
+            "isTestUser": null,
+            "deleted": null,
+            "isNew": null,
+            "profile": {
+              "insuranceProvider": "",
+              "insuranceProvider2": "",
+              "firstName": "Arthur W",
+              "lastName": "Fluitt",
+              "nickName": null,
+              "languages": [
+                "EL"
+              ],
+              "memberId": null,
+              "billableHealthConditions": [],
+              "appLanguage": "EL",
+              "birthday": "1943-06-06",
+              "gender": "M",
+              "genderIdentity": "MAN",
+              "race": "WHITE",
+              "avatar": null,
+              "timezone": "US/Central",
+              "weight": {
+                "value": 75.75070307538782,
+                "unit": "kg",
+                "bmi": 25.39226310434695,
+                "source": "PROFILE",
+                "updatedAt": "2026-02-05T16:52:58.171"
+              },
+              "height": {
+                "value": 172.72,
+                "unit": "cm"
+              },
+              "testPatient": null,
+              "communitySupport": "F, Hortense",
+              "contactInfo": "713-504-5213",
+              "otherProviders": null,
+              "easeOfFoodAccess": null,
+              "behaviorChangeInfo": {
+                "behaviorChangeLevel": null,
+                "updatedBy": "66e8902ce0d59c5ba8136ea9",
+                "updatedAt": "2026-02-05T16:52:58.171",
+                "isEdit": false,
+                "updatedByUser": {
+                  "id": "66e8902ce0d59c5ba8136ea9",
+                  "firstName": "Phuong",
+                  "lastName": "Trinh",
+                  "title": "CA",
+                  "email": "phuong.trinh@ihealthlabs.com",
+                  "avatar": {
+                    "fileKey": "avatar/user/66e8902ce0d59c5ba8136ea9/IMG_3265.jpg"
+                  },
+                  "roles": [
+                    "CA"
+                  ],
+                  "clinicIds": [
+                    "632c5b1b8473f80013a5d275",
+                    "68e7310783f3107e37c07b38",
+                    "60a40917823ab800139e5232",
+                    "5b4d072f1d1b2fbe8ddc674f",
+                    "5e3a07859e052800149a88f8",
+                    "67bea55e6f63895ded077d67",
+                    "67f82f07c000ac46b727e9af",
+                    "67c5f3b86f63895ded09f1c6",
+                    "67c5f36b19bcce12de773504",
+                    "682d01fd9688d2515a344238",
+                    "62d7023a07d8390012b00595",
+                    "62d7024507d8390012b00dd4",
+                    "62d7022807d8390012affc2c",
+                    "5dcc8c4ae59fea41c9b226df",
+                    "6388e1f9c710e00013be4d7b",
+                    "5f7f5609ebeed10015e53a6f",
+                    "64874300da98140013d43b3d",
+                    "65f8ca75fc5ab7708af3ff09",
+                    "65fdbb73d0c8385b41523be8",
+                    "66075804d3ef147656bc966a",
+                    "65caca53593cfa001371ddce",
+                    "5bcd5c60eb81250b844770fc",
+                    "665620e391d4792d579fd99d",
+                    "671f0f42cbddfc68d56452f0",
+                    "6883d84e3e40b112e29a5031",
+                    "6883d8823e40b112e29a503b",
+                    "65fdcae6d0c8385b41523d9c",
+                    "6536e58c17fea2001327a97e",
+                    "63470211e3b38f0013d4633e",
+                    "63936ad0af5b370013fb5171",
+                    "65286576d3bef600135b7a65",
+                    "651c947809211b0013d252b9",
+                    "652ee45d6751480013bda45b",
+                    "63e6c0d74b5ebb0013e849ba",
+                    "65ce9148f1541f001365c6fc",
+                    "65c9bea124af530013385688",
+                    "5f4590bbe8f9890013dc3e26",
+                    "5db762bd72a7ef0e520273a0",
+                    "66955af647cf917c8ba5f82a",
+                    "66b05020ea2d9f5c5cbb8207",
+                    "66b5b7436a57267b093e8d26",
+                    "66db2de27463c55497eb47d8",
+                    "670ddc019d6e5166de671817",
+                    "671674e6c5820e6e5ae53549",
+                    "6723b06ecbddfc68d56544db",
+                    "67805ff6aafde53d887a16be",
+                    "68717084e9b73371607afac8",
+                    "68b0d9d0733e85329dbae373",
+                    "68daaf7ada9fba66559e83cf",
+                    "5bc7d750936b862640f070df",
+                    "5ffce3fb718247001480b7a0",
+                    "651df7ec4c28a60013e5a32b",
+                    "64efbebe5e1797001369af78",
+                    "651af07c2185df00135ab78d",
+                    "5fd1079f71874b00134cb04c",
+                    "62cf2aa1d1e56d00148f5089",
+                    "66356bc9e25b79452421c231",
+                    "663c7fbfa472e564bbd4814d",
+                    "663c8015a472e564bbd48155",
+                    "664c3d50947ebf673fd0f2bb",
+                    "66983bd2193aa2047421b11d",
+                    "66356d8ae25b79452421c2f7",
+                    "6683443a7c85c2016bce60ce",
+                    "66de8b64360b0a254f895eed",
+                    "66e0860e3d64f74f199a124b",
+                    "66eb4ea0e0d59c5ba813dd73",
+                    "670dd99e2dcc347a1f6d4feb",
+                    "681c2c4d24ab4f1a1b0b117b",
+                    "6938cb800b86487fff3cca36",
+                    "651b04688f3f4f0013d19a8a",
+                    "648a4e90ff0e800013c0c76b",
+                    "65679381a598b800143ca004",
+                    "65369df9eef17d00131f8898",
+                    "64763db2ff0e8000138fccdf",
+                    "630fd37b9c1847001323dfed",
+                    "651310c6e11eeb001318ea26",
+                    "656a28246d904300132b2f4f",
+                    "62f1d2e7ff15bf0013c56c58",
+                    "64d133ea769f200014c72a31",
+                    "6427636651916300134df0e0",
+                    "65555ca80079b3001365491e",
+                    "6578de4810802b0013d77622",
+                    "6178ed79ef9e2a00120dd3a2",
+                    "5feccb0b67978c00147a37b7",
+                    "632ca85f8cf8da001456d378",
+                    "666b5a7a3275e41c87557c5e",
+                    "6679eb39f04e6e62dc663401",
+                    "670938f8d3cb061168a2f6f6",
+                    "6769d675ab47bf4bb21dbfc4",
+                    "684887f73d401140874efc99",
+                    "68b222c7e10dd600b2d935ce",
+                    "5fa9c37efbd9380013221261",
+                    "5f7f4c6997e0520015b385e9",
+                    "607db5b278eb9a00131a979a",
+                    "620bd78d64085e0014b18c2c",
+                    "60946b65252aa50014c05040",
+                    "613760a44475f500121b9835",
+                    "638a94fe0870f900134d3bdd",
+                    "632a095b1ff9ac0013dfca65",
+                    "64359a7593e76c0013207568",
+                    "5f9062c85d914b001434956c",
+                    "6172e169ef9e2a00120c8e0e",
+                    "5f90f8c7a3562700134b96bd",
+                    "663a4a1c2f630c3ff7d8caaa",
+                    "63f76060a879a10013ae0a7c"
+                  ]
+                }
+              },
+              "behaviorChange": null,
+              "patientTechLevel": "MEDIUM",
+              "doctorId": "657b7ffe47ea4500136d8aad",
+              "doctorUser": {
+                "id": "657b7ffe47ea4500136d8aad",
+                "firstName": "Quyen",
+                "lastName": "Trinh",
+                "title": "",
+                "email": "qxtrinh@msn.com",
+                "roles": [
+                  "PROVIDER"
+                ],
+                "clinicIds": [
+                  "6578de4810802b0013d77622"
+                ]
+              }
+            },
+            "email": null,
+            "majorRole": "MEMBER",
+            "loginId": "arthurwfluitt",
+            "phone": [
+              {
+                "countryCode": "1",
+                "areaCode": null,
+                "number": "2817821982",
+                "verified": null,
+                "isPrimary": null,
+                "isPrivate": null,
+                "type": "MOBILE",
+                "canUseForLogin": true,
+                "isSmartPhone": false
+              },
+              {
+                "countryCode": "1",
+                "areaCode": null,
+                "number": null,
+                "verified": null,
+                "isPrimary": null,
+                "isPrivate": null,
+                "type": "HOME",
+                "canUseForLogin": null,
+                "isSmartPhone": null
+              }
+            ],
+            "medicalRecordId": "39465026",
+            "source": null,
+            "address": [
+              {
+                "type": "MAIN",
+                "streetName": "1711 Brook Grove dr",
+                "streetNumber": null,
+                "floor": null,
+                "unit": null,
+                "city": "Katy",
+                "state": "TX",
+                "country": null,
+                "postCode": "77450"
+              }
+            ],
+            "monthlyMeasurementDays": 20231200,
+            "visitId": null,
+            "editWeight": null,
+            "editHeight": null,
+            "weightFixTag": null,
+            "monthlyBillableStatistic": {
+              "totalTime": 23,
+              "measurementDays": 3,
+              "callCount": 2,
+              "callEligible": null,
+              "timeEligible": true,
+              "measurementEligible": null,
+              "eligible": true,
+              "monthOfYear": 202602,
+              "updatedAt": "2026-02-10T00:01:28.984"
+            },
+            "updatedBy": "657bb2604d6f20696a5d4e0d",
+            "createdBy": null,
+            "patientSource": "MIGRATION",
+            "screenStatus": null,
+            "clinicId": "6578de4810802b0013d77622",
+            "riskLevel": "LOW_RISK",
+            "patientListInfo": {
+              "enrolledStatus": "ENROLLED",
+              "vitals": [
+                {
+                  "id": null,
+                  "createdAt": "2026-02-05T16:24:15.204",
+                  "updatedAt": null,
+                  "type": "BG",
+                  "repeat": null,
+                  "templateDetails": null,
+                  "target": null,
+                  "activated": null
+                },
+                {
+                  "id": null,
+                  "createdAt": "2026-02-05T16:24:15.204",
+                  "updatedAt": null,
+                  "type": "BP",
+                  "repeat": null,
+                  "templateDetails": null,
+                  "target": null,
+                  "activated": null
+                }
+              ],
+              "programs": [
+                {
+                  "id": null,
+                  "createdAt": "2026-02-05T16:19:25.710",
+                  "updatedAt": null,
+                  "category": "RPM",
+                  "startDate": "2026-02-05T16:24:15.204"
+                },
+                {
+                  "id": null,
+                  "createdAt": "2026-02-05T16:19:25.710",
+                  "updatedAt": null,
+                  "category": "CCM",
+                  "startDate": "2026-02-05T16:24:15.204"
+                }
+              ],
+              "additionalServices": [],
+              "enrollmentDate": "2026-02-05T16:24:15.204",
+              "dischargedAt": null
+            },
+            "assignedToRD": "6490e6ee446be000137642d5",
+            "assignedToCA": "66e8902ce0d59c5ba8136ea9",
+            "tag": null,
+            "complexity": "COMPLEX",
+            "associatedList": null,
+            "bpDeviceInfo": {
+              "recentUsedDeviceMacId": "582B0A64BD86",
+              "recentUsedTime": "2026-02-09T18:16:07.000",
+              "pairedTime": "2026-02-07T14:50:27.000"
+            },
+            "bgDeviceInfo": {
+              "recentUsedDeviceMacId": "004D3249EDEF",
+              "recentUsedTime": "2026-02-09T18:10:56.000",
+              "pairedTime": "2026-02-07T14:11:05.000"
+            },
+            "patientCgmDevice": {
+              "brand": null,
+              "model": null,
+              "displayName": null,
+              "installationDate": null,
+              "installedBy": null,
+              "removalDate": null,
+              "removedBy": null,
+              "updatedAt": "2026-02-05T16:45:07.082",
+              "updatedBy": "66e8902ce0d59c5ba8136ea9",
+              "installedByUser": null,
+              "removedByUser": null,
+              "updatedByUser": null,
+              "status": null
+            },
+            "deleteReason": null,
+            "inquiryIdList": null,
+            "loginFailCount": null,
+            "diagnoses": [
+              "HTN",
+              "DM2",
+              "HLD"
+            ],
+            "icdCodes": [
+              "E11.22",
+              "E78.2",
+              "I10"
+            ],
+            "healthConditions": [
+              {
+                "code": "E11.22",
+                "diagnosis": "DM2",
+                "tooltipHtml": "",
+                "condition": "Type 2 diabetes mellitus with diabetic chronic kidney disease",
+                "isBillable": true,
+                "duplicate": null,
+                "conflict": null
+              },
+              {
+                "code": "E78.2",
+                "diagnosis": "HLD",
+                "tooltipHtml": "",
+                "condition": "Mixed hyperlipidemia",
+                "isBillable": false,
+                "duplicate": null,
+                "conflict": null
+              },
+              {
+                "code": "I10",
+                "diagnosis": "HTN",
+                "tooltipHtml": "",
+                "condition": "Essential (primary) hypertension",
+                "isBillable": true,
+                "duplicate": null,
+                "conflict": null
+              }
+            ],
+            "protocol": "DM2",
+            "patientCategories": [
+              "HLD",
+              "HTN",
+              "DM2"
+            ],
+            "controlLevel": "UNCATEGORIZED",
+            "incompleteStatusList": [],
+            "lastOutboundCallDate": "2026-02-04T22:18:55.642",
+            "firstCgmDataReceivedAt": null,
+            "bpStatData": {
+              "sbp": 151,
+              "dbp": 83,
+              "count": 3,
+              "periodStart": "2026-01-10T08:00:00.000",
+              "periodEnd": "2026-02-09T07:59:59.999",
+              "startDay": 20260110,
+              "endDay": 20260208,
+              "updatedAt": null
+            },
+            "bgStatData": {
+              "latestHbA1c": 7,
+              "latestGMI": null,
+              "latestA1c": 7,
+              "source": "HbA1c",
+              "gmiStartDate": null,
+              "gmiEndDate": null,
+              "a1cDate": "2026-01-20T00:00:00.000",
+              "latestHbA1cDate": "2026-01-20T00:00:00.000",
+              "updatedAt": "2026-02-09T10:01:16.654"
+            },
+            "updatedByUser": null,
+            "watchInfo": null,
+            "pinInfo": null,
+            "clinic": {
+              "id": "6578de4810802b0013d77622",
+              "businessName": " Mason Park Medical Clinic",
+              "alias": "TX/Katy - Mason Park Medical Clinic",
+              "orgNumber": "103",
+              "address": "21770 Kingsland Blvd",
+              "address2": "",
+              "state": "TX",
+              "city": "Katy",
+              "timezone": "US/Central",
+              "medicalOrgStatus": "ACTIVE",
+              "enableShareAccess": true,
+              "addOnServices": [
+                "CGM"
+              ],
+              "serviceConfig": {
+                "inClinicInventory": true,
+                "callCenterLocalNumber": "8325530453",
+                "nonSmartPhoneAlternatives": [
+                  "WIFI_ROUTER",
+                  "HOTSPOT",
+                  "BP_CELLULAR_PYLO",
+                  "BP_CLEAR"
+                ],
+                "coBrandConfig": {
+                  "coBrandName": "UnifiedCare",
+                  "logo": {
+                    "fileKey": "https://s3.us-west-2.amazonaws.com/unifiedcare-prod-organization-logo/5b4d04591d1b2fbe8ddc674e/UC logo.png"
+                  }
+                },
+                "showLogo": null
+              },
+              "isMyClinics": true,
+              "sequenceNumber": null,
+              "nickName": "TX/Katy - Mason Park Medical Clinic",
+              "clinicStatus": "ACTIVE"
+            },
+            "medicalOrganizationAssignment": {
+              "id": "6614b7b21859032bb102cb8c",
+              "createdAt": "2024-04-09T03:36:18.822",
+              "updatedAt": "2024-04-09T03:36:18.822",
+              "medicalOrgId": "6578de4810802b0013d77622",
+              "careGroupId": "65e0cb6d7fff9f03c3b687d9",
+              "careCenterId": "65e0a9217fff9f03c3b687ca",
+              "careDivisionId": "65e0cb5e7fff9f03c3b687d8",
+              "rootId": "635700bfba27eb0eabce5000",
+              "deleted": null,
+              "medicalOrganization": {
+                "id": "6578de4810802b0013d77622",
+                "businessName": " Mason Park Medical Clinic",
+                "alias": "TX/Katy - Mason Park Medical Clinic",
+                "orgNumber": "103",
+                "address": "21770 Kingsland Blvd",
+                "address2": "",
+                "state": "TX",
+                "city": "Katy",
+                "timezone": "US/Central",
+                "medicalOrgStatus": "ACTIVE",
+                "enableShareAccess": true,
+                "addOnServices": [
+                  "CGM"
+                ],
+                "serviceConfig": {
+                  "inClinicInventory": true,
+                  "callCenterLocalNumber": "8325530453",
+                  "nonSmartPhoneAlternatives": [
+                    "WIFI_ROUTER",
+                    "HOTSPOT",
+                    "BP_CELLULAR_PYLO",
+                    "BP_CLEAR"
+                  ],
+                  "coBrandConfig": {
+                    "coBrandName": "UnifiedCare",
+                    "logo": {
+                      "fileKey": "https://s3.us-west-2.amazonaws.com/unifiedcare-prod-organization-logo/5b4d04591d1b2fbe8ddc674e/UC logo.png"
+                    }
+                  },
+                  "showLogo": null
+                },
+                "isMyClinics": true,
+                "sequenceNumber": null,
+                "nickName": "TX/Katy - Mason Park Medical Clinic",
+                "clinicStatus": "ACTIVE"
+              },
+              "careGroup": {
+                "id": "65e0cb6d7fff9f03c3b687d9",
+                "name": "Group 1",
+                "businessName": null,
+                "orgNumber": null
+              }
+            },
+            "assignedToRDUser": {
+              "id": "6490e6ee446be000137642d5",
+              "firstName": "Ginny",
+              "lastName": "Ho",
+              "title": "RD",
+              "email": "ngocanhthu.ho@ihealthlabs.com",
+              "avatar": {
+                "fileKey": "avatar/user/6490e6ee446be000137642d5/Ginny Ho_headshot.jpg"
+              },
+              "roles": [
+                "RD"
+              ],
+              "clinicIds": [
+                "60a40917823ab800139e5232",
+                "5b4d072f1d1b2fbe8ddc674f",
+                "5e3a07859e052800149a88f8",
+                "67bea55e6f63895ded077d67",
+                "67f82f07c000ac46b727e9af",
+                "67c5f3b86f63895ded09f1c6",
+                "67c5f36b19bcce12de773504",
+                "682d01fd9688d2515a344238",
+                "62d7023a07d8390012b00595",
+                "62d7024507d8390012b00dd4",
+                "62d7022807d8390012affc2c",
+                "5dcc8c4ae59fea41c9b226df",
+                "6388e1f9c710e00013be4d7b",
+                "5f7f5609ebeed10015e53a6f",
+                "64874300da98140013d43b3d",
+                "65f8ca75fc5ab7708af3ff09",
+                "65fdbb73d0c8385b41523be8",
+                "66075804d3ef147656bc966a",
+                "65caca53593cfa001371ddce",
+                "5bcd5c60eb81250b844770fc",
+                "665620e391d4792d579fd99d",
+                "671f0f42cbddfc68d56452f0",
+                "6883d84e3e40b112e29a5031",
+                "6883d8823e40b112e29a503b",
+                "65fdcae6d0c8385b41523d9c",
+                "6536e58c17fea2001327a97e",
+                "63470211e3b38f0013d4633e",
+                "63936ad0af5b370013fb5171",
+                "65286576d3bef600135b7a65",
+                "651c947809211b0013d252b9",
+                "652ee45d6751480013bda45b",
+                "63e6c0d74b5ebb0013e849ba",
+                "65ce9148f1541f001365c6fc",
+                "65c9bea124af530013385688",
+                "5f4590bbe8f9890013dc3e26",
+                "5db762bd72a7ef0e520273a0",
+                "66955af647cf917c8ba5f82a",
+                "66b05020ea2d9f5c5cbb8207",
+                "66b5b7436a57267b093e8d26",
+                "66db2de27463c55497eb47d8",
+                "670ddc019d6e5166de671817",
+                "671674e6c5820e6e5ae53549",
+                "6723b06ecbddfc68d56544db",
+                "67805ff6aafde53d887a16be",
+                "68717084e9b73371607afac8",
+                "68b0d9d0733e85329dbae373",
+                "68daaf7ada9fba66559e83cf",
+                "5bc7d750936b862640f070df",
+                "5ffce3fb718247001480b7a0",
+                "651df7ec4c28a60013e5a32b",
+                "64efbebe5e1797001369af78",
+                "651af07c2185df00135ab78d",
+                "5fd1079f71874b00134cb04c",
+                "62cf2aa1d1e56d00148f5089",
+                "66356bc9e25b79452421c231",
+                "663c7fbfa472e564bbd4814d",
+                "663c8015a472e564bbd48155",
+                "664c3d50947ebf673fd0f2bb",
+                "66983bd2193aa2047421b11d",
+                "66356d8ae25b79452421c2f7",
+                "6683443a7c85c2016bce60ce",
+                "66de8b64360b0a254f895eed",
+                "66e0860e3d64f74f199a124b",
+                "66eb4ea0e0d59c5ba813dd73",
+                "670dd99e2dcc347a1f6d4feb",
+                "681c2c4d24ab4f1a1b0b117b",
+                "6938cb800b86487fff3cca36",
+                "651b04688f3f4f0013d19a8a",
+                "648a4e90ff0e800013c0c76b",
+                "65679381a598b800143ca004",
+                "65369df9eef17d00131f8898",
+                "64763db2ff0e8000138fccdf",
+                "630fd37b9c1847001323dfed",
+                "651310c6e11eeb001318ea26",
+                "656a28246d904300132b2f4f",
+                "62f1d2e7ff15bf0013c56c58",
+                "64d133ea769f200014c72a31",
+                "6427636651916300134df0e0",
+                "65555ca80079b3001365491e",
+                "6578de4810802b0013d77622",
+                "6178ed79ef9e2a00120dd3a2",
+                "5feccb0b67978c00147a37b7",
+                "632c5b1b8473f80013a5d275",
+                "632ca85f8cf8da001456d378",
+                "666b5a7a3275e41c87557c5e",
+                "6679eb39f04e6e62dc663401",
+                "670938f8d3cb061168a2f6f6",
+                "6769d675ab47bf4bb21dbfc4",
+                "684887f73d401140874efc99",
+                "68b222c7e10dd600b2d935ce",
+                "5fa9c37efbd9380013221261",
+                "5f7f4c6997e0520015b385e9",
+                "607db5b278eb9a00131a979a",
+                "620bd78d64085e0014b18c2c",
+                "60946b65252aa50014c05040",
+                "613760a44475f500121b9835",
+                "638a94fe0870f900134d3bdd",
+                "632a095b1ff9ac0013dfca65",
+                "64359a7593e76c0013207568",
+                "5f9062c85d914b001434956c",
+                "6172e169ef9e2a00120c8e0e",
+                "5f90f8c7a3562700134b96bd",
+                "663a4a1c2f630c3ff7d8caaa",
+                "63f76060a879a10013ae0a7c"
+              ]
+            },
+            "assignedToCAUser": {
+              "id": "66e8902ce0d59c5ba8136ea9",
+              "firstName": "Phuong",
+              "lastName": "Trinh",
+              "title": "CA",
+              "email": "phuong.trinh@ihealthlabs.com",
+              "avatar": {
+                "fileKey": "avatar/user/66e8902ce0d59c5ba8136ea9/IMG_3265.jpg"
+              },
+              "roles": [
+                "CA"
+              ],
+              "clinicIds": [
+                "632c5b1b8473f80013a5d275",
+                "68e7310783f3107e37c07b38",
+                "60a40917823ab800139e5232",
+                "5b4d072f1d1b2fbe8ddc674f",
+                "5e3a07859e052800149a88f8",
+                "67bea55e6f63895ded077d67",
+                "67f82f07c000ac46b727e9af",
+                "67c5f3b86f63895ded09f1c6",
+                "67c5f36b19bcce12de773504",
+                "682d01fd9688d2515a344238",
+                "62d7023a07d8390012b00595",
+                "62d7024507d8390012b00dd4",
+                "62d7022807d8390012affc2c",
+                "5dcc8c4ae59fea41c9b226df",
+                "6388e1f9c710e00013be4d7b",
+                "5f7f5609ebeed10015e53a6f",
+                "64874300da98140013d43b3d",
+                "65f8ca75fc5ab7708af3ff09",
+                "65fdbb73d0c8385b41523be8",
+                "66075804d3ef147656bc966a",
+                "65caca53593cfa001371ddce",
+                "5bcd5c60eb81250b844770fc",
+                "665620e391d4792d579fd99d",
+                "671f0f42cbddfc68d56452f0",
+                "6883d84e3e40b112e29a5031",
+                "6883d8823e40b112e29a503b",
+                "65fdcae6d0c8385b41523d9c",
+                "6536e58c17fea2001327a97e",
+                "63470211e3b38f0013d4633e",
+                "63936ad0af5b370013fb5171",
+                "65286576d3bef600135b7a65",
+                "651c947809211b0013d252b9",
+                "652ee45d6751480013bda45b",
+                "63e6c0d74b5ebb0013e849ba",
+                "65ce9148f1541f001365c6fc",
+                "65c9bea124af530013385688",
+                "5f4590bbe8f9890013dc3e26",
+                "5db762bd72a7ef0e520273a0",
+                "66955af647cf917c8ba5f82a",
+                "66b05020ea2d9f5c5cbb8207",
+                "66b5b7436a57267b093e8d26",
+                "66db2de27463c55497eb47d8",
+                "670ddc019d6e5166de671817",
+                "671674e6c5820e6e5ae53549",
+                "6723b06ecbddfc68d56544db",
+                "67805ff6aafde53d887a16be",
+                "68717084e9b73371607afac8",
+                "68b0d9d0733e85329dbae373",
+                "68daaf7ada9fba66559e83cf",
+                "5bc7d750936b862640f070df",
+                "5ffce3fb718247001480b7a0",
+                "651df7ec4c28a60013e5a32b",
+                "64efbebe5e1797001369af78",
+                "651af07c2185df00135ab78d",
+                "5fd1079f71874b00134cb04c",
+                "62cf2aa1d1e56d00148f5089",
+                "66356bc9e25b79452421c231",
+                "663c7fbfa472e564bbd4814d",
+                "663c8015a472e564bbd48155",
+                "664c3d50947ebf673fd0f2bb",
+                "66983bd2193aa2047421b11d",
+                "66356d8ae25b79452421c2f7",
+                "6683443a7c85c2016bce60ce",
+                "66de8b64360b0a254f895eed",
+                "66e0860e3d64f74f199a124b",
+                "66eb4ea0e0d59c5ba813dd73",
+                "670dd99e2dcc347a1f6d4feb",
+                "681c2c4d24ab4f1a1b0b117b",
+                "6938cb800b86487fff3cca36",
+                "651b04688f3f4f0013d19a8a",
+                "648a4e90ff0e800013c0c76b",
+                "65679381a598b800143ca004",
+                "65369df9eef17d00131f8898",
+                "64763db2ff0e8000138fccdf",
+                "630fd37b9c1847001323dfed",
+                "651310c6e11eeb001318ea26",
+                "656a28246d904300132b2f4f",
+                "62f1d2e7ff15bf0013c56c58",
+                "64d133ea769f200014c72a31",
+                "6427636651916300134df0e0",
+                "65555ca80079b3001365491e",
+                "6578de4810802b0013d77622",
+                "6178ed79ef9e2a00120dd3a2",
+                "5feccb0b67978c00147a37b7",
+                "632ca85f8cf8da001456d378",
+                "666b5a7a3275e41c87557c5e",
+                "6679eb39f04e6e62dc663401",
+                "670938f8d3cb061168a2f6f6",
+                "6769d675ab47bf4bb21dbfc4",
+                "684887f73d401140874efc99",
+                "68b222c7e10dd600b2d935ce",
+                "5fa9c37efbd9380013221261",
+                "5f7f4c6997e0520015b385e9",
+                "607db5b278eb9a00131a979a",
+                "620bd78d64085e0014b18c2c",
+                "60946b65252aa50014c05040",
+                "613760a44475f500121b9835",
+                "638a94fe0870f900134d3bdd",
+                "632a095b1ff9ac0013dfca65",
+                "64359a7593e76c0013207568",
+                "5f9062c85d914b001434956c",
+                "6172e169ef9e2a00120c8e0e",
+                "5f90f8c7a3562700134b96bd",
+                "663a4a1c2f630c3ff7d8caaa",
+                "63f76060a879a10013ae0a7c"
+              ]
+            },
+            "cgmPotential": true,
+            "patientExtendedInfo": {
+              "id": "657bb2604d6f20696a5d4e0d",
+              "intakeFormSubmitted": false
+            }
+          },
+          "msg": null,
+          "error": null
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-13T01:22:20.550Z",
+      "createdAt": "2026-01-13T01:22:20.550Z",
+      "role": "workflow:owner",
+      "workflowId": "jJ8NNdOsh0RQp0RT",
+      "projectId": "IGL0EzJNN8XZ65mm"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-02-10T01:38:56.575Z",
+  "versionId": "dd0fd184-38c1-4e7d-993b-38dd9068224b"
+}
