@@ -1,0 +1,111 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get many issues",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many issues": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-02-09T19:51:59.714Z",
+  "id": "cS3Nh-WT2qvlxHTd1a1zf",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "JiraGmail",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -288,
+        -16
+      ],
+      "id": "c2af356b-092b-47a8-afbc-d64513a130c6",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": 1,
+        "options": {
+          "jql": "assignee in (currentUser()) AND status not in (\"Done\", \"Closed\", \"DEV VERIFIED\", \"QA VERIFIED\", \"Test\", \"Production\", \"Released to production\", \"Not A Bug\") ORDER BY created DESC"
+        }
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        -16
+      ],
+      "id": "d3d388f3-02b7-4bfd-ba65-18d11d758b02",
+      "name": "Get many issues",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "8MFK8GhY79UNHP7W",
+          "name": "Jira SW Cloud account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        128,
+        -16
+      ],
+      "id": "41fc0a42-94cb-4d7a-9fe3-5720c0aebe15",
+      "name": "Send a message",
+      "webhookId": "ac36d8c3-d1ef-4060-a3cb-0dbe8fd807dd"
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-09T19:51:59.716Z",
+      "createdAt": "2026-02-09T19:51:59.716Z",
+      "role": "workflow:owner",
+      "workflowId": "cS3Nh-WT2qvlxHTd1a1zf",
+      "projectId": "zPoguUlBzBwCeW9l"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-02-14T00:01:15.055Z",
+  "versionId": "4332efd2-7d74-447d-9433-7ad1bd62e1c1"
+}
