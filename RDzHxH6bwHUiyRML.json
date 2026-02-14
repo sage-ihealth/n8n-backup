@@ -1,0 +1,1172 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-02-13T00:43:38.071Z",
+    "createdAt": "2026-02-13T00:43:38.071Z",
+    "versionId": "946ac970-4cdb-4cfd-8f29-89dfca462391",
+    "workflowId": "RDzHxH6bwHUiyRML",
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "cronExpression",
+                "expression": "0 8,12,16 * * 1-5"
+              }
+            ]
+          }
+        },
+        "id": "schedule_trigger",
+        "name": "3x Daily Mon-Fri",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          -112,
+          -48
+        ]
+      },
+      {
+        "parameters": {
+          "url": "https://ihealthlabs.talentlms.com/api/v1/users",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "httpHeaderAuth",
+          "options": {}
+        },
+        "id": "get_users",
+        "name": "Get All TalentLMS Users",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          112,
+          -48
+        ],
+        "credentials": {
+          "httpHeaderAuth": {
+            "id": "zjdo1NyXWx7o3LVy",
+            "name": "TalentLMS Header Auth"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1SgvK3lM0Yyn6hmaQUqiEfo7ea5UCfyodTShfMb3DGVE",
+            "mode": "list",
+            "cachedResultName": "TalentLMS Mastersheet",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SgvK3lM0Yyn6hmaQUqiEfo7ea5UCfyodTShfMb3DGVE/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 953847980,
+            "mode": "list",
+            "cachedResultName": "Assessment Summary",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SgvK3lM0Yyn6hmaQUqiEfo7ea5UCfyodTShfMb3DGVE/edit#gid=953847980"
+          },
+          "options": {}
+        },
+        "id": "read_sheet",
+        "name": "Read Existing Entries",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.5,
+        "position": [
+          672,
+          -80
+        ],
+        "alwaysOutputData": true,
+        "retryOnFail": true,
+        "maxTries": 3,
+        "waitBetweenTries": 5000,
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "vdcRQ7DzD7EJYCNd",
+            "name": "Google Sheets account 3"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "url": "https://ihealthlabs.talentlms.com/api/v1/courses/id:171",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "httpHeaderAuth",
+          "options": {}
+        },
+        "id": "get_course",
+        "name": "Get Course 171 Details",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          896,
+          -80
+        ],
+        "credentials": {
+          "httpHeaderAuth": {
+            "id": "zjdo1NyXWx7o3LVy",
+            "name": "TalentLMS Header Auth"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Course 171 details (from previous node)\nconst course = $input.first().json;\n\n// All TalentLMS users (pre-filtered to hires on/after 1/1/2026)\nconst allUsers = $('Hire Date Filter').all();\n\n// Existing entries in Google Sheet for dedup\nconst existingEntries = $('Read Existing Entries').all();\n\n// Build user details lookup: userId -> full user object\nconst userDetailsMap = {};\nfor (const item of allUsers) {\n  const u = Array.isArray(item.json) ? item.json : [item.json];\n  for (const user of u) {\n    userDetailsMap[String(user.id)] = user;\n  }\n}\n\n// Parse timestamp to epoch ms (handles format differences like leading zeros)\nfunction toEpoch(str) {\n  if (!str) return 0;\n  const t = new Date(String(str)).getTime();\n  return isNaN(t) ? 0 : t;\n}\n\n// Dedup by User ID + normalized Completed On timestamp\nconst existingCompletions = {};  // userId → Set of epoch ms values\nfor (const entry of existingEntries) {\n  const uid = String(entry.json['User ID'] || '');\n  const epoch = toEpoch(entry.json['Completed On']);\n  if (uid) {\n    if (!existingCompletions[uid]) existingCompletions[uid] = new Set();\n    if (epoch) existingCompletions[uid].add(epoch);\n  }\n}\n\n// Find the single test unit in course 171\nconst testUnits = (course.units || []).filter(u =>\n  u.type === 'Test' || u.type === 'test'\n);\n\nif (testUnits.length === 0) {\n  return [{ json: { hasNewUsers: false, message: 'No test units found in course 171' } }];\n}\n\nconst testId = String(testUnits[0].id);\nconst testName = testUnits[0].name || 'Knowledge Assessment';\n\n// Only analyze users hired on or after Jan 1, 2026\nconst cutoffDate = new Date(2026, 0, 1);\n\n// Filter course users: completed, new hire, not already analyzed for this attempt\nconst output = [];\nconst courseUsers = course.users || [];\n\nfor (const cu of courseUsers) {\n  if (cu.role !== 'learner') continue;\n  const pct = String(cu.completion_percentage);\n  if (pct !== '100') continue;\n\n  const userId = String(cu.user_id || cu.id);\n\n  const fullUser = userDetailsMap[userId];\n  if (!fullUser) continue;\n\n  const hireDateStr = fullUser.custom_field_31;\n  if (!hireDateStr) continue;\n  const parts = hireDateStr.split('/');\n  if (parts.length !== 3) continue;\n  const hireDate = new Date(parts[2], parts[0] - 1, parts[1]);\n  if (hireDate < cutoffDate) continue;\n  if (fullUser.status !== 'active') continue;\n\n  // Dedup: compare normalized timestamps (avoids Google Sheets formatting mismatches)\n  const completedOn = cu.completed_on || cu.completed_on_timestamp || '';\n  const completedEpoch = toEpoch(completedOn);\n  if (completedEpoch && existingCompletions[userId] && existingCompletions[userId].has(completedEpoch)) continue;\n\n  // Calculate attempt number based on existing rows for this user\n  const attemptNumber = existingCompletions[userId]\n    ? existingCompletions[userId].size + 1\n    : 1;\n\n  const userName = ((fullUser.first_name || '') + ' ' + (fullUser.last_name || '')).trim();\n\n  output.push({\n    json: {\n      userId,\n      userName,\n      email: fullUser.email || '',\n      hireDate: hireDateStr,\n      manager: fullUser.custom_field_30 || 'Unknown',\n      jobTitle: fullUser.custom_field_23 || '',\n      department: fullUser.custom_field_25 || '',\n      completedOn,\n      attemptNumber,\n      testId,\n      testName,\n      hasNewUsers: true\n    }\n  });\n}\n\nif (output.length === 0) {\n  return [{ json: { hasNewUsers: false, message: 'No new completed new hires to analyze' } }];\n}\n\nreturn output;"
+        },
+        "id": "find_new_users",
+        "name": "Find New Completed Users",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1120,
+          -80
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "version": 2,
+              "leftValue": "",
+              "caseSensitive": true,
+              "typeValidation": "strict"
+            },
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "1",
+                "leftValue": "={{ $json.hasNewUsers }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "equals"
+                }
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "has_new_users",
+        "name": "Has New Users?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          1344,
+          -80
+        ]
+      },
+      {
+        "parameters": {
+          "url": "=https://ihealthlabs.talentlms.com/api/v1/gettestanswers/test_id:{{ $json.testId }},user_id:{{ $json.userId }}",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "httpHeaderAuth",
+          "options": {
+            "response": {
+              "response": {
+                "neverError": true
+              }
+            }
+          }
+        },
+        "id": "get_test_answers",
+        "name": "Get Test Answers",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1568,
+          -80
+        ],
+        "credentials": {
+          "httpHeaderAuth": {
+            "id": "zjdo1NyXWx7o3LVy",
+            "name": "TalentLMS Header Auth"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Get test answer API response and original user metadata\nconst testResult = $input.item.json;\nconst context = $('Find New Completed Users').item.json;\n\n// Helper: convert answer objects (e.g. {\"2\": \"False\"}) to readable strings\nfunction formatAnswers(answersObj) {\n  if (!answersObj || typeof answersObj !== 'object') return 'N/A';\n  return Object.values(answersObj).join(', ');\n}\n\n// Topic keyword mapping for Course 171 questions\nconst TOPIC_KEYWORDS = {\n  'Device & Technology': ['device', 'bp ', 'blood pressure', 'cgm', 'libre', 'dexcom', 'lancet', 'scale', 'router', 'hotspot', 'portal', 'faulty', 'returned', 'bpm1', 'glucose monitor'],\n  'Clinical Knowledge': ['diagnos', 'protocol', 'scope of practice', 'billable hierarch', 'monitor', 'post-md', 'chronic condition', 'eligible', 'rpm', 'ccm'],\n  'Workflow & Process': ['call log', 'appointment', 'monthly review', 'ehr', 'visit type', 'screening', 'schedule', 'billable', 'waived'],\n  'Company & Program': ['ihealth', 'unified care', 'o+o', 'okr', 'core value', 'vbc', 'value-based', 'enrolled', 'benefit of the program', 'care & growth', 'care team'],\n  'Compliance & Professionalism': ['phi', 'hipaa', 'professional appear', 'onsite', 'exam room', 'permission', 'health information', 'knock']\n};\n\nfunction categorizeTopic(questionText) {\n  const lower = questionText.toLowerCase();\n  for (const [topic, keywords] of Object.entries(TOPIC_KEYWORDS)) {\n    if (keywords.some(kw => lower.includes(kw))) return topic;\n  }\n  return 'General Knowledge';\n}\n\n// Parse test answers\nlet questions = [];\nif (Array.isArray(testResult)) {\n  questions = testResult;\n} else if (testResult.questions) {\n  questions = testResult.questions;\n}\n\nconst wrongAnswers = [];\nlet totalCorrect = 0;\n\nfor (const q of questions) {\n  const isCorrect = q.correct === true || q.correct === 'true' || q.correct === 1 || q.correct === '1';\n  if (isCorrect) {\n    totalCorrect++;\n  } else {\n    const questionText = (q.text || q.question || 'Unknown question').trim();\n    wrongAnswers.push({\n      question: questionText,\n      userAnswer: formatAnswers(q.user_answers),\n      correctAnswer: formatAnswers(q.correct_answers),\n      topic: categorizeTopic(questionText)\n    });\n  }\n}\n\nconst totalQuestions = questions.length;\nconst overallScore = totalQuestions > 0 ? Math.round((totalCorrect / totalQuestions) * 100) : null;\n\n// Group wrong answers by topic\nconst byTopic = {};\nfor (const wa of wrongAnswers) {\n  if (!byTopic[wa.topic]) byTopic[wa.topic] = [];\n  byTopic[wa.topic].push(wa);\n}\n\n// Build topic summary string\nconst topicSummary = Object.keys(byTopic).join(', ');\n\n// Build LLM prompt\nlet prompt = 'You are a training analyst for iHealth Unified Care, a healthcare technology company specializing in remote patient monitoring (RPM), chronic care management (CCM), and value-based care. ';\nprompt += 'New hires (Care Associates, Care Coordinators, etc.) take a Knowledge Assessment covering devices, clinical protocols, workflows, compliance, and company programs.\\n';\nprompt += 'Analyze the following results and provide targeted coaching feedback.\\n\\n';\nprompt += '## New Hire Profile\\n';\nprompt += `- Name: ${context.userName}\\n`;\nprompt += `- Job Title: ${context.jobTitle || 'Not specified'}\\n`;\nprompt += `- Department: ${context.department || 'Not specified'}\\n`;\nprompt += `- Hire Date: ${context.hireDate}\\n`;\nprompt += `- Manager: ${context.manager}\\n`;\nprompt += `- Overall Score: ${overallScore}%\\n\\n`;\n\nif (wrongAnswers.length === 0) {\n  prompt += '## Assessment Result: PERFECT SCORE (100%)\\n';\n  prompt += `This new hire answered all ${totalQuestions} questions correctly.\\n\\n`;\n  prompt += 'Please provide:\\n';\n  prompt += '1. A brief congratulatory note\\n';\n  prompt += '2. 2-3 areas where they can deepen their knowledge further\\n';\n  prompt += '3. Recommended next steps for advanced learning\\n';\n} else {\n  prompt += `## Topic Summary\\nWeak areas: ${topicSummary}\\n\\n`;\n  prompt += `## Wrong Answers by Topic (${wrongAnswers.length} of ${totalQuestions} total)\\n\\n`;\n  for (const [topic, answers] of Object.entries(byTopic)) {\n    prompt += `### ${topic} (${answers.length} wrong)\\n`;\n    for (const a of answers) {\n      prompt += `- Q: \"${a.question}\"\\n`;\n      prompt += `  Answered: \"${a.userAnswer}\" | Correct: \"${a.correctAnswer}\"\\n`;\n    }\n    prompt += '\\n';\n  }\n  prompt += '## Provide the following sections:\\n';\n  prompt += '1. **Knowledge Gap Summary**: For each weak topic area listed above, describe the specific gap (1-2 sentences each)\\n';\n  prompt += '2. **For the New Hire**: 3-5 specific, actionable study recommendations mapped to the weak topics\\n';\n  prompt += `3. **For the Manager (${context.manager})**: 2-3 coaching points or conversation starters for 1:1s, referencing the specific topics\\n`;\n  prompt += '4. **Risk Level**: Rate as LOW (1-2 wrong, minor topics), MEDIUM (3-4 wrong or core topics), or HIGH (5+ wrong or critical safety/compliance topics)\\n';\n  prompt += '5. **Follow-up Recommendation**: Should this person retake the assessment? If so, after how many days of study?\\n';\n}\nprompt += '\\nKeep your response concise and actionable. Use bullet points. Do not repeat the questions back.';\n\nreturn [{\n  json: {\n    ...context,\n    totalQuestions,\n    totalCorrect,\n    overallScore,\n    wrongAnswers,\n    topicSummary,\n    byTopic,\n    prompt\n  }\n}];"
+        },
+        "id": "format_prompt",
+        "name": "Parse Results & Build Prompt",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1792,
+          -80
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "// Get LLM Chain response and parsed user data\nconst llmResponse = $input.item.json;\nconst userData = $('Parse Results & Build Prompt').item.json;\n\n// Extract AI analysis text from Basic LLM Chain output\nlet aiAnalysis = 'No analysis available';\ntry {\n  aiAnalysis = llmResponse.output || llmResponse.text || llmResponse.response?.text || 'No analysis available';\n} catch (e) {\n  aiAnalysis = 'Failed to parse LLM response';\n}\n\n// Format wrong questions as readable multi-line text\nlet wrongQuestionsText = '';\nif (userData.wrongAnswers && userData.wrongAnswers.length > 0) {\n  wrongQuestionsText = userData.wrongAnswers.map((wa, i) =>\n    `${i + 1}. \"${wa.question}\" — Answered: \"${wa.userAnswer}\" (Correct: \"${wa.correctAnswer}\")`\n  ).join('\\n');\n} else {\n  wrongQuestionsText = 'None — Perfect Score!';\n}\n\nconst runTimestamp = new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles' });\n\nreturn [{\n  json: {\n    'User ID': userData.userId,\n    'User Name': userData.userName,\n    'Email': userData.email,\n    'Job Title': userData.jobTitle,\n    'Department': userData.department,\n    'Hire Date': userData.hireDate,\n    'Manager': userData.manager,\n    'Completed On': userData.completedOn,\n    'Attempt': userData.attemptNumber || 1,\n    'Overall Score': userData.overallScore !== null ? userData.overallScore + '%' : 'N/A',\n    'Total Questions': userData.totalQuestions,\n    'Correct': userData.totalCorrect,\n    'Wrong': userData.wrongAnswers ? userData.wrongAnswers.length : 0,\n    'Wrong Questions': wrongQuestionsText,\n    'AI Analysis': aiAnalysis,\n    'Analysis Date': runTimestamp\n  }\n}];"
+        },
+        "id": "prepare_sheet",
+        "name": "Prepare Sheet Row",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2368,
+          -80
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "1SgvK3lM0Yyn6hmaQUqiEfo7ea5UCfyodTShfMb3DGVE",
+            "mode": "list",
+            "cachedResultName": "TalentLMS Mastersheet",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SgvK3lM0Yyn6hmaQUqiEfo7ea5UCfyodTShfMb3DGVE/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 953847980,
+            "mode": "list",
+            "cachedResultName": "Assessment Summary",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SgvK3lM0Yyn6hmaQUqiEfo7ea5UCfyodTShfMb3DGVE/edit#gid=953847980"
+          },
+          "columns": {
+            "mappingMode": "autoMapInputData",
+            "value": {}
+          },
+          "options": {
+            "cellFormat": "USER_ENTERED"
+          }
+        },
+        "id": "write_summary",
+        "name": "Write Assessment Summary",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.5,
+        "position": [
+          2592,
+          -80
+        ],
+        "retryOnFail": true,
+        "maxTries": 3,
+        "waitBetweenTries": 15000,
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "vdcRQ7DzD7EJYCNd",
+            "name": "Google Sheets account 3"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Build a single chat notification from all analyzed users\nconst allUserData = $('Parse Results & Build Prompt').all();\nconst pstDate = new Date().toLocaleDateString('en-US', {\n  timeZone: 'America/Los_Angeles',\n  month: 'short', day: 'numeric', year: 'numeric'\n});\n\nlet message = `\\ud83d\\udcdd Knowledge Assessment Analysis - ${pstDate}\\n\\n`;\nmessage += `*${allUserData.length} new hire(s) analyzed*\\n\\n`;\n\nfor (const item of allUserData) {\n  const u = item.json;\n  let scoreEmoji = '\\u2705';\n  if (u.overallScore < 90) scoreEmoji = '\\u26a0\\ufe0f';\n  if (u.overallScore < 70) scoreEmoji = '\\u274c';\n\n  message += `${scoreEmoji} *${u.userName}* - Score: ${u.overallScore}%`;\n  message += ` (${u.wrongAnswers.length}/${u.totalQuestions} wrong)\\n`;\n  message += `   Title: ${u.jobTitle || 'N/A'} | Manager: ${u.manager}\\n`;\n  message += `   Hire Date: ${u.hireDate}\\n`;\n\n  if (u.wrongAnswers.length > 0 && u.byTopic) {\n    const topicCounts = Object.entries(u.byTopic)\n      .map(([topic, answers]) => `${topic} (${answers.length})`)\n      .join(', ');\n    message += `   Weak areas: ${topicCounts}\\n`;\n  }\n  message += '\\n';\n}\n\nmessage += `Full analysis \\u2192 https://docs.google.com/spreadsheets/d/1SgvK3lM0Yyn6hmaQUqiEfo7ea5UCfyodTShfMb3DGVE`;\n\nreturn [{ json: { text: message } }];"
+        },
+        "id": "build_chat",
+        "name": "Build Chat Message",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2816,
+          -80
+        ]
+      },
+      {
+        "parameters": {},
+        "id": "error_trigger",
+        "name": "Error Trigger",
+        "type": "n8n-nodes-base.errorTrigger",
+        "typeVersion": 1,
+        "position": [
+          0,
+          248
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://chat.googleapis.com/v1/spaces/AAQArkdpCu4/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=73gOUomiJ0I3JIfi746DoVGZfN98WtxzqIT0IeI-0Mg",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ text: '⚠️ *Knowledge Assessment Analysis Failed*\\nError: ' + ($json.execution?.error?.message || 'Unknown error') + '\\nTime: ' + new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }) }) }}",
+          "options": {}
+        },
+        "id": "error_chat",
+        "name": "Send Error to Chat",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          224,
+          248
+        ]
+      },
+      {
+        "parameters": {
+          "content": "**Knowledge Assessment Analysis**\nCourse 171 | New hires (hired on/after 1/1/2026) | Gemini AI analysis\n\nPolls 3x daily Mon-Fri. Detects new hires who completed the assessment, fetches test answers, analyzes with LLM, writes to Google Sheet + sends Chat notification.\n\n**Credentials needed:**\n- TalentLMS API (HTTP Basic Auth)\n- Google Sheets OAuth\n- Google Gemini API Key (httpQueryAuth: name=key, value=API_KEY)"
+        },
+        "id": "sticky_overview",
+        "name": "Sticky Note - Overview",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          16,
+          -288
+        ]
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "={{ $json.prompt }}",
+          "batching": {}
+        },
+        "id": "llm_analysis",
+        "name": "AI Analysis",
+        "type": "@n8n/n8n-nodes-langchain.chainLlm",
+        "typeVersion": 1.9,
+        "position": [
+          2016,
+          -80
+        ]
+      },
+      {
+        "parameters": {
+          "modelName": "models/gemini-2.5-flash-lite",
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+        "typeVersion": 1,
+        "position": [
+          2088,
+          144
+        ],
+        "id": "a5605b22-a774-476a-92e5-bf88cebcfa4b",
+        "name": "Google Gemini Chat Model",
+        "credentials": {
+          "googlePalmApi": {
+            "id": "LLF6MLepnlTsChok",
+            "name": "Google Gemini(PaLM) Api account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://chat.googleapis.com/v1/spaces/AAQA4Ksbm-M/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=UPaxjAUjYdJowRki8zCMCrbLprOL-C_dQpcW5BxyFno",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ text: $json.text }) }}",
+          "options": {}
+        },
+        "id": "send_chat_prod",
+        "name": "Send to UC Onboarding",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          3040,
+          -80
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "version": 2,
+              "leftValue": "",
+              "caseSensitive": true,
+              "typeValidation": "strict"
+            },
+            "conditions": [
+              {
+                "id": "hire-date-check",
+                "leftValue": "={{ (() => { const d = ($json.custom_field_31 || '').split('/'); if (d.length !== 3) return false; return new Date(d[2], d[0]-1, d[1]) >= new Date(2026, 0, 1); })() }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "hire_date_filter",
+        "name": "Hire Date Filter",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          352,
+          -48
+        ]
+      }
+    ],
+    "connections": {
+      "3x Daily Mon-Fri": {
+        "main": [
+          [
+            {
+              "node": "Get All TalentLMS Users",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Read Existing Entries": {
+        "main": [
+          [
+            {
+              "node": "Get Course 171 Details",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Course 171 Details": {
+        "main": [
+          [
+            {
+              "node": "Find New Completed Users",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Find New Completed Users": {
+        "main": [
+          [
+            {
+              "node": "Has New Users?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Has New Users?": {
+        "main": [
+          [
+            {
+              "node": "Get Test Answers",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Write Assessment Summary": {
+        "main": [
+          [
+            {
+              "node": "Build Chat Message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Chat Message": {
+        "main": [
+          [
+            {
+              "node": "Send to UC Onboarding",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Error Trigger": {
+        "main": [
+          [
+            {
+              "node": "Send Error to Chat",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Test Answers": {
+        "main": [
+          [
+            {
+              "node": "Parse Results & Build Prompt",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Parse Results & Build Prompt": {
+        "main": [
+          [
+            {
+              "node": "AI Analysis",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "AI Analysis": {
+        "main": [
+          [
+            {
+              "node": "Prepare Sheet Row",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Google Gemini Chat Model": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "AI Analysis",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Prepare Sheet Row": {
+        "main": [
+          [
+            {
+              "node": "Write Assessment Summary",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get All TalentLMS Users": {
+        "main": [
+          [
+            {
+              "node": "Hire Date Filter",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Hire Date Filter": {
+        "main": [
+          [
+            {
+              "node": "Read Existing Entries",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Phoebe You",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "activeVersionId": "946ac970-4cdb-4cfd-8f29-89dfca462391",
+  "connections": {
+    "3x Daily Mon-Fri": {
+      "main": [
+        [
+          {
+            "node": "Get All TalentLMS Users",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Existing Entries": {
+      "main": [
+        [
+          {
+            "node": "Get Course 171 Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Course 171 Details": {
+      "main": [
+        [
+          {
+            "node": "Find New Completed Users",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find New Completed Users": {
+      "main": [
+        [
+          {
+            "node": "Has New Users?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has New Users?": {
+      "main": [
+        [
+          {
+            "node": "Get Test Answers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write Assessment Summary": {
+      "main": [
+        [
+          {
+            "node": "Build Chat Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Chat Message": {
+      "main": [
+        [
+          {
+            "node": "Send to UC Onboarding",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Send Error to Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Test Answers": {
+      "main": [
+        [
+          {
+            "node": "Parse Results & Build Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Results & Build Prompt": {
+      "main": [
+        [
+          {
+            "node": "AI Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Analysis": {
+      "main": [
+        [
+          {
+            "node": "Prepare Sheet Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Analysis",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Sheet Row": {
+      "main": [
+        [
+          {
+            "node": "Write Assessment Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get All TalentLMS Users": {
+      "main": [
+        [
+          {
+            "node": "Hire Date Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hire Date Filter": {
+      "main": [
+        [
+          {
+            "node": "Read Existing Entries",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-02-09T23:32:58.681Z",
+  "id": "RDzHxH6bwHUiyRML",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "Knowledge Assessment Analysis (Course 171)",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8,12,16 * * 1-5"
+            }
+          ]
+        }
+      },
+      "id": "schedule_trigger",
+      "name": "3x Daily Mon-Fri",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -112,
+        -48
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://ihealthlabs.talentlms.com/api/v1/users",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "get_users",
+      "name": "Get All TalentLMS Users",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        112,
+        -48
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "zjdo1NyXWx7o3LVy",
+          "name": "TalentLMS Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1SgvK3lM0Yyn6hmaQUqiEfo7ea5UCfyodTShfMb3DGVE",
+          "mode": "list",
+          "cachedResultName": "TalentLMS Mastersheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SgvK3lM0Yyn6hmaQUqiEfo7ea5UCfyodTShfMb3DGVE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 953847980,
+          "mode": "list",
+          "cachedResultName": "Assessment Summary",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SgvK3lM0Yyn6hmaQUqiEfo7ea5UCfyodTShfMb3DGVE/edit#gid=953847980"
+        },
+        "options": {}
+      },
+      "id": "read_sheet",
+      "name": "Read Existing Entries",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        672,
+        -80
+      ],
+      "alwaysOutputData": true,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "vdcRQ7DzD7EJYCNd",
+          "name": "Google Sheets account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://ihealthlabs.talentlms.com/api/v1/courses/id:171",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "options": {}
+      },
+      "id": "get_course",
+      "name": "Get Course 171 Details",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        896,
+        -80
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "zjdo1NyXWx7o3LVy",
+          "name": "TalentLMS Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Course 171 details (from previous node)\nconst course = $input.first().json;\n\n// All TalentLMS users (pre-filtered to hires on/after 1/1/2026)\nconst allUsers = $('Hire Date Filter').all();\n\n// Existing entries in Google Sheet for dedup\nconst existingEntries = $('Read Existing Entries').all();\n\n// Build user details lookup: userId -> full user object\nconst userDetailsMap = {};\nfor (const item of allUsers) {\n  const u = Array.isArray(item.json) ? item.json : [item.json];\n  for (const user of u) {\n    userDetailsMap[String(user.id)] = user;\n  }\n}\n\n// Parse timestamp to epoch ms (handles format differences like leading zeros)\nfunction toEpoch(str) {\n  if (!str) return 0;\n  const t = new Date(String(str)).getTime();\n  return isNaN(t) ? 0 : t;\n}\n\n// Dedup by User ID + normalized Completed On timestamp\nconst existingCompletions = {};  // userId → Set of epoch ms values\nfor (const entry of existingEntries) {\n  const uid = String(entry.json['User ID'] || '');\n  const epoch = toEpoch(entry.json['Completed On']);\n  if (uid) {\n    if (!existingCompletions[uid]) existingCompletions[uid] = new Set();\n    if (epoch) existingCompletions[uid].add(epoch);\n  }\n}\n\n// Find the single test unit in course 171\nconst testUnits = (course.units || []).filter(u =>\n  u.type === 'Test' || u.type === 'test'\n);\n\nif (testUnits.length === 0) {\n  return [{ json: { hasNewUsers: false, message: 'No test units found in course 171' } }];\n}\n\nconst testId = String(testUnits[0].id);\nconst testName = testUnits[0].name || 'Knowledge Assessment';\n\n// Only analyze users hired on or after Jan 1, 2026\nconst cutoffDate = new Date(2026, 0, 1);\n\n// Filter course users: completed, new hire, not already analyzed for this attempt\nconst output = [];\nconst courseUsers = course.users || [];\n\nfor (const cu of courseUsers) {\n  if (cu.role !== 'learner') continue;\n  const pct = String(cu.completion_percentage);\n  if (pct !== '100') continue;\n\n  const userId = String(cu.user_id || cu.id);\n\n  const fullUser = userDetailsMap[userId];\n  if (!fullUser) continue;\n\n  const hireDateStr = fullUser.custom_field_31;\n  if (!hireDateStr) continue;\n  const parts = hireDateStr.split('/');\n  if (parts.length !== 3) continue;\n  const hireDate = new Date(parts[2], parts[0] - 1, parts[1]);\n  if (hireDate < cutoffDate) continue;\n  if (fullUser.status !== 'active') continue;\n\n  // Dedup: compare normalized timestamps (avoids Google Sheets formatting mismatches)\n  const completedOn = cu.completed_on || cu.completed_on_timestamp || '';\n  const completedEpoch = toEpoch(completedOn);\n  if (completedEpoch && existingCompletions[userId] && existingCompletions[userId].has(completedEpoch)) continue;\n\n  // Calculate attempt number based on existing rows for this user\n  const attemptNumber = existingCompletions[userId]\n    ? existingCompletions[userId].size + 1\n    : 1;\n\n  const userName = ((fullUser.first_name || '') + ' ' + (fullUser.last_name || '')).trim();\n\n  output.push({\n    json: {\n      userId,\n      userName,\n      email: fullUser.email || '',\n      hireDate: hireDateStr,\n      manager: fullUser.custom_field_30 || 'Unknown',\n      jobTitle: fullUser.custom_field_23 || '',\n      department: fullUser.custom_field_25 || '',\n      completedOn,\n      attemptNumber,\n      testId,\n      testName,\n      hasNewUsers: true\n    }\n  });\n}\n\nif (output.length === 0) {\n  return [{ json: { hasNewUsers: false, message: 'No new completed new hires to analyze' } }];\n}\n\nreturn output;"
+      },
+      "id": "find_new_users",
+      "name": "Find New Completed Users",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "1",
+              "leftValue": "={{ $json.hasNewUsers }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "has_new_users",
+      "name": "Has New Users?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1344,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://ihealthlabs.talentlms.com/api/v1/gettestanswers/test_id:{{ $json.testId }},user_id:{{ $json.userId }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "get_test_answers",
+      "name": "Get Test Answers",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1568,
+        -80
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "zjdo1NyXWx7o3LVy",
+          "name": "TalentLMS Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get test answer API response and original user metadata\nconst testResult = $input.item.json;\nconst context = $('Find New Completed Users').item.json;\n\n// Helper: convert answer objects (e.g. {\"2\": \"False\"}) to readable strings\nfunction formatAnswers(answersObj) {\n  if (!answersObj || typeof answersObj !== 'object') return 'N/A';\n  return Object.values(answersObj).join(', ');\n}\n\n// Topic keyword mapping for Course 171 questions\nconst TOPIC_KEYWORDS = {\n  'Device & Technology': ['device', 'bp ', 'blood pressure', 'cgm', 'libre', 'dexcom', 'lancet', 'scale', 'router', 'hotspot', 'portal', 'faulty', 'returned', 'bpm1', 'glucose monitor'],\n  'Clinical Knowledge': ['diagnos', 'protocol', 'scope of practice', 'billable hierarch', 'monitor', 'post-md', 'chronic condition', 'eligible', 'rpm', 'ccm'],\n  'Workflow & Process': ['call log', 'appointment', 'monthly review', 'ehr', 'visit type', 'screening', 'schedule', 'billable', 'waived'],\n  'Company & Program': ['ihealth', 'unified care', 'o+o', 'okr', 'core value', 'vbc', 'value-based', 'enrolled', 'benefit of the program', 'care & growth', 'care team'],\n  'Compliance & Professionalism': ['phi', 'hipaa', 'professional appear', 'onsite', 'exam room', 'permission', 'health information', 'knock']\n};\n\nfunction categorizeTopic(questionText) {\n  const lower = questionText.toLowerCase();\n  for (const [topic, keywords] of Object.entries(TOPIC_KEYWORDS)) {\n    if (keywords.some(kw => lower.includes(kw))) return topic;\n  }\n  return 'General Knowledge';\n}\n\n// Parse test answers\nlet questions = [];\nif (Array.isArray(testResult)) {\n  questions = testResult;\n} else if (testResult.questions) {\n  questions = testResult.questions;\n}\n\nconst wrongAnswers = [];\nlet totalCorrect = 0;\n\nfor (const q of questions) {\n  const isCorrect = q.correct === true || q.correct === 'true' || q.correct === 1 || q.correct === '1';\n  if (isCorrect) {\n    totalCorrect++;\n  } else {\n    const questionText = (q.text || q.question || 'Unknown question').trim();\n    wrongAnswers.push({\n      question: questionText,\n      userAnswer: formatAnswers(q.user_answers),\n      correctAnswer: formatAnswers(q.correct_answers),\n      topic: categorizeTopic(questionText)\n    });\n  }\n}\n\nconst totalQuestions = questions.length;\nconst overallScore = totalQuestions > 0 ? Math.round((totalCorrect / totalQuestions) * 100) : null;\n\n// Group wrong answers by topic\nconst byTopic = {};\nfor (const wa of wrongAnswers) {\n  if (!byTopic[wa.topic]) byTopic[wa.topic] = [];\n  byTopic[wa.topic].push(wa);\n}\n\n// Build topic summary string\nconst topicSummary = Object.keys(byTopic).join(', ');\n\n// Build LLM prompt\nlet prompt = 'You are a training analyst for iHealth Unified Care, a healthcare technology company specializing in remote patient monitoring (RPM), chronic care management (CCM), and value-based care. ';\nprompt += 'New hires (Care Associates, Care Coordinators, etc.) take a Knowledge Assessment covering devices, clinical protocols, workflows, compliance, and company programs.\\n';\nprompt += 'Analyze the following results and provide targeted coaching feedback.\\n\\n';\nprompt += '## New Hire Profile\\n';\nprompt += `- Name: ${context.userName}\\n`;\nprompt += `- Job Title: ${context.jobTitle || 'Not specified'}\\n`;\nprompt += `- Department: ${context.department || 'Not specified'}\\n`;\nprompt += `- Hire Date: ${context.hireDate}\\n`;\nprompt += `- Manager: ${context.manager}\\n`;\nprompt += `- Overall Score: ${overallScore}%\\n\\n`;\n\nif (wrongAnswers.length === 0) {\n  prompt += '## Assessment Result: PERFECT SCORE (100%)\\n';\n  prompt += `This new hire answered all ${totalQuestions} questions correctly.\\n\\n`;\n  prompt += 'Please provide:\\n';\n  prompt += '1. A brief congratulatory note\\n';\n  prompt += '2. 2-3 areas where they can deepen their knowledge further\\n';\n  prompt += '3. Recommended next steps for advanced learning\\n';\n} else {\n  prompt += `## Topic Summary\\nWeak areas: ${topicSummary}\\n\\n`;\n  prompt += `## Wrong Answers by Topic (${wrongAnswers.length} of ${totalQuestions} total)\\n\\n`;\n  for (const [topic, answers] of Object.entries(byTopic)) {\n    prompt += `### ${topic} (${answers.length} wrong)\\n`;\n    for (const a of answers) {\n      prompt += `- Q: \"${a.question}\"\\n`;\n      prompt += `  Answered: \"${a.userAnswer}\" | Correct: \"${a.correctAnswer}\"\\n`;\n    }\n    prompt += '\\n';\n  }\n  prompt += '## Provide the following sections:\\n';\n  prompt += '1. **Knowledge Gap Summary**: For each weak topic area listed above, describe the specific gap (1-2 sentences each)\\n';\n  prompt += '2. **For the New Hire**: 3-5 specific, actionable study recommendations mapped to the weak topics\\n';\n  prompt += `3. **For the Manager (${context.manager})**: 2-3 coaching points or conversation starters for 1:1s, referencing the specific topics\\n`;\n  prompt += '4. **Risk Level**: Rate as LOW (1-2 wrong, minor topics), MEDIUM (3-4 wrong or core topics), or HIGH (5+ wrong or critical safety/compliance topics)\\n';\n  prompt += '5. **Follow-up Recommendation**: Should this person retake the assessment? If so, after how many days of study?\\n';\n}\nprompt += '\\nKeep your response concise and actionable. Use bullet points. Do not repeat the questions back.';\n\nreturn [{\n  json: {\n    ...context,\n    totalQuestions,\n    totalCorrect,\n    overallScore,\n    wrongAnswers,\n    topicSummary,\n    byTopic,\n    prompt\n  }\n}];"
+      },
+      "id": "format_prompt",
+      "name": "Parse Results & Build Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1792,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get LLM Chain response and parsed user data\nconst llmResponse = $input.item.json;\nconst userData = $('Parse Results & Build Prompt').item.json;\n\n// Extract AI analysis text from Basic LLM Chain output\nlet aiAnalysis = 'No analysis available';\ntry {\n  aiAnalysis = llmResponse.output || llmResponse.text || llmResponse.response?.text || 'No analysis available';\n} catch (e) {\n  aiAnalysis = 'Failed to parse LLM response';\n}\n\n// Format wrong questions as readable multi-line text\nlet wrongQuestionsText = '';\nif (userData.wrongAnswers && userData.wrongAnswers.length > 0) {\n  wrongQuestionsText = userData.wrongAnswers.map((wa, i) =>\n    `${i + 1}. \"${wa.question}\" — Answered: \"${wa.userAnswer}\" (Correct: \"${wa.correctAnswer}\")`\n  ).join('\\n');\n} else {\n  wrongQuestionsText = 'None — Perfect Score!';\n}\n\nconst runTimestamp = new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles' });\n\nreturn [{\n  json: {\n    'User ID': userData.userId,\n    'User Name': userData.userName,\n    'Email': userData.email,\n    'Job Title': userData.jobTitle,\n    'Department': userData.department,\n    'Hire Date': userData.hireDate,\n    'Manager': userData.manager,\n    'Completed On': userData.completedOn,\n    'Attempt': userData.attemptNumber || 1,\n    'Overall Score': userData.overallScore !== null ? userData.overallScore + '%' : 'N/A',\n    'Total Questions': userData.totalQuestions,\n    'Correct': userData.totalCorrect,\n    'Wrong': userData.wrongAnswers ? userData.wrongAnswers.length : 0,\n    'Wrong Questions': wrongQuestionsText,\n    'AI Analysis': aiAnalysis,\n    'Analysis Date': runTimestamp\n  }\n}];"
+      },
+      "id": "prepare_sheet",
+      "name": "Prepare Sheet Row",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2368,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1SgvK3lM0Yyn6hmaQUqiEfo7ea5UCfyodTShfMb3DGVE",
+          "mode": "list",
+          "cachedResultName": "TalentLMS Mastersheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SgvK3lM0Yyn6hmaQUqiEfo7ea5UCfyodTShfMb3DGVE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 953847980,
+          "mode": "list",
+          "cachedResultName": "Assessment Summary",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1SgvK3lM0Yyn6hmaQUqiEfo7ea5UCfyodTShfMb3DGVE/edit#gid=953847980"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {}
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "write_summary",
+      "name": "Write Assessment Summary",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2592,
+        -80
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 15000,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "vdcRQ7DzD7EJYCNd",
+          "name": "Google Sheets account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build a single chat notification from all analyzed users\nconst allUserData = $('Parse Results & Build Prompt').all();\nconst pstDate = new Date().toLocaleDateString('en-US', {\n  timeZone: 'America/Los_Angeles',\n  month: 'short', day: 'numeric', year: 'numeric'\n});\n\nlet message = `\\ud83d\\udcdd Knowledge Assessment Analysis - ${pstDate}\\n\\n`;\nmessage += `*${allUserData.length} new hire(s) analyzed*\\n\\n`;\n\nfor (const item of allUserData) {\n  const u = item.json;\n  let scoreEmoji = '\\u2705';\n  if (u.overallScore < 90) scoreEmoji = '\\u26a0\\ufe0f';\n  if (u.overallScore < 70) scoreEmoji = '\\u274c';\n\n  message += `${scoreEmoji} *${u.userName}* - Score: ${u.overallScore}%`;\n  message += ` (${u.wrongAnswers.length}/${u.totalQuestions} wrong)\\n`;\n  message += `   Title: ${u.jobTitle || 'N/A'} | Manager: ${u.manager}\\n`;\n  message += `   Hire Date: ${u.hireDate}\\n`;\n\n  if (u.wrongAnswers.length > 0 && u.byTopic) {\n    const topicCounts = Object.entries(u.byTopic)\n      .map(([topic, answers]) => `${topic} (${answers.length})`)\n      .join(', ');\n    message += `   Weak areas: ${topicCounts}\\n`;\n  }\n  message += '\\n';\n}\n\nmessage += `Full analysis \\u2192 https://docs.google.com/spreadsheets/d/1SgvK3lM0Yyn6hmaQUqiEfo7ea5UCfyodTShfMb3DGVE`;\n\nreturn [{ json: { text: message } }];"
+      },
+      "id": "build_chat",
+      "name": "Build Chat Message",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2816,
+        -80
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "error_trigger",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        248
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://chat.googleapis.com/v1/spaces/AAQArkdpCu4/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=73gOUomiJ0I3JIfi746DoVGZfN98WtxzqIT0IeI-0Mg",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ text: '⚠️ *Knowledge Assessment Analysis Failed*\\nError: ' + ($json.execution?.error?.message || 'Unknown error') + '\\nTime: ' + new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }) }) }}",
+        "options": {}
+      },
+      "id": "error_chat",
+      "name": "Send Error to Chat",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        224,
+        248
+      ]
+    },
+    {
+      "parameters": {
+        "content": "**Knowledge Assessment Analysis**\nCourse 171 | New hires (hired on/after 1/1/2026) | Gemini AI analysis\n\nPolls 3x daily Mon-Fri. Detects new hires who completed the assessment, fetches test answers, analyzes with LLM, writes to Google Sheet + sends Chat notification.\n\n**Credentials needed:**\n- TalentLMS API (HTTP Basic Auth)\n- Google Sheets OAuth\n- Google Gemini API Key (httpQueryAuth: name=key, value=API_KEY)"
+      },
+      "id": "sticky_overview",
+      "name": "Sticky Note - Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        16,
+        -288
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.prompt }}",
+        "batching": {}
+      },
+      "id": "llm_analysis",
+      "name": "AI Analysis",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        2016,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        2088,
+        144
+      ],
+      "id": "a5605b22-a774-476a-92e5-bf88cebcfa4b",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "LLF6MLepnlTsChok",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://chat.googleapis.com/v1/spaces/AAQA4Ksbm-M/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=UPaxjAUjYdJowRki8zCMCrbLprOL-C_dQpcW5BxyFno",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ text: $json.text }) }}",
+        "options": {}
+      },
+      "id": "send_chat_prod",
+      "name": "Send to UC Onboarding",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3040,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "hire-date-check",
+              "leftValue": "={{ (() => { const d = ($json.custom_field_31 || '').split('/'); if (d.length !== 3) return false; return new Date(d[2], d[0]-1, d[1]) >= new Date(2026, 0, 1); })() }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "hire_date_filter",
+      "name": "Hire Date Filter",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        352,
+        -48
+      ]
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Los_Angeles",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "timeSavedPerExecution": 30
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-09T23:32:58.684Z",
+      "createdAt": "2026-02-09T23:32:58.684Z",
+      "role": "workflow:owner",
+      "workflowId": "RDzHxH6bwHUiyRML",
+      "projectId": "SzgLfYyy3lWDJHJA"
+    }
+  ],
+  "staticData": {
+    "node:Every 30min Mon-Fri": {
+      "recurrenceRules": []
+    },
+    "node:3x Daily Mon-Fri": {
+      "recurrenceRules": []
+    }
+  },
+  "tags": [
+    {
+      "updatedAt": "2026-02-11T01:57:02.890Z",
+      "createdAt": "2026-02-11T01:57:02.890Z",
+      "id": "aOUk5y2lWjpAIKLe",
+      "name": "Training"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2026-02-13T00:43:38.070Z",
+  "versionId": "946ac970-4cdb-4cfd-8f29-89dfca462391"
+}
