@@ -1,0 +1,575 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Create a user",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many users": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-02-03T23:30:55.240Z",
+  "id": "brDFAk0ICJFKR5p6fyP_R",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "My workflow 20",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -256,
+        96
+      ],
+      "id": "bc274d4a-15b0-4b40-aa36-d4cfb7220dec",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.gSuiteAdmin",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        96
+      ],
+      "id": "86d08d2d-3a84-4d64-9fa8-7537f7f6de73",
+      "name": "Create a user",
+      "credentials": {
+        "gSuiteAdminOAuth2Api": {
+          "id": "EGMHOJZOQY0EOX9n",
+          "name": "Google Workspace Admin account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "filter": {}
+      },
+      "type": "n8n-nodes-base.gSuiteAdmin",
+      "typeVersion": 1,
+      "position": [
+        -256,
+        -128
+      ],
+      "id": "9bc39e6a-c527-4a24-84f3-6d2b949c2c3a",
+      "name": "Get many users",
+      "credentials": {
+        "gSuiteAdminOAuth2Api": {
+          "id": "EGMHOJZOQY0EOX9n",
+          "name": "Google Workspace Admin account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1VVuiJzxO16TC11KA3kX_9HKNcds6l1nWeMeuS_9nByo",
+          "mode": "list",
+          "cachedResultName": "Monthly review - Feb 3 2026",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VVuiJzxO16TC11KA3kX_9HKNcds6l1nWeMeuS_9nByo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 2108411624,
+          "mode": "list",
+          "cachedResultName": "Google_User_Download_03022026_152651",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1VVuiJzxO16TC11KA3kX_9HKNcds6l1nWeMeuS_9nByo/edit#gid=2108411624"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "First Name [Required]": "={{ $json.name.givenName }}",
+            "Last Name [Required]": "={{ $json.name.familyName }}",
+            "Email Address [Required]": "={{ $json.primaryEmail }}",
+            "Password [Required]": "****"
+          },
+          "matchingColumns": [
+            "Email Address [Required]"
+          ],
+          "schema": [
+            {
+              "id": "First Name [Required]",
+              "displayName": "First Name [Required]",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Last Name [Required]",
+              "displayName": "Last Name [Required]",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email Address [Required]",
+              "displayName": "Email Address [Required]",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Password [Required]",
+              "displayName": "Password [Required]",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Password Hash Function [UPLOAD ONLY]",
+              "displayName": "Password Hash Function [UPLOAD ONLY]",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Org Unit Path [Required]",
+              "displayName": "Org Unit Path [Required]",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "New Primary Email [UPLOAD ONLY]",
+              "displayName": "New Primary Email [UPLOAD ONLY]",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status [READ ONLY]",
+              "displayName": "Status [READ ONLY]",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Last Sign In [READ ONLY]",
+              "displayName": "Last Sign In [READ ONLY]",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Recovery Email",
+              "displayName": "Recovery Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Home Secondary Email",
+              "displayName": "Home Secondary Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Work Secondary Email",
+              "displayName": "Work Secondary Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Recovery Phone [MUST BE IN THE E.164 FORMAT]",
+              "displayName": "Recovery Phone [MUST BE IN THE E.164 FORMAT]",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Work Phone",
+              "displayName": "Work Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Home Phone",
+              "displayName": "Home Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Mobile Phone",
+              "displayName": "Mobile Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Work Address",
+              "displayName": "Work Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Home Address",
+              "displayName": "Home Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Employee ID",
+              "displayName": "Employee ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Employee Type",
+              "displayName": "Employee Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Employee Title",
+              "displayName": "Employee Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Manager Email",
+              "displayName": "Manager Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Department",
+              "displayName": "Department",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Cost Center",
+              "displayName": "Cost Center",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "2sv Enrolled [READ ONLY]",
+              "displayName": "2sv Enrolled [READ ONLY]",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "2sv Enforced [READ ONLY]",
+              "displayName": "2sv Enforced [READ ONLY]",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Building ID",
+              "displayName": "Building ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Floor Name",
+              "displayName": "Floor Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Floor Section",
+              "displayName": "Floor Section",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Email Usage [READ ONLY]",
+              "displayName": "Email Usage [READ ONLY]",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Drive Usage [READ ONLY]",
+              "displayName": "Drive Usage [READ ONLY]",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Photos Usage [READ ONLY]",
+              "displayName": "Photos Usage [READ ONLY]",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Storage limit [READ ONLY]",
+              "displayName": "Storage limit [READ ONLY]",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Storage Used [READ ONLY]",
+              "displayName": "Storage Used [READ ONLY]",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Change Password at Next Sign-In",
+              "displayName": "Change Password at Next Sign-In",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "New Status [UPLOAD ONLY]",
+              "displayName": "New Status [UPLOAD ONLY]",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Licenses [READ ONLY]",
+              "displayName": "Licenses [READ ONLY]",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "New Licenses [UPLOAD ONLY]",
+              "displayName": "New Licenses [UPLOAD ONLY]",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Gemini Limit Status [READ ONLY]",
+              "displayName": "Gemini Limit Status [READ ONLY]",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -32,
+        -128
+      ],
+      "id": "bec19b90-4983-4159-9d96-78f26c16de02",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "IgLxZDEszaKF5jQf",
+          "name": "Google Sheets account 6"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.myNewField = 1;\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        192,
+        -128
+      ],
+      "id": "94e6e44e-8830-4054-9f1a-ff350b8b63f1",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-03T23:30:55.242Z",
+      "createdAt": "2026-02-03T23:30:55.242Z",
+      "role": "workflow:owner",
+      "workflowId": "brDFAk0ICJFKR5p6fyP_R",
+      "projectId": "zqVlevjPOeDBzNIB"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-02-03T23:58:50.075Z",
+  "versionId": "08dffcd7-5de8-4179-964a-439444701634"
+}
