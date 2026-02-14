@@ -1,0 +1,82 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Snowflake",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-02-06T22:14:12.870Z",
+  "id": "spScNqbAiIbNFwI5u5Nl1",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "My workflow 29",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "8800e29c-d7b3-4fa0-b865-97f3012554d4",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM ANALYTICS.N8N.MOBILE_APP_AND_DEVICE_COMPLAINTS_RAW"
+      },
+      "type": "n8n-nodes-base.snowflake",
+      "typeVersion": 1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "8d74ae57-258a-4719-8be0-093c33c09c1c",
+      "name": "Snowflake",
+      "credentials": {
+        "snowflake": {
+          "id": "cIKGe5X3X9igoZpt",
+          "name": "Snowflake account 3"
+        }
+      }
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-06T22:14:12.875Z",
+      "createdAt": "2026-02-06T22:14:12.875Z",
+      "role": "workflow:owner",
+      "workflowId": "spScNqbAiIbNFwI5u5Nl1",
+      "projectId": "kugITzN49x98FAtM"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-02-06T22:14:39.492Z",
+  "versionId": "17cc4792-6767-4da8-9fe1-e4a943a4b521"
+}
