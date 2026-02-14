@@ -1,0 +1,936 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-02-12T00:34:54.000Z",
+    "createdAt": "2026-02-12T00:34:45.917Z",
+    "versionId": "c928ee4d-8725-4992-a0a5-4ac5f52a258c",
+    "workflowId": "kUMRbVEhYfRkmRyI",
+    "nodes": [
+      {
+        "parameters": {
+          "pollTimes": {
+            "item": [
+              {
+                "mode": "everyMinute"
+              }
+            ]
+          },
+          "filters": {
+            "sender": "callcenterassistant@ihealthlabs.com"
+          }
+        },
+        "id": "trigger",
+        "name": "Gmail Trigger",
+        "type": "n8n-nodes-base.gmailTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          0,
+          -16
+        ],
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "ctcxHDJ9lfivsYvG",
+            "name": "Gmail account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Configuration\nconst START_DATE = new Date('2026-02-17T00:00:00-08:00');\nconst END_DATE = new Date('2026-03-06T23:59:59-08:00');\nconst TIME_WINDOWS = [\n  { startHour: 6, startMin: 0, endHour: 8, endMin: 0 },    // 6:00-8:00 AM PST\n  { startHour: 12, startMin: 30, endHour: 13, endMin: 30 }, // 12:30-1:30 PM PST\n];\nconst TEST_MODE = false;\n\n// Helper: decode base64url-encoded Gmail body data\nfunction decodeBase64Url(data) {\n  if (!data) return '';\n  const base64 = data.replace(/-/g, '+').replace(/_/g, '/');\n  return Buffer.from(base64, 'base64').toString('utf-8');\n}\n\n// Helper: recursively extract text and HTML body from Gmail API payload\nfunction extractBodyFromPayload(payload) {\n  if (!payload) return { text: '', html: '' };\n  let textContent = '';\n  let htmlContent = '';\n\n  if (payload.body && payload.body.data) {\n    const decoded = decodeBase64Url(payload.body.data);\n    if (payload.mimeType === 'text/plain') textContent = decoded;\n    else if (payload.mimeType === 'text/html') htmlContent = decoded;\n  }\n\n  if (payload.parts) {\n    for (const part of payload.parts) {\n      const sub = extractBodyFromPayload(part);\n      if (sub.text && !textContent) textContent = sub.text;\n      if (sub.html && !htmlContent) htmlContent = sub.html;\n    }\n  }\n\n  return { text: textContent, html: htmlContent };\n}\n\n// Helper: strip HTML tags\nfunction stripHtml(html) {\n  return html\n    .replace(/<br\\s*\\/?>/gi, '\\n')\n    .replace(/<\\/?(p|div|tr|li|td|th)[^>]*>/gi, '\\n')\n    .replace(/<[^>]+>/g, '')\n    .replace(/&amp;/g, '&')\n    .replace(/&lt;/g, '<')\n    .replace(/&gt;/g, '>')\n    .replace(/&#39;/g, \"'\")\n    .replace(/&quot;/g, '\"')\n    .replace(/&nbsp;/g, ' ')\n    .replace(/\\n{3,}/g, '\\n\\n');\n}\n\nconst items = $input.all();\nconst results = [];\n\nfor (const item of items) {\n  const d = item.json;\n\n  // Parse email date\n  let emailDate;\n  if (d.internalDate) {\n    emailDate = new Date(parseInt(d.internalDate));\n  } else {\n    emailDate = new Date(d.date || d.Date);\n  }\n\n  const pstTimeStr = emailDate.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' });\n  const pstTime = new Date(pstTimeStr);\n  const hour = pstTime.getHours();\n  const minutes = pstTime.getMinutes();\n\n  const isWithinDateRange = emailDate >= START_DATE && emailDate <= END_DATE;\n  const timeInMinutes = hour * 60 + minutes;\n  const isWithinTimeWindow = TIME_WINDOWS.some(w =>\n    timeInMinutes >= (w.startHour * 60 + w.startMin) &&\n    timeInMinutes < (w.endHour * 60 + w.endMin)\n  );\n\n  if (!TEST_MODE && (!isWithinDateRange || !isWithinTimeWindow)) {\n    continue;\n  }\n\n  // Extract body from Gmail API payload (base64url decoded)\n  const { text: payloadText, html: payloadHtml } = extractBodyFromPayload(d.payload);\n\n  const textBody = d.text || d.textPlain || payloadText || '';\n  const htmlBody = d.html || d.textHtml || payloadHtml || '';\n  const snippet = d.snippet || '';\n\n  const strippedHtml = htmlBody ? stripHtml(htmlBody) : '';\n  const fullContent = textBody || strippedHtml || snippet;\n\n  // Extract Assigned CA name\n  const caMatch = fullContent.match(/Assigned CA[:\\s]*([^\\n\\r]+)/i);\n  const assignedCA = caMatch ? caMatch[1].trim() : null;\n\n  const fromNumberMatch = fullContent.match(/From Number:\\s*([^\\n\\r]+)/i);\n  const patientMatch = fullContent.match(/Patient Name:\\s*([^\\n\\r]+)/i);\n  const clinicMatch = fullContent.match(/Clinic(?:\\s*No)?[.:]\\s*([^\\n\\r]+)/i);\n\n  results.push({\n    json: {\n      ...d,\n      assignedCA: assignedCA,\n      hasAssignedCA: !!assignedCA,\n      fromNumber: fromNumberMatch ? fromNumberMatch[1].trim() : 'Unknown',\n      patientName: patientMatch ? patientMatch[1].trim() : 'Unknown',\n      clinic: clinicMatch ? clinicMatch[1].trim() : 'Unknown',\n      originalSubject: d.Subject || d.subject || 'Call Center Notification',\n      originalBody: textBody || strippedHtml || snippet,\n      receivedAt: pstTimeStr,\n      testMode: TEST_MODE\n    }\n  });\n}\n\nreturn results;"
+        },
+        "id": "check_time_parse",
+        "name": "Check Time & Parse Email",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          448,
+          -16
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "version": 2,
+              "leftValue": "",
+              "caseSensitive": true,
+              "typeValidation": "strict"
+            },
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "1",
+                "leftValue": "={{ $json.hasAssignedCA }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "equals"
+                }
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "if_has_ca",
+        "name": "Has Assigned CA?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          672,
+          -16
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "version": 2,
+              "leftValue": "",
+              "caseSensitive": true,
+              "typeValidation": "strict"
+            },
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "1",
+                "leftValue": "={{ $json.caEmailFound }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "equals"
+                }
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "if_email_found",
+        "name": "CA Email Found?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          1344,
+          -112
+        ]
+      },
+      {
+        "parameters": {
+          "sendTo": "={{ $json.caEmail }}",
+          "subject": "=FWD: {{ $json.originalSubject }}",
+          "message": "=<p>Hi {{ $json.assignedCA }},</p>\n<p><strong>Please help to handle the following inquiry and reply to ALL once it has been addressed.</strong></p>\n<hr>\n<p><strong>Original Message:</strong></p>\n<p>{{ $json.originalBody.replace(/\\n/g, '<br>') }}</p>\n<hr>\n<p><em>This email was auto-forwarded during a coverage gap period (6-8 AM / 12:30-1:30 PM).</em></p>",
+          "options": {
+            "ccList": "callcenter@ihealthlabs.com"
+          }
+        },
+        "id": "send_to_ca",
+        "name": "Forward to Assigned CA",
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.2,
+        "position": [
+          1568,
+          -208
+        ],
+        "webhookId": "665a168a-87e9-4f02-9311-b31e7788bae0",
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "ctcxHDJ9lfivsYvG",
+            "name": "Gmail account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "sendTo": "melody.lassalle@ihealthlabs.com",
+          "subject": "=FWD: {{ $json.originalSubject }} [No Assigned CA]",
+          "message": "=<p>Hi,</p>\n<p><strong>Please help to handle the following inquiry and reply to ALL once it has been addressed.</strong></p>\n<p><em>Note: This email did not have an assigned CA or the CA could not be found in the directory.</em></p>\n<hr>\n<p><strong>Original Message:</strong></p>\n<p>{{ $json.originalBody.replace(/\\n/g, '<br>') }}</p>\n<hr>\n<p><em>This email was auto-forwarded during a coverage gap period (6-8 AM / 12:30-1:30 PM).</em></p>",
+          "options": {
+            "ccList": "callcenter@ihealthlabs.com"
+          }
+        },
+        "id": "send_to_default",
+        "name": "Forward to Default CA",
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.2,
+        "position": [
+          1568,
+          -16
+        ],
+        "webhookId": "5e827b25-5918-4478-8963-61b5a085e701",
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "ctcxHDJ9lfivsYvG",
+            "name": "Gmail account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "sendTo": "melody.lassalle@ihealthlabs.com",
+          "subject": "=FWD: {{ $json.originalSubject }} [No Assigned CA in Email]",
+          "message": "=<p>Hi,</p>\n<p><strong>Please help to handle the following inquiry and reply to ALL once it has been addressed.</strong></p>\n<p><em>Note: This email did not contain an \"Assigned CA\" field.</em></p>\n<hr>\n<p><strong>Original Message:</strong></p>\n<p>{{ $json.originalBody.replace(/\\n/g, '<br>') }}</p>\n<hr>\n<p><em>This email was auto-forwarded during a coverage gap period (6-8 AM / 12:30-1:30 PM).</em></p>",
+          "options": {
+            "ccList": "callcenter@ihealthlabs.com"
+          }
+        },
+        "id": "no_ca_default",
+        "name": "Forward to Default (No CA Field)",
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.2,
+        "position": [
+          896,
+          80
+        ],
+        "webhookId": "aecc6613-abca-4e85-84f6-1c8dfe1147d6",
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "ctcxHDJ9lfivsYvG",
+            "name": "Gmail account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "content": "**Gmail Trigger**\nPolls for new emails from callcenterassistant@ihealthlabs.com",
+          "height": 120,
+          "width": 200
+        },
+        "id": "sticky_trigger",
+        "name": "Sticky Note - Trigger",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -64,
+          -176
+        ]
+      },
+      {
+        "parameters": {
+          "content": "**Time Filter**\nProcesses emails received 6-8 AM PST and 12:30-1:30 PM PST. Parses \"Assigned CA\" from body.",
+          "height": 120
+        },
+        "id": "sticky_time",
+        "name": "Sticky Note - Time Check",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          160,
+          -176
+        ]
+      },
+      {
+        "parameters": {
+          "content": "**Google People API**\nLooks up CA name in company directory to get email address.\n\nRequires: Google OAuth2 credential with directory.readonly scope"
+        },
+        "id": "sticky_lookup",
+        "name": "Sticky Note - Lookup",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          608,
+          -288
+        ]
+      },
+      {
+        "parameters": {
+          "content": "**TODO:** Update DEFAULT_CA_EMAIL with actual default recipient",
+          "height": 80,
+          "width": 200
+        },
+        "id": "sticky_default",
+        "name": "Sticky Note - Default",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          1280,
+          -288
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "// Extract email from People API response\nconst item = $input.first();\nconst people = item.json.people || [];\n\n// Get original data from earlier node\nconst checkTimeNode = $('Check Time & Parse Email');\nconst originalData = checkTimeNode.first().json;\n\nlet caEmail = null;\n\nif (people.length > 0) {\n  const person = people[0];\n  const emails = person.emailAddresses || [];\n  if (emails.length > 0) {\n    caEmail = emails[0].value;\n  }\n}\n\nreturn [{\n  json: {\n    ...originalData,\n    caEmail: caEmail,\n    caEmailFound: !!caEmail\n  }\n}];"
+        },
+        "id": "extract_ca_email",
+        "name": "Extract CA Email",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1120,
+          -112
+        ]
+      },
+      {
+        "parameters": {
+          "url": "https://people.googleapis.com/v1/people:searchDirectoryPeople",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "googleOAuth2Api",
+          "sendQuery": true,
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "query",
+                "value": "={{ $json.assignedCA }}"
+              },
+              {
+                "name": "readMask",
+                "value": "names,emailAddresses"
+              },
+              {
+                "name": "sources",
+                "value": "DIRECTORY_SOURCE_TYPE_DOMAIN_PROFILE"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "lookup_people_api",
+        "name": "Lookup CA Email (People API)",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          896,
+          -112
+        ],
+        "credentials": {
+          "googleOAuth2Api": {
+            "id": "Tb34Zvws6rNPaS7F",
+            "name": "Google account 3"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "url": "=https://gmail.googleapis.com/gmail/v1/users/me/messages/{{ $json.id }}?format=full",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "gmailOAuth2",
+          "options": {}
+        },
+        "id": "get_full_email",
+        "name": "Get Full Email",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          224,
+          -16
+        ],
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "ctcxHDJ9lfivsYvG",
+            "name": "Gmail account 2"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Check Time & Parse Email": {
+        "main": [
+          [
+            {
+              "node": "Has Assigned CA?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Has Assigned CA?": {
+        "0": [
+          [
+            {
+              "node": "Lookup CA Email (People API)",
+              "type": "0",
+              "index": 0
+            }
+          ]
+        ],
+        "main": [
+          [
+            {
+              "node": "Lookup CA Email (People API)",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Forward to Default (No CA Field)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "CA Email Found?": {
+        "main": [
+          [
+            {
+              "node": "Forward to Assigned CA",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Forward to Default CA",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Extract CA Email": {
+        "0": [
+          [
+            {
+              "node": "CA Email Found?",
+              "type": "0",
+              "index": 0
+            }
+          ]
+        ],
+        "main": [
+          [
+            {
+              "node": "CA Email Found?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Lookup CA Email (People API)": {
+        "0": [
+          [
+            {
+              "node": "Extract CA Email",
+              "type": "0",
+              "index": 0
+            }
+          ]
+        ],
+        "main": [
+          [
+            {
+              "node": "Extract CA Email",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Gmail Trigger": {
+        "main": [
+          [
+            {
+              "node": "Get Full Email",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Full Email": {
+        "main": [
+          [
+            {
+              "node": "Check Time & Parse Email",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Phoebe You",
+    "name": "Version c928ee4d",
+    "description": "",
+    "autosaved": true
+  },
+  "activeVersionId": "c928ee4d-8725-4992-a0a5-4ac5f52a258c",
+  "connections": {
+    "Check Time & Parse Email": {
+      "main": [
+        [
+          {
+            "node": "Has Assigned CA?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Assigned CA?": {
+      "0": [
+        [
+          {
+            "node": "Lookup CA Email (People API)",
+            "type": "0",
+            "index": 0
+          }
+        ]
+      ],
+      "main": [
+        [
+          {
+            "node": "Lookup CA Email (People API)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Forward to Default (No CA Field)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CA Email Found?": {
+      "main": [
+        [
+          {
+            "node": "Forward to Assigned CA",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Forward to Default CA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract CA Email": {
+      "0": [
+        [
+          {
+            "node": "CA Email Found?",
+            "type": "0",
+            "index": 0
+          }
+        ]
+      ],
+      "main": [
+        [
+          {
+            "node": "CA Email Found?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lookup CA Email (People API)": {
+      "0": [
+        [
+          {
+            "node": "Extract CA Email",
+            "type": "0",
+            "index": 0
+          }
+        ]
+      ],
+      "main": [
+        [
+          {
+            "node": "Extract CA Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Full Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Full Email": {
+      "main": [
+        [
+          {
+            "node": "Check Time & Parse Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-02-04T22:37:57.506Z",
+  "id": "kUMRbVEhYfRkmRyI",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "Call Center Email Auto-Forward (6-8 AM & 12:30-1:30 PM)",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {
+          "sender": "callcenterassistant@ihealthlabs.com"
+        }
+      },
+      "id": "trigger",
+      "name": "Gmail Trigger",
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        -16
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ctcxHDJ9lfivsYvG",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Configuration\nconst START_DATE = new Date('2026-02-17T00:00:00-08:00');\nconst END_DATE = new Date('2026-03-06T23:59:59-08:00');\nconst TIME_WINDOWS = [\n  { startHour: 6, startMin: 0, endHour: 8, endMin: 0 },    // 6:00-8:00 AM PST\n  { startHour: 12, startMin: 30, endHour: 13, endMin: 30 }, // 12:30-1:30 PM PST\n];\nconst TEST_MODE = false;\n\n// Helper: decode base64url-encoded Gmail body data\nfunction decodeBase64Url(data) {\n  if (!data) return '';\n  const base64 = data.replace(/-/g, '+').replace(/_/g, '/');\n  return Buffer.from(base64, 'base64').toString('utf-8');\n}\n\n// Helper: recursively extract text and HTML body from Gmail API payload\nfunction extractBodyFromPayload(payload) {\n  if (!payload) return { text: '', html: '' };\n  let textContent = '';\n  let htmlContent = '';\n\n  if (payload.body && payload.body.data) {\n    const decoded = decodeBase64Url(payload.body.data);\n    if (payload.mimeType === 'text/plain') textContent = decoded;\n    else if (payload.mimeType === 'text/html') htmlContent = decoded;\n  }\n\n  if (payload.parts) {\n    for (const part of payload.parts) {\n      const sub = extractBodyFromPayload(part);\n      if (sub.text && !textContent) textContent = sub.text;\n      if (sub.html && !htmlContent) htmlContent = sub.html;\n    }\n  }\n\n  return { text: textContent, html: htmlContent };\n}\n\n// Helper: strip HTML tags\nfunction stripHtml(html) {\n  return html\n    .replace(/<br\\s*\\/?>/gi, '\\n')\n    .replace(/<\\/?(p|div|tr|li|td|th)[^>]*>/gi, '\\n')\n    .replace(/<[^>]+>/g, '')\n    .replace(/&amp;/g, '&')\n    .replace(/&lt;/g, '<')\n    .replace(/&gt;/g, '>')\n    .replace(/&#39;/g, \"'\")\n    .replace(/&quot;/g, '\"')\n    .replace(/&nbsp;/g, ' ')\n    .replace(/\\n{3,}/g, '\\n\\n');\n}\n\nconst items = $input.all();\nconst results = [];\n\nfor (const item of items) {\n  const d = item.json;\n\n  // Parse email date\n  let emailDate;\n  if (d.internalDate) {\n    emailDate = new Date(parseInt(d.internalDate));\n  } else {\n    emailDate = new Date(d.date || d.Date);\n  }\n\n  const pstTimeStr = emailDate.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' });\n  const pstTime = new Date(pstTimeStr);\n  const hour = pstTime.getHours();\n  const minutes = pstTime.getMinutes();\n\n  const isWithinDateRange = emailDate >= START_DATE && emailDate <= END_DATE;\n  const timeInMinutes = hour * 60 + minutes;\n  const isWithinTimeWindow = TIME_WINDOWS.some(w =>\n    timeInMinutes >= (w.startHour * 60 + w.startMin) &&\n    timeInMinutes < (w.endHour * 60 + w.endMin)\n  );\n\n  if (!TEST_MODE && (!isWithinDateRange || !isWithinTimeWindow)) {\n    continue;\n  }\n\n  // Extract body from Gmail API payload (base64url decoded)\n  const { text: payloadText, html: payloadHtml } = extractBodyFromPayload(d.payload);\n\n  const textBody = d.text || d.textPlain || payloadText || '';\n  const htmlBody = d.html || d.textHtml || payloadHtml || '';\n  const snippet = d.snippet || '';\n\n  const strippedHtml = htmlBody ? stripHtml(htmlBody) : '';\n  const fullContent = textBody || strippedHtml || snippet;\n\n  // Extract Assigned CA name\n  const caMatch = fullContent.match(/Assigned CA[:\\s]*([^\\n\\r]+)/i);\n  const assignedCA = caMatch ? caMatch[1].trim() : null;\n\n  const fromNumberMatch = fullContent.match(/From Number:\\s*([^\\n\\r]+)/i);\n  const patientMatch = fullContent.match(/Patient Name:\\s*([^\\n\\r]+)/i);\n  const clinicMatch = fullContent.match(/Clinic(?:\\s*No)?[.:]\\s*([^\\n\\r]+)/i);\n\n  results.push({\n    json: {\n      ...d,\n      assignedCA: assignedCA,\n      hasAssignedCA: !!assignedCA,\n      fromNumber: fromNumberMatch ? fromNumberMatch[1].trim() : 'Unknown',\n      patientName: patientMatch ? patientMatch[1].trim() : 'Unknown',\n      clinic: clinicMatch ? clinicMatch[1].trim() : 'Unknown',\n      originalSubject: d.Subject || d.subject || 'Call Center Notification',\n      originalBody: textBody || strippedHtml || snippet,\n      receivedAt: pstTimeStr,\n      testMode: TEST_MODE\n    }\n  });\n}\n\nreturn results;"
+      },
+      "id": "check_time_parse",
+      "name": "Check Time & Parse Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        -16
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "1",
+              "leftValue": "={{ $json.hasAssignedCA }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "if_has_ca",
+      "name": "Has Assigned CA?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        672,
+        -16
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "1",
+              "leftValue": "={{ $json.caEmailFound }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "if_email_found",
+      "name": "CA Email Found?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1344,
+        -112
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.caEmail }}",
+        "subject": "=FWD: {{ $json.originalSubject }}",
+        "message": "=<p>Hi {{ $json.assignedCA }},</p>\n<p><strong>Please help to handle the following inquiry and reply to ALL once it has been addressed.</strong></p>\n<hr>\n<p><strong>Original Message:</strong></p>\n<p>{{ $json.originalBody.replace(/\\n/g, '<br>') }}</p>\n<hr>\n<p><em>This email was auto-forwarded during a coverage gap period (6-8 AM / 12:30-1:30 PM).</em></p>",
+        "options": {
+          "ccList": "callcenter@ihealthlabs.com"
+        }
+      },
+      "id": "send_to_ca",
+      "name": "Forward to Assigned CA",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1568,
+        -208
+      ],
+      "webhookId": "665a168a-87e9-4f02-9311-b31e7788bae0",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ctcxHDJ9lfivsYvG",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "melody.lassalle@ihealthlabs.com",
+        "subject": "=FWD: {{ $json.originalSubject }} [No Assigned CA]",
+        "message": "=<p>Hi,</p>\n<p><strong>Please help to handle the following inquiry and reply to ALL once it has been addressed.</strong></p>\n<p><em>Note: This email did not have an assigned CA or the CA could not be found in the directory.</em></p>\n<hr>\n<p><strong>Original Message:</strong></p>\n<p>{{ $json.originalBody.replace(/\\n/g, '<br>') }}</p>\n<hr>\n<p><em>This email was auto-forwarded during a coverage gap period (6-8 AM / 12:30-1:30 PM).</em></p>",
+        "options": {
+          "ccList": "callcenter@ihealthlabs.com"
+        }
+      },
+      "id": "send_to_default",
+      "name": "Forward to Default CA",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1568,
+        -16
+      ],
+      "webhookId": "5e827b25-5918-4478-8963-61b5a085e701",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ctcxHDJ9lfivsYvG",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "melody.lassalle@ihealthlabs.com",
+        "subject": "=FWD: {{ $json.originalSubject }} [No Assigned CA in Email]",
+        "message": "=<p>Hi,</p>\n<p><strong>Please help to handle the following inquiry and reply to ALL once it has been addressed.</strong></p>\n<p><em>Note: This email did not contain an \"Assigned CA\" field.</em></p>\n<hr>\n<p><strong>Original Message:</strong></p>\n<p>{{ $json.originalBody.replace(/\\n/g, '<br>') }}</p>\n<hr>\n<p><em>This email was auto-forwarded during a coverage gap period (6-8 AM / 12:30-1:30 PM).</em></p>",
+        "options": {
+          "ccList": "callcenter@ihealthlabs.com"
+        }
+      },
+      "id": "no_ca_default",
+      "name": "Forward to Default (No CA Field)",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        896,
+        80
+      ],
+      "webhookId": "aecc6613-abca-4e85-84f6-1c8dfe1147d6",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ctcxHDJ9lfivsYvG",
+          "name": "Gmail account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "**Gmail Trigger**\nPolls for new emails from callcenterassistant@ihealthlabs.com",
+        "height": 120,
+        "width": 200
+      },
+      "id": "sticky_trigger",
+      "name": "Sticky Note - Trigger",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -64,
+        -176
+      ]
+    },
+    {
+      "parameters": {
+        "content": "**Time Filter**\nProcesses emails received 6-8 AM PST and 12:30-1:30 PM PST. Parses \"Assigned CA\" from body.",
+        "height": 120
+      },
+      "id": "sticky_time",
+      "name": "Sticky Note - Time Check",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        160,
+        -176
+      ]
+    },
+    {
+      "parameters": {
+        "content": "**Google People API**\nLooks up CA name in company directory to get email address.\n\nRequires: Google OAuth2 credential with directory.readonly scope"
+      },
+      "id": "sticky_lookup",
+      "name": "Sticky Note - Lookup",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        608,
+        -288
+      ]
+    },
+    {
+      "parameters": {
+        "content": "**TODO:** Update DEFAULT_CA_EMAIL with actual default recipient",
+        "height": 80,
+        "width": 200
+      },
+      "id": "sticky_default",
+      "name": "Sticky Note - Default",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        -288
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract email from People API response\nconst item = $input.first();\nconst people = item.json.people || [];\n\n// Get original data from earlier node\nconst checkTimeNode = $('Check Time & Parse Email');\nconst originalData = checkTimeNode.first().json;\n\nlet caEmail = null;\n\nif (people.length > 0) {\n  const person = people[0];\n  const emails = person.emailAddresses || [];\n  if (emails.length > 0) {\n    caEmail = emails[0].value;\n  }\n}\n\nreturn [{\n  json: {\n    ...originalData,\n    caEmail: caEmail,\n    caEmailFound: !!caEmail\n  }\n}];"
+      },
+      "id": "extract_ca_email",
+      "name": "Extract CA Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        -112
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://people.googleapis.com/v1/people:searchDirectoryPeople",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "={{ $json.assignedCA }}"
+            },
+            {
+              "name": "readMask",
+              "value": "names,emailAddresses"
+            },
+            {
+              "name": "sources",
+              "value": "DIRECTORY_SOURCE_TYPE_DOMAIN_PROFILE"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "lookup_people_api",
+      "name": "Lookup CA Email (People API)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        896,
+        -112
+      ],
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "Tb34Zvws6rNPaS7F",
+          "name": "Google account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://gmail.googleapis.com/gmail/v1/users/me/messages/{{ $json.id }}?format=full",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "gmailOAuth2",
+        "options": {}
+      },
+      "id": "get_full_email",
+      "name": "Get Full Email",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        224,
+        -16
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ctcxHDJ9lfivsYvG",
+          "name": "Gmail account 2"
+        }
+      }
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Los_Angeles",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "timeSavedPerExecution": 2
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-04T22:37:57.514Z",
+      "createdAt": "2026-02-04T22:37:57.514Z",
+      "role": "workflow:owner",
+      "workflowId": "kUMRbVEhYfRkmRyI",
+      "projectId": "SzgLfYyy3lWDJHJA"
+    }
+  ],
+  "staticData": {
+    "node:Gmail Trigger": {
+      "Gmail Trigger": {
+        "lastTimeChecked": 1771023375,
+        "possibleDuplicates": [
+          "19c5938242fd2c35",
+          "19c58eec2584563a"
+        ]
+      }
+    }
+  },
+  "tags": [
+    {
+      "updatedAt": "2026-02-11T01:56:50.617Z",
+      "createdAt": "2026-02-11T01:56:50.617Z",
+      "id": "RRuC1OHNJlDHTP56",
+      "name": "Call Center"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2026-02-12T00:35:19.033Z",
+  "versionId": "c928ee4d-8725-4992-a0a5-4ac5f52a258c"
+}
