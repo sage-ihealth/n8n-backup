@@ -1,0 +1,1384 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Every 5 Min - Poll Chat": {
+      "main": [
+        [
+          {
+            "node": "Get Recent Chat Messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Recent Chat Messages": {
+      "main": [
+        [
+          {
+            "node": "Filter New Messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter New Messages": {
+      "main": [
+        [
+          {
+            "node": "Has New Messages?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has New Messages?": {
+      "main": [
+        [
+          {
+            "node": "Get Category Rules",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No New Messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Category Rules": {
+      "main": [
+        [
+          {
+            "node": "Prepare AI Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare AI Input": {
+      "main": [
+        [
+          {
+            "node": "AI Extract Task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Extract Task": {
+      "main": [
+        [
+          {
+            "node": "Parse AI Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse AI Response": {
+      "main": [
+        [
+          {
+            "node": "Append to Tasks Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append to Tasks Sheet": {
+      "main": [
+        [
+          {
+            "node": "Needs Reminder?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Needs Reminder?": {
+      "main": [
+        [
+          {
+            "node": "Create Google Task",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Skip to Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Google Task": {
+      "main": [
+        [
+          {
+            "node": "Update Sheet with Task ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Sheet with Task ID": {
+      "main": [
+        [
+          {
+            "node": "Reply in Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Skip to Reply": {
+      "main": [
+        [
+          {
+            "node": "Reply in Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Every 15 Min - Sheet Sync": {
+      "main": [
+        [
+          {
+            "node": "Get All Tasks (Sync)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get All Tasks (Sync)": {
+      "main": [
+        [
+          {
+            "node": "Detect Sheet Changes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Detect Sheet Changes": {
+      "main": [
+        [
+          {
+            "node": "Has Changes?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Changes?": {
+      "main": [
+        [
+          {
+            "node": "Is Create?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Is Complete?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Changes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Create?": {
+      "main": [
+        [
+          {
+            "node": "Create Task (from Sheet)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Is Complete?": {
+      "main": [
+        [
+          {
+            "node": "Complete Google Task",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Is Category Learned?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is Category Learned?": {
+      "main": [
+        [
+          {
+            "node": "Extract Keyword",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Create Task (from Sheet)": {
+      "main": [
+        [
+          {
+            "node": "Update Task ID (Sync)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Keyword": {
+      "main": [
+        [
+          {
+            "node": "Add Category Rule",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Daily 6PM - Calendar Sync": {
+      "main": [
+        [
+          {
+            "node": "Get Open Tasks with Calendar ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Open Tasks with Calendar ID": {
+      "main": [
+        [
+          {
+            "node": "Filter Tasks with Calendar ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Tasks with Calendar ID": {
+      "main": [
+        [
+          {
+            "node": "Has Tasks to Check?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Tasks to Check?": {
+      "main": [
+        [
+          {
+            "node": "Get Calendar Task Status",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Tasks to Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Calendar Task Status": {
+      "main": [
+        [
+          {
+            "node": "Combine Statuses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine Statuses": {
+      "main": [
+        [
+          {
+            "node": "Completed in Calendar?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Completed in Calendar?": {
+      "main": [
+        [
+          {
+            "node": "Mark Sheet Complete",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Not Completed Yet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-29T02:45:01.118Z",
+  "id": "fo8fCT0VL5rAkZZK",
+  "isArchived": false,
+  "meta": null,
+  "name": "Personal Task Management System",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 5
+            }
+          ]
+        }
+      },
+      "id": "trigger-chat-poll",
+      "name": "Every 5 Min - Poll Chat",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "id": "trigger-sheet-sync",
+      "name": "Every 15 Min - Sheet Sync",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        600
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 18 * * 1-5"
+            }
+          ]
+        }
+      },
+      "id": "trigger-daily-sync",
+      "name": "Daily 6PM - Calendar Sync",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        1200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://chat.googleapis.com/v1/spaces/AAQAamP-Wx0/messages",
+        "authentication": "oAuth2",
+        "options": {
+          "qs": {
+            "parameters": [
+              {
+                "name": "pageSize",
+                "value": "20"
+              },
+              {
+                "name": "orderBy",
+                "value": "createTime desc"
+              }
+            ]
+          }
+        }
+      },
+      "id": "get-chat-messages",
+      "name": "Get Recent Chat Messages",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        240,
+        0
+      ],
+      "credentials": {
+        "oAuth2Api": {
+          "id": "sz05GM9U2uo8stiL",
+          "name": "Google Chat"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filter to only new messages since last run\nconst staticData = $getWorkflowStaticData('global');\nconst lastProcessedTime = staticData.lastProcessedTime || '1970-01-01T00:00:00Z';\n\nconst messages = $input.first().json.messages || [];\nconst newMessages = [];\n\nfor (const msg of messages) {\n  // Skip bot messages\n  if (msg.sender && msg.sender.type === 'BOT') continue;\n  \n  // Skip already processed\n  if (msg.createTime <= lastProcessedTime) continue;\n  \n  // Skip empty messages\n  if (!msg.text || msg.text.trim() === '') continue;\n  \n  newMessages.push({\n    json: {\n      messageId: msg.name,\n      text: msg.text,\n      threadName: msg.thread ? msg.thread.name : msg.name,\n      createTime: msg.createTime,\n      senderName: msg.sender ? msg.sender.displayName : 'Unknown'\n    }\n  });\n}\n\n// Update last processed time\nif (messages.length > 0 && messages[0].createTime) {\n  staticData.lastProcessedTime = messages[0].createTime;\n}\n\nif (newMessages.length === 0) {\n  return [{ json: { noNewMessages: true } }];\n}\n\nreturn newMessages.reverse();"
+      },
+      "id": "filter-new-messages",
+      "name": "Filter New Messages",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "check-has-messages",
+              "leftValue": "={{ $json.noNewMessages }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "has-new-messages",
+      "name": "Has New Messages?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        720,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": {
+          "__rl": true,
+          "value": "1dQ7OpHvt-lxFc75Y-c2UFMNk-mR7hVb2h2mAfC57hk0",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Category Rules",
+          "mode": "list"
+        },
+        "options": {}
+      },
+      "id": "get-category-rules",
+      "name": "Get Category Rules",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        960,
+        -100
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "NEEDS_CONFIG",
+          "name": "Google Sheets OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Combine message with category rules for AI\nconst message = $('Has New Messages?').first().json;\nconst rules = $('Get Category Rules').all();\n\nconst rulesText = rules.map(r => `${r.json.keyword} → ${r.json.category}`).join('\\n');\n\nreturn {\n  json: {\n    messageText: message.text,\n    threadName: message.threadName,\n    messageId: message.messageId,\n    createTime: message.createTime,\n    senderName: message.senderName,\n    categoryRules: rulesText\n  }\n};"
+      },
+      "id": "prepare-ai-input",
+      "name": "Prepare AI Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1200,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "chat",
+        "model": "gpt-4o-mini",
+        "options": {
+          "maxTokens": 500,
+          "temperature": 0
+        },
+        "messages": {
+          "values": [
+            {
+              "role": "system",
+              "content": "You are a task extraction assistant. Parse the user's message and extract task details.\n\nCATEGORY RULES (if any keyword appears, use that category):\n{{ $json.categoryRules }}\n\nRULES:\n1. Task: The core action (clean up but preserve meaning)\n2. Who: Person/team mentioned (empty string if none)\n3. Due Date: Parse natural language\n   - \"Friday\", \"Jan 30\" → YYYY-MM-DD\n   - \"next week\" → +7 days\n   - \"remind me\" without date → +7 days\n   - No date mentioned → empty string\n4. Category: Match keyword first, else guess (add \"?\" if uncertain)\n5. Reminder: true if due_date exists OR \"remind me\" in message\n\nOUTPUT JSON ONLY:\n{\"task\":\"string\",\"who\":\"string\",\"due_date\":\"YYYY-MM-DD or empty\",\"category\":\"string\",\"reminder_needed\":boolean}"
+            },
+            {
+              "role": "user",
+              "content": "Today: {{ $now.format('yyyy-MM-dd') }}\nMessage: {{ $json.messageText }}"
+            }
+          ]
+        }
+      },
+      "id": "ai-extract-task",
+      "name": "AI Extract Task",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1440,
+        0
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "NEEDS_CONFIG",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const aiResponse = $input.first().json;\nconst originalData = $('Prepare AI Input').first().json;\n\nlet parsed;\ntry {\n  // Handle OpenAI response format\n  const content = aiResponse.choices?.[0]?.message?.content || aiResponse.message?.content || aiResponse.content || JSON.stringify(aiResponse);\n  const jsonMatch = content.match(/\\{[\\s\\S]*\\}/);\n  parsed = JSON.parse(jsonMatch ? jsonMatch[0] : content);\n} catch (e) {\n  parsed = { task: originalData.messageText, who: '', due_date: '', category: 'General?', reminder_needed: false };\n}\n\nconst taskId = `TASK-${Date.now()}`;\nconst dateAdded = new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles' });\n\nreturn {\n  json: {\n    task_id: taskId,\n    date_added: dateAdded,\n    task: parsed.task || originalData.messageText,\n    who: parsed.who || '',\n    due_date: parsed.due_date || '',\n    category: parsed.category || 'General?',\n    reminder_needed: parsed.reminder_needed ? 'Y' : 'N',\n    calendar_task_id: '',\n    status: 'Open',\n    original_message: originalData.messageText,\n    threadName: originalData.threadName\n  }\n};"
+      },
+      "id": "parse-ai-response",
+      "name": "Parse AI Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1680,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1dQ7OpHvt-lxFc75Y-c2UFMNk-mR7hVb2h2mAfC57hk0",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Tasks",
+          "mode": "list"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "task_id": "={{ $json.task_id }}",
+            "date_added": "={{ $json.date_added }}",
+            "task": "={{ $json.task }}",
+            "who": "={{ $json.who }}",
+            "due_date": "={{ $json.due_date }}",
+            "category": "={{ $json.category }}",
+            "reminder_needed": "={{ $json.reminder_needed }}",
+            "calendar_task_id": "={{ $json.calendar_task_id }}",
+            "status": "={{ $json.status }}",
+            "original_message": "={{ $json.original_message }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "append-to-sheet",
+      "name": "Append to Tasks Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1920,
+        0
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "NEEDS_CONFIG",
+          "name": "Google Sheets OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "check-reminder",
+              "leftValue": "={{ $json.reminder_needed }}",
+              "rightValue": "Y",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "needs-reminder",
+      "name": "Needs Reminder?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        2160,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://tasks.googleapis.com/tasks/v1/lists/@default/tasks",
+        "authentication": "oAuth2",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"title\": \"{{ $json.task }}\",\n  \"notes\": \"Category: {{ $json.category }} | Who: {{ $json.who }} | Task ID: {{ $json.task_id }}\",\n  \"due\": \"{{ $json.due_date }}T17:00:00.000Z\"\n}",
+        "options": {}
+      },
+      "id": "create-google-task",
+      "name": "Create Google Task",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2400,
+        -100
+      ],
+      "credentials": {
+        "oAuth2Api": {
+          "id": "NEEDS_CONFIG",
+          "name": "Google Tasks OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1dQ7OpHvt-lxFc75Y-c2UFMNk-mR7hVb2h2mAfC57hk0",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Tasks",
+          "mode": "list"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "calendar_task_id": "={{ $json.id }}"
+          }
+        },
+        "options": {},
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "task_id",
+              "lookupValue": "={{ $('Parse AI Response').first().json.task_id }}"
+            }
+          ]
+        }
+      },
+      "id": "update-sheet-task-id",
+      "name": "Update Sheet with Task ID",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2640,
+        -100
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "NEEDS_CONFIG",
+          "name": "Google Sheets OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://chat.googleapis.com/v1/spaces/AAQAamP-Wx0/messages",
+        "authentication": "oAuth2",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": \"{{ $('Parse AI Response').first().json.reminder_needed === 'Y' ? '✓' : '○' }} *{{ $('Parse AI Response').first().json.task }}*\\nCategory: {{ $('Parse AI Response').first().json.category }} | Due: {{ $('Parse AI Response').first().json.due_date || 'None' }} | Reminder: {{ $('Parse AI Response').first().json.reminder_needed === 'Y' ? 'Yes' : 'No' }}\",\n  \"thread\": {\n    \"name\": \"{{ $('Parse AI Response').first().json.threadName }}\"\n  }\n}",
+        "options": {}
+      },
+      "id": "reply-in-chat",
+      "name": "Reply in Chat",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2880,
+        0
+      ],
+      "credentials": {
+        "oAuth2Api": {
+          "id": "sz05GM9U2uo8stiL",
+          "name": "Google Chat"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "no-new-messages",
+      "name": "No New Messages",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        960,
+        100
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "no-reminder-merge",
+      "name": "Skip to Reply",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2640,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": {
+          "__rl": true,
+          "value": "1dQ7OpHvt-lxFc75Y-c2UFMNk-mR7hVb2h2mAfC57hk0",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Tasks",
+          "mode": "list"
+        },
+        "options": {}
+      },
+      "id": "get-all-tasks-sync",
+      "name": "Get All Tasks (Sync)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        240,
+        600
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "NEEDS_CONFIG",
+          "name": "Google Sheets OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Detect changes in sheet since last sync\nconst staticData = $getWorkflowStaticData('global');\nconst previousTasks = staticData.previousTasks || [];\nconst currentTasks = $input.all().map(item => item.json);\n\nconst changes = [];\nconst prevMap = new Map(previousTasks.map(t => [t.task_id, t]));\nconst currMap = new Map(currentTasks.map(t => [t.task_id, t]));\n\nfor (const [taskId, curr] of currMap) {\n  const prev = prevMap.get(taskId);\n  \n  if (!prev) {\n    // New task with due date but no calendar task yet\n    if (curr.due_date && !curr.calendar_task_id) {\n      changes.push({ type: 'create', task: curr });\n    }\n  } else {\n    // Due date added\n    if (!prev.due_date && curr.due_date && !curr.calendar_task_id) {\n      changes.push({ type: 'create', task: curr });\n    }\n    // Due date changed\n    if (prev.due_date && curr.due_date && prev.due_date !== curr.due_date && curr.calendar_task_id) {\n      changes.push({ type: 'update_date', task: curr });\n    }\n    // Marked complete\n    if (prev.status !== 'Complete' && curr.status === 'Complete' && curr.calendar_task_id) {\n      changes.push({ type: 'complete', task: curr });\n    }\n    // Category corrected (learned)\n    if (prev.category && prev.category.includes('?') && curr.category && !curr.category.includes('?')) {\n      changes.push({ type: 'category_learned', task: curr, old_category: prev.category });\n    }\n  }\n}\n\n// Check for deleted tasks\nfor (const [taskId, prev] of prevMap) {\n  if (!currMap.has(taskId) && prev.calendar_task_id) {\n    changes.push({ type: 'delete', task: prev });\n  }\n}\n\n// Save current state for next run\nstaticData.previousTasks = currentTasks;\n\nif (changes.length === 0) {\n  return [{ json: { noChanges: true } }];\n}\n\nreturn changes.map(c => ({ json: c }));"
+      },
+      "id": "detect-sheet-changes",
+      "name": "Detect Sheet Changes",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        600
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "check-changes",
+              "leftValue": "={{ $json.noChanges }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "has-changes",
+      "name": "Has Changes?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        720,
+        600
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "route-create",
+              "leftValue": "={{ $json.type }}",
+              "rightValue": "create",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "route-create",
+      "name": "Is Create?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        960,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "route-complete",
+              "leftValue": "={{ $json.type }}",
+              "rightValue": "complete",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "route-complete",
+      "name": "Is Complete?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        960,
+        700
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "route-learned",
+              "leftValue": "={{ $json.type }}",
+              "rightValue": "category_learned",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "route-learned",
+      "name": "Is Category Learned?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1200,
+        700
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://tasks.googleapis.com/tasks/v1/lists/@default/tasks",
+        "authentication": "oAuth2",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"title\": \"{{ $json.task.task }}\",\n  \"notes\": \"Category: {{ $json.task.category }} | Who: {{ $json.task.who }} | Task ID: {{ $json.task.task_id }}\",\n  \"due\": \"{{ $json.task.due_date }}T17:00:00.000Z\"\n}",
+        "options": {}
+      },
+      "id": "create-task-from-sheet",
+      "name": "Create Task (from Sheet)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1200,
+        400
+      ],
+      "credentials": {
+        "oAuth2Api": {
+          "id": "NEEDS_CONFIG",
+          "name": "Google Tasks OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1dQ7OpHvt-lxFc75Y-c2UFMNk-mR7hVb2h2mAfC57hk0",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Tasks",
+          "mode": "list"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "calendar_task_id": "={{ $json.id }}",
+            "reminder_needed": "Y"
+          }
+        },
+        "options": {},
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "task_id",
+              "lookupValue": "={{ $('Is Create?').first().json.task.task_id }}"
+            }
+          ]
+        }
+      },
+      "id": "update-created-task-id",
+      "name": "Update Task ID (Sync)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1440,
+        400
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "NEEDS_CONFIG",
+          "name": "Google Sheets OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://tasks.googleapis.com/tasks/v1/lists/@default/tasks/{{ $json.task.calendar_task_id }}",
+        "authentication": "oAuth2",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"status\": \"completed\"\n}",
+        "options": {}
+      },
+      "id": "complete-google-task",
+      "name": "Complete Google Task",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1200,
+        600
+      ],
+      "credentials": {
+        "oAuth2Api": {
+          "id": "NEEDS_CONFIG",
+          "name": "Google Tasks OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract keyword from task for learning\nconst task = $json.task;\nconst stopWords = ['the', 'a', 'an', 'to', 'for', 'of', 'and', 'or', 'in', 'on', 'at', 'by', 'with', 'up', 'follow'];\nconst words = task.task.toLowerCase()\n  .replace(/[^a-z0-9\\s]/g, '')\n  .split(/\\s+/)\n  .filter(w => w.length > 2 && !stopWords.includes(w));\n\nconst keyword = words.sort((a, b) => b.length - a.length)[0] || task.task.toLowerCase().substring(0, 20);\n\nreturn {\n  json: {\n    keyword: keyword,\n    category: task.category,\n    source_task: task.task,\n    date_added: new Date().toISOString().split('T')[0]\n  }\n};"
+      },
+      "id": "extract-keyword",
+      "name": "Extract Keyword",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1440,
+        800
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1dQ7OpHvt-lxFc75Y-c2UFMNk-mR7hVb2h2mAfC57hk0",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Category Rules",
+          "mode": "list"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "keyword": "={{ $json.keyword }}",
+            "category": "={{ $json.category }}",
+            "source_task": "={{ $json.source_task }}",
+            "date_added": "={{ $json.date_added }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "add-category-rule",
+      "name": "Add Category Rule",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1680,
+        800
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "NEEDS_CONFIG",
+          "name": "Google Sheets OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "no-changes",
+      "name": "No Changes",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        960,
+        900
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": {
+          "__rl": true,
+          "value": "1dQ7OpHvt-lxFc75Y-c2UFMNk-mR7hVb2h2mAfC57hk0",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Tasks",
+          "mode": "list"
+        },
+        "options": {
+          "outputFormatting": {
+            "values": {
+              "general": "string"
+            }
+          }
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "status",
+              "lookupValue": "Open"
+            }
+          ]
+        }
+      },
+      "id": "get-open-tasks",
+      "name": "Get Open Tasks with Calendar ID",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        240,
+        1200
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "NEEDS_CONFIG",
+          "name": "Google Sheets OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filter to only tasks with calendar IDs\nconst tasks = $input.all();\nconst tasksWithCalendar = tasks.filter(t => t.json.calendar_task_id && t.json.calendar_task_id.trim() !== '');\n\nif (tasksWithCalendar.length === 0) {\n  return [{ json: { noTasksToCheck: true } }];\n}\n\nreturn tasksWithCalendar;"
+      },
+      "id": "filter-tasks-with-calendar",
+      "name": "Filter Tasks with Calendar ID",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        1200
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "check-tasks",
+              "leftValue": "={{ $json.noTasksToCheck }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "has-tasks-to-check",
+      "name": "Has Tasks to Check?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        720,
+        1200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://tasks.googleapis.com/tasks/v1/lists/@default/tasks/{{ $json.calendar_task_id }}",
+        "authentication": "oAuth2",
+        "options": {}
+      },
+      "id": "get-calendar-task-status",
+      "name": "Get Calendar Task Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        960,
+        1100
+      ],
+      "credentials": {
+        "oAuth2Api": {
+          "id": "NEEDS_CONFIG",
+          "name": "Google Tasks OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Combine sheet task with calendar status\nconst calendarTask = $input.first().json;\nconst sheetTask = $('Has Tasks to Check?').first().json;\n\nreturn {\n  json: {\n    task_id: sheetTask.task_id,\n    calendar_status: calendarTask.status,\n    sheet_status: sheetTask.status\n  }\n};"
+      },
+      "id": "combine-statuses",
+      "name": "Combine Statuses",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1200,
+        1100
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "check-completed",
+              "leftValue": "={{ $json.calendar_status }}",
+              "rightValue": "completed",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "is-completed-in-calendar",
+      "name": "Completed in Calendar?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1440,
+        1100
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1dQ7OpHvt-lxFc75Y-c2UFMNk-mR7hVb2h2mAfC57hk0",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Tasks",
+          "mode": "list"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "status": "Complete"
+          }
+        },
+        "options": {},
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "task_id",
+              "lookupValue": "={{ $json.task_id }}"
+            }
+          ]
+        }
+      },
+      "id": "mark-sheet-complete",
+      "name": "Mark Sheet Complete",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1680,
+        1000
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "NEEDS_CONFIG",
+          "name": "Google Sheets OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "no-tasks-to-check",
+      "name": "No Tasks to Check",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        960,
+        1300
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "not-completed",
+      "name": "Not Completed Yet",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1680,
+        1200
+      ]
+    }
+  ],
+  "origin": "n8n",
+  "pinData": null,
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Los_Angeles",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-29T02:45:01.121Z",
+      "createdAt": "2026-01-29T02:45:01.121Z",
+      "role": "workflow:owner",
+      "workflowId": "fo8fCT0VL5rAkZZK",
+      "projectId": "SzgLfYyy3lWDJHJA"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-02-11T01:03:19.675Z",
+  "versionId": "59f9aa17-bc97-4476-95b9-409e36a41054"
+}
