@@ -1,0 +1,37 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {},
+  "createdAt": "2025-10-07T06:48:21.977Z",
+  "id": "JOmT0e9BrNt0ZvuU",
+  "isArchived": true,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "My workflow",
+  "nodes": [],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [
+    {
+      "updatedAt": "2025-10-07T06:48:21.994Z",
+      "createdAt": "2025-10-07T06:48:21.994Z",
+      "role": "workflow:owner",
+      "workflowId": "JOmT0e9BrNt0ZvuU",
+      "projectId": "IGL0EzJNN8XZ65mm"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2026-01-26T19:09:27.000Z",
+  "versionId": "5bc206c0-85f5-4890-b5fd-0e0a1d376855"
+}
