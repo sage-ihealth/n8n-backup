@@ -1,0 +1,117 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Fetch Patient API": {
+      "main": [
+        [
+          {
+            "node": "Format Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Fetch Patient API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-13T01:24:55.673Z",
+  "id": "rcc5c7iSpXawUS9b",
+  "isArchived": false,
+  "meta": null,
+  "name": "Tool - Get Patient Info - webhook",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "465ece37-155b-452f-b1ec-aeaff7b95deb",
+        "options": {
+          "rawBody": false
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        -16
+      ],
+      "id": "495d428c-0fb7-4271-b99a-e930a9045347",
+      "name": "Webhook",
+      "webhookId": "465ece37-155b-452f-b1ec-aeaff7b95deb"
+    },
+    {
+      "parameters": {
+        "url": "=https://uc-prod.ihealth-eng.com/v1/uc/patient/{{ $json.patientId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "id": "36ffa9d3-e0f5-4bc2-80e5-be13f7e5a124",
+      "name": "Fetch Patient API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        224,
+        -16
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "vclQZ2plyvKtgSUw",
+          "name": "Header Auth - iHealth Prod"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 简化版：只返回最重要的信息\nconst data = $input.first().json.data;\n\nif (!data) {\n  return {\n    json: {\n      error: \"Patient not found\",\n      patientId: $input.first().json.patientId\n    }\n  };\n}\n\n// 计算年龄\nconst calculateAge = (birthday) => {\n  const today = new Date();\n  const birthDate = new Date(birthday);\n  let age = today.getFullYear() - birthDate.getFullYear();\n  const monthDiff = today.getMonth() - birthDate.getMonth();\n  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {\n    age--;\n  }\n  return age;\n};\n\n// 格式化日期\nconst formatDate = (dateString) => {\n  if (!dateString) return null;\n  return new Date(dateString).toLocaleDateString('en-US');\n};\n\nconst result = {\n  // 基本信息\n  patientId: data.id,\n  name: `${data.profile.firstName} ${data.profile.lastName}`,\n  firstName: data.profile.firstName,\n  lastName: data.profile.lastName,\n  birthday: data.profile.birthday,\n  age: calculateAge(data.profile.birthday),\n  gender: data.profile.gender,\n  \n  // 联系方式\n  phone: data.phone?.[0]?.number || null,\n  address: data.address?.[0] ? \n    `${data.address[0].streetName}, ${data.address[0].city}, ${data.address[0].state} ${data.address[0].postCode}` : null,\n  \n  // 保险\n  primaryInsurance: data.profile.insuranceProvider,\n  secondaryInsurance: data.profile.insuranceProvider2,\n  memberId: data.profile.memberId,\n  \n  // 诊所和医生\n  clinic: {\n    name: data.clinic?.businessName,\n    location: `${data.clinic?.city}, ${data.clinic?.state}`\n  },\n  doctor: data.profile.doctorUser ? \n    `Dr. ${data.profile.doctorUser.firstName} ${data.profile.doctorUser.lastName}` : null,\n  \n  // 护理团队\n  assignedRD: data.assignedToRDUser ? \n    `${data.assignedToRDUser.firstName} ${data.assignedToRDUser.lastName} (${data.assignedToRDUser.title})` : null,\n  assignedCA: data.assignedToCAUser ? \n    `${data.assignedToCAUser.firstName} ${data.assignedToCAUser.lastName} (${data.assignedToCAUser.title})` : null,\n  \n  // 诊断（简化）\n  diagnoses: data.healthConditions?.map(d => `${d.code}: ${d.condition}`).join('; ') || null,\n  primaryDiagnosis: data.healthConditions?.[0] ? \n    `${data.healthConditions[0].code}: ${data.healthConditions[0].condition}` : null,\n  \n  // 项目\n  programs: data.patientListInfo?.programs?.map(p => p.category).join(', ') || null,\n  enrollmentStatus: data.patientListInfo?.enrolledStatus,\n  enrollmentDate: formatDate(data.patientListInfo?.enrollmentDate),\n  \n  // 本月计费状态\n  currentMonthBillable: {\n    eligible: data.monthlyBillableStatistic?.eligible || false,\n    totalTime: data.monthlyBillableStatistic?.totalTime || 0,\n    measurementDays: data.monthlyBillableStatistic?.measurementDays || 0,\n    month: data.monthlyBillableStatistic?.monthOfYear,\n    timeEligible: data.monthlyBillableStatistic?.timeEligible || false,\n    measurementEligible: data.monthlyBillableStatistic?.measurementEligible\n  },\n  \n  // 设备信息\n  hasBloodPressureDevice: !!data.bpDeviceInfo?.recentUsedDeviceMacId,\n  bpLastUsed: formatDate(data.bpDeviceInfo?.recentUsedTime),\n  \n  // 最近血压数据\n  recentBP: data.bpStatData ? \n    `${data.bpStatData.sbp}/${data.bpStatData.dbp} (${data.bpStatData.count} readings)` : null,\n  \n  // 元数据\n  medicalRecordNumber: data.medicalRecordId,\n  patientComplexity: data.complexity,\n  lastUpdated: formatDate(data.updatedAt)\n};\n\nreturn { json: result };"
+      },
+      "id": "2c0cf9ff-259b-415d-b0e9-02a09ca53d2e",
+      "name": "Format Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        -16
+      ]
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-13T01:24:55.679Z",
+      "createdAt": "2026-01-13T01:24:55.679Z",
+      "role": "workflow:owner",
+      "workflowId": "rcc5c7iSpXawUS9b",
+      "projectId": "IGL0EzJNN8XZ65mm"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2026-01-13T22:38:47.134Z",
+  "versionId": "25113b48-d785-46e8-8197-5f9cd0dfed1e"
+}
