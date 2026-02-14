@@ -1,0 +1,383 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-01-23T04:59:56.000Z",
+    "createdAt": "2026-01-23T04:59:51.016Z",
+    "versionId": "fa2d5fa2-239f-4691-82d4-30169cd439ab",
+    "workflowId": "l96kHmeuKtFICZMXrNJmh",
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "minutes"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          -1984,
+          -512
+        ],
+        "id": "a1cbe5d8-093f-4960-a9f7-f9c5c6dac9f7",
+        "name": "Every 10 Minutes"
+      },
+      {
+        "parameters": {
+          "url": "https://langfuse.ihealth-eng.com/api/public/observations",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpHeaderAuth",
+          "sendQuery": true,
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "level",
+                "value": "ERROR"
+              },
+              {
+                "name": "fromStartTime",
+                "value": "={{ $now.minus(10, 'minutes').toUTC().toISO() }}"
+              },
+              {
+                "name": "limit",
+                "value": "3"
+              }
+            ]
+          },
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {}
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.1,
+        "position": [
+          -1760,
+          -512
+        ],
+        "id": "629425c4-cb00-4939-9a1a-ed63c507889a",
+        "name": "Get Recent Errors (Self-Host)",
+        "credentials": {
+          "httpHeaderAuth": {
+            "id": "Ph89LdXe4YPCcT0Q",
+            "name": "Langfuse Header Auth account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "number": [
+              {
+                "value1": "={{ $json.data.length }}",
+                "operation": "larger"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 1,
+        "position": [
+          -1536,
+          -512
+        ],
+        "id": "f951b5ca-99c7-4598-9344-7eaa813d99b6",
+        "name": "Any Errors?1"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Define your self-hosted base URL\nconst baseUrl = 'https://langfuse.ihealth-eng.com';\n\n// 1. Get the list of errors\n// Your input shows the errors are inside a \"data\" array in the first item\nconst rawData = items[0].json;\nconst errors = Array.isArray(rawData.data) ? rawData.data : items.map(i => i.json);\n\nlet msg = `🚨 *${errors.length} System Errors Detected*\\n`;\n\nfor (const obs of errors) {\n  const link = `${baseUrl}/project/${obs.projectId}/traces/${obs.traceId}`;\n  \n  // -- FORMAT ERROR TYPE --\n  // Combine Name + Status (e.g., \"tool_update_appointment (network)\")\n  const errorHeader = `*${obs.name}*` + (obs.statusMessage ? ` (${obs.statusMessage})` : '');\n\n  // -- FORMAT INPUT ARGUMENTS --\n  // Show what data was passed to the tool when it failed\n  let inputStr = \"\";\n  if (obs.input && typeof obs.input === 'object') {\n    // Convert {\"date\": \"...\"} into \"date: ... | time: ...\"\n    inputStr = Object.entries(obs.input)\n      .map(([k, v]) => `${k}: ${v}`)\n      .join(' | ');\n  }\n\n  // -- FORMAT OUTPUT/ERROR MESSAGE --\n  // The output often contains the real python error. Let's clean it up.\n  let outputStr = typeof obs.output === 'string' ? obs.output : JSON.stringify(obs.output);\n  \n  // Optional: If the output is a huge python dict string, try to shorten it or keep it as is.\n  // For now, we'll put it in a block quote so it stands out.\n  \n  // -- BUILD MESSAGE --\n  msg += `\\n${errorHeader}`;\n  \n  if (inputStr) {\n    msg += `\\n   📝 Input: ${inputStr}`;\n  }\n  \n  if (outputStr) {\n    // Truncate if insanely long (>200 chars) to keep chat clean\n    if (outputStr.length > 300) outputStr = outputStr.substring(0, 300) + \"...\";\n    msg += `\\n   ❌ Error: _${outputStr}_`;\n  }\n  \n  msg += `\\n   <${link}|🔎 Inspect Trace>\\n`;\n}\n\nreturn [{json: {text: msg}}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -1312,
+          -512
+        ],
+        "id": "43461a4b-f3df-4951-9ae6-0d9e7193f4f4",
+        "name": "Format Alert1"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://chat.googleapis.com/v1/spaces/AAQAl1r1FEA/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=fPIzunMvWxKm6smh9gA9Hq2dDZSvNOonIUIi0epT3bk",
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "text",
+                "value": "={{ $json.text }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.1,
+        "position": [
+          -1088,
+          -512
+        ],
+        "id": "85c454e8-8421-4240-93bb-a62ce0ab5dba",
+        "name": "Notify Google Chat1"
+      }
+    ],
+    "connections": {
+      "Every 10 Minutes": {
+        "main": [
+          [
+            {
+              "node": "Get Recent Errors (Self-Host)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Recent Errors (Self-Host)": {
+        "main": [
+          [
+            {
+              "node": "Any Errors?1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Any Errors?1": {
+        "main": [
+          [
+            {
+              "node": "Format Alert1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Format Alert1": {
+        "main": [
+          [
+            {
+              "node": "Notify Google Chat1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "sage gu",
+    "name": "Version fa2d5fa2",
+    "description": "",
+    "autosaved": true
+  },
+  "activeVersionId": "fa2d5fa2-239f-4691-82d4-30169cd439ab",
+  "connections": {
+    "Every 10 Minutes": {
+      "main": [
+        [
+          {
+            "node": "Get Recent Errors (Self-Host)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Recent Errors (Self-Host)": {
+      "main": [
+        [
+          {
+            "node": "Any Errors?1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Any Errors?1": {
+      "main": [
+        [
+          {
+            "node": "Format Alert1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Alert1": {
+      "main": [
+        [
+          {
+            "node": "Notify Google Chat1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-23T01:04:32.970Z",
+  "id": "l96kHmeuKtFICZMXrNJmh",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "Minerva Langfuse Error Alert",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1984,
+        -512
+      ],
+      "id": "a1cbe5d8-093f-4960-a9f7-f9c5c6dac9f7",
+      "name": "Every 10 Minutes"
+    },
+    {
+      "parameters": {
+        "url": "https://langfuse.ihealth-eng.com/api/public/observations",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "level",
+              "value": "ERROR"
+            },
+            {
+              "name": "fromStartTime",
+              "value": "={{ $now.minus(10, 'minutes').toUTC().toISO() }}"
+            },
+            {
+              "name": "limit",
+              "value": "3"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -1760,
+        -512
+      ],
+      "id": "629425c4-cb00-4939-9a1a-ed63c507889a",
+      "name": "Get Recent Errors (Self-Host)",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "Ph89LdXe4YPCcT0Q",
+          "name": "Langfuse Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.data.length }}",
+              "operation": "larger"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        -1536,
+        -512
+      ],
+      "id": "f951b5ca-99c7-4598-9344-7eaa813d99b6",
+      "name": "Any Errors?1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Define your self-hosted base URL\nconst baseUrl = 'https://langfuse.ihealth-eng.com';\n\n// 1. Get the list of errors\n// Your input shows the errors are inside a \"data\" array in the first item\nconst rawData = items[0].json;\nconst errors = Array.isArray(rawData.data) ? rawData.data : items.map(i => i.json);\n\nlet msg = `🚨 *${errors.length} System Errors Detected*\\n`;\n\nfor (const obs of errors) {\n  const link = `${baseUrl}/project/${obs.projectId}/traces/${obs.traceId}`;\n  \n  // -- FORMAT ERROR TYPE --\n  // Combine Name + Status (e.g., \"tool_update_appointment (network)\")\n  const errorHeader = `*${obs.name}*` + (obs.statusMessage ? ` (${obs.statusMessage})` : '');\n\n  // -- FORMAT INPUT ARGUMENTS --\n  // Show what data was passed to the tool when it failed\n  let inputStr = \"\";\n  if (obs.input && typeof obs.input === 'object') {\n    // Convert {\"date\": \"...\"} into \"date: ... | time: ...\"\n    inputStr = Object.entries(obs.input)\n      .map(([k, v]) => `${k}: ${v}`)\n      .join(' | ');\n  }\n\n  // -- FORMAT OUTPUT/ERROR MESSAGE --\n  // The output often contains the real python error. Let's clean it up.\n  let outputStr = typeof obs.output === 'string' ? obs.output : JSON.stringify(obs.output);\n  \n  // Optional: If the output is a huge python dict string, try to shorten it or keep it as is.\n  // For now, we'll put it in a block quote so it stands out.\n  \n  // -- BUILD MESSAGE --\n  msg += `\\n${errorHeader}`;\n  \n  if (inputStr) {\n    msg += `\\n   📝 Input: ${inputStr}`;\n  }\n  \n  if (outputStr) {\n    // Truncate if insanely long (>200 chars) to keep chat clean\n    if (outputStr.length > 300) outputStr = outputStr.substring(0, 300) + \"...\";\n    msg += `\\n   ❌ Error: _${outputStr}_`;\n  }\n  \n  msg += `\\n   <${link}|🔎 Inspect Trace>\\n`;\n}\n\nreturn [{json: {text: msg}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1312,
+        -512
+      ],
+      "id": "43461a4b-f3df-4951-9ae6-0d9e7193f4f4",
+      "name": "Format Alert1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://chat.googleapis.com/v1/spaces/AAQAl1r1FEA/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=fPIzunMvWxKm6smh9gA9Hq2dDZSvNOonIUIi0epT3bk",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "={{ $json.text }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -1088,
+        -512
+      ],
+      "id": "85c454e8-8421-4240-93bb-a62ce0ab5dba",
+      "name": "Notify Google Chat1"
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-23T01:04:32.977Z",
+      "createdAt": "2026-01-23T01:04:32.977Z",
+      "role": "workflow:owner",
+      "workflowId": "l96kHmeuKtFICZMXrNJmh",
+      "projectId": "IGL0EzJNN8XZ65mm"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2026-01-23T04:59:51.015Z",
+  "versionId": "fa2d5fa2-239f-4691-82d4-30169cd439ab"
+}
