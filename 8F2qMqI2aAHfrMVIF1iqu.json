@@ -1,0 +1,213 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Filter Videos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Videos": {
+      "main": [
+        [
+          {
+            "node": "Download Video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Video": {
+      "main": [
+        [
+          {
+            "node": "TikTok Init Upload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TikTok Init Upload": {
+      "main": [
+        [
+          {
+            "node": "TikTok Binary Upload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-27T18:10:22.079Z",
+  "id": "8F2qMqI2aAHfrMVIF1iqu",
+  "isArchived": false,
+  "meta": null,
+  "name": "TikTok Upload from Google Drive",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        }
+      },
+      "id": "40f853ac-13be-40bc-8dd9-72d410c17097",
+      "name": "Google Drive Trigger",
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -480,
+        -176
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.mimeType }}",
+              "operation": "startsWith",
+              "value2": "video/"
+            }
+          ]
+        }
+      },
+      "id": "72695ce4-992e-4737-b93a-2f4adbb5492b",
+      "name": "Filter Videos",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        -288,
+        -176
+      ]
+    },
+    {
+      "parameters": {
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "root",
+          "cachedResultName": "/ (Root folder)"
+        },
+        "options": {}
+      },
+      "id": "696cebf7-8610-40b3-a44b-098a213a7575",
+      "name": "Download Video",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -80,
+        -176
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://open.tiktokapis.com/v2/post/publish/video/init/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json; charset=UTF-8"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "post_info",
+              "value": "={{ { \"title\": $node[\"Google Drive Trigger\"].json.name, \"privacy_level\": \"PUBLIC_TO_EVERYONE\" } }}"
+            },
+            {
+              "name": "source_info",
+              "value": "={{ { \"source\": \"FILE_UPLOAD\", \"video_size\": $binary.data.fileSize } }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "144c4337-6290-4c41-820e-1219cb894a15",
+      "name": "TikTok Init Upload",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        128,
+        -176
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "={{ $json.data.upload_url }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "video/mp4"
+            },
+            {
+              "name": "Content-Range",
+              "value": "={{ \"bytes 0-\" + ($binary.data.fileSize - 1) + \"/\" + $binary.data.fileSize }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "options": {}
+      },
+      "id": "b5d6caeb-ab96-4999-8aa3-f095a91bbe69",
+      "name": "TikTok Binary Upload",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        320,
+        -176
+      ]
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-27T18:10:22.084Z",
+      "createdAt": "2026-01-27T18:10:22.084Z",
+      "role": "workflow:owner",
+      "workflowId": "8F2qMqI2aAHfrMVIF1iqu",
+      "projectId": "IGL0EzJNN8XZ65mm"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-01-28T05:36:48.343Z",
+  "versionId": "03a45395-be30-46a0-a2e0-5acac2bb8cc8"
+}
