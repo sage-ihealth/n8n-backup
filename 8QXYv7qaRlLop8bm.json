@@ -1,0 +1,1603 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-02-05T02:36:19.017Z",
+    "createdAt": "2026-02-05T02:36:19.017Z",
+    "versionId": "84dd7bb6-3c14-4f65-b2b7-428f4b7a6af6",
+    "workflowId": "8QXYv7qaRlLop8bm",
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "google-docs-editor",
+          "responseMode": "responseNode",
+          "options": {}
+        },
+        "id": "webhook",
+        "name": "Webhook",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2,
+        "position": [
+          0,
+          464
+        ],
+        "webhookId": "google-docs-editor"
+      },
+      {
+        "parameters": {
+          "jsCode": "const body = $input.first().json.body;\n\n// Validate required fields\nif (!body.documentId && !body.documentUrl) {\n  throw new Error('Missing required field: documentId or documentUrl');\n}\n\nif (!body.action) {\n  throw new Error('Missing required field: action');\n}\n\nconst validActions = ['append', 'insert', 'replace', 'read', 'listTabs', 'createTab', 'deleteTab', 'appendToTab', 'readTab'];\nif (!validActions.includes(body.action)) {\n  throw new Error(`Invalid action: ${body.action}. Must be one of: ${validActions.join(', ')}`);\n}\n\n// Content required for write operations\nconst writeActions = ['append', 'insert', 'replace', 'appendToTab'];\nif (writeActions.includes(body.action) && !body.content) {\n  throw new Error('Missing required field: content');\n}\n\nif (body.action === 'replace' && !body.findText) {\n  throw new Error('Missing required field: findText (required for replace action)');\n}\n\n// Tab ID required for tab-specific operations\nconst tabActions = ['deleteTab', 'appendToTab', 'readTab'];\nif (tabActions.includes(body.action) && !body.tabId) {\n  throw new Error('Missing required field: tabId');\n}\n\n// Tab name required for createTab\nif (body.action === 'createTab' && !body.tabName) {\n  throw new Error('Missing required field: tabName');\n}\n\n// Extract document ID from URL if provided\nlet documentId = body.documentId;\nif (!documentId && body.documentUrl) {\n  const match = body.documentUrl.match(/\\/d\\/([a-zA-Z0-9-_]+)/);\n  if (match) {\n    documentId = match[1];\n  } else {\n    throw new Error('Could not extract document ID from URL');\n  }\n}\n\nreturn [{\n  json: {\n    documentId,\n    action: body.action,\n    content: body.content || '',\n    findText: body.findText || '',\n    position: body.position || 'end',\n    matchCase: body.matchCase || false,\n    tabId: body.tabId || '',\n    tabName: body.tabName || 'New Tab'\n  }\n}];"
+        },
+        "id": "validate",
+        "name": "Validate Request",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          224,
+          464
+        ]
+      },
+      {
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "combinator": "and",
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.action }}",
+                      "rightValue": "append",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "combinator": "and",
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.action }}",
+                      "rightValue": "insert",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "combinator": "and",
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.action }}",
+                      "rightValue": "replace",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "combinator": "and",
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.action }}",
+                      "rightValue": "read",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "combinator": "and",
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.action }}",
+                      "rightValue": "listTabs",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "combinator": "and",
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.action }}",
+                      "rightValue": "createTab",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "combinator": "and",
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.action }}",
+                      "rightValue": "appendToTab",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "combinator": "and",
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.action }}",
+                      "rightValue": "readTab",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "switch_action",
+        "name": "Route by Action",
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3.2,
+        "position": [
+          448,
+          368
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "get",
+          "documentURL": "={{ $json.documentId }}"
+        },
+        "id": "read_doc",
+        "name": "Read Document",
+        "type": "n8n-nodes-base.googleDocs",
+        "typeVersion": 2,
+        "position": [
+          896,
+          368
+        ],
+        "credentials": {
+          "googleDocsOAuth2Api": {
+            "id": "M2zVRJdd6mtAgbc0",
+            "name": "Google Docs account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "documentURL": "={{ $json.documentId }}",
+          "actionsUi": {
+            "actionFields": [
+              {
+                "action": "insert",
+                "text": "={{ $json.content }}"
+              }
+            ]
+          }
+        },
+        "id": "append_text",
+        "name": "Append Text",
+        "type": "n8n-nodes-base.googleDocs",
+        "typeVersion": 2,
+        "position": [
+          896,
+          -208
+        ],
+        "credentials": {
+          "googleDocsOAuth2Api": {
+            "id": "M2zVRJdd6mtAgbc0",
+            "name": "Google Docs account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "documentURL": "={{ $json.documentId }}",
+          "actionsUi": {
+            "actionFields": [
+              {
+                "action": "insert",
+                "locationChoice": "index",
+                "text": "={{ $json.content }}"
+              }
+            ]
+          }
+        },
+        "id": "insert_text",
+        "name": "Insert Text",
+        "type": "n8n-nodes-base.googleDocs",
+        "typeVersion": 2,
+        "position": [
+          896,
+          -16
+        ],
+        "credentials": {
+          "googleDocsOAuth2Api": {
+            "id": "M2zVRJdd6mtAgbc0",
+            "name": "Google Docs account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "documentURL": "={{ $json.documentId }}",
+          "actionsUi": {
+            "actionFields": [
+              {
+                "action": "replaceAll",
+                "text": "={{ $json.content }}",
+                "replaceText": "={{ $json.findText }}",
+                "matchCase": "={{ $json.matchCase }}"
+              }
+            ]
+          }
+        },
+        "id": "replace_text",
+        "name": "Replace Text",
+        "type": "n8n-nodes-base.googleDocs",
+        "typeVersion": 2,
+        "position": [
+          896,
+          176
+        ],
+        "credentials": {
+          "googleDocsOAuth2Api": {
+            "id": "M2zVRJdd6mtAgbc0",
+            "name": "Google Docs account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "respondWith": "json",
+          "responseBody": "={{ JSON.stringify($json) }}",
+          "options": {}
+        },
+        "id": "success_response",
+        "name": "Success Response",
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.1,
+        "position": [
+          1840,
+          496
+        ]
+      },
+      {
+        "parameters": {
+          "content": "Google Docs Editor API\\n\\n**Endpoint:** POST /webhook/google-docs-editor\\n\\n**Request Body:**\\n```json\\n{\\n  \\\"documentId\\\": \\\"doc-id-here\\\" or \\\"documentUrl\\\": \\\"full-url\\\",\\n  \\\"action\\\": \\\"append|insert|replace|read\\\",\\n  \\\"content\\\": \\\"text to add\\\",\\n  \\\"findText\\\": \\\"text to find\\\" (for replace),\\n  \\\"position\\\": 1 (index for insert)\\n}\\n```",
+          "height": 152,
+          "width": 500
+        },
+        "id": "sticky_usage",
+        "name": "Usage Guide",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -64,
+          -304
+        ]
+      },
+      {
+        "parameters": {
+          "url": "=https://docs.googleapis.com/v1/documents/{{ $json.documentId }}?includeTabsContent=true",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "googleDocsOAuth2Api",
+          "options": {}
+        },
+        "id": "list_tabs",
+        "name": "List Tabs",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          880,
+          544
+        ],
+        "credentials": {
+          "googleDocsOAuth2Api": {
+            "id": "M2zVRJdd6mtAgbc0",
+            "name": "Google Docs account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const doc = $input.first().json;\nconst tabs = doc.tabs || [];\n\nconst tabList = tabs.map(tab => ({\n  tabId: tab.tabProperties?.tabId || '',\n  title: tab.tabProperties?.title || 'Untitled',\n  index: tab.tabProperties?.index || 0\n}));\n\nreturn [{\n  json: {\n    success: true,\n    action: 'listTabs',\n    documentId: $('Validate Request').first().json.documentId,\n    tabs: tabList\n  }\n}];"
+        },
+        "id": "extract_tabs",
+        "name": "Extract Tabs Info",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1408,
+          560
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "// Google Docs API does not support creating tabs programmatically\n// Tabs can only be created through the Google Docs UI\n// This node returns an informative error message\n\nconst item = $input.first();\nconst documentId = item.json.documentId;\nconst tabName = item.json.tabName;\n\nreturn [{\n  json: {\n    success: false,\n    action: 'createTab',\n    documentId: documentId,\n    requestedTabName: tabName,\n    error: 'Google Docs API does not support creating tabs programmatically',\n    suggestion: 'Please create the tab manually in Google Docs UI, then use appendToTab or readTab actions with the tab ID'\n  }\n}];"
+        },
+        "id": "create_tab",
+        "name": "Create Tab",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          896,
+          736
+        ],
+        "credentials": {
+          "googleDocsOAuth2Api": {
+            "id": "M2zVRJdd6mtAgbc0",
+            "name": "Google Docs account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "=https://docs.googleapis.com/v1/documents/{{ $json.documentId }}:batchUpdate",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "googleDocsOAuth2Api",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ requests: [{ insertText: { text: $json.content, endOfSegmentLocation: { tabId: $json.tabId } } }] }) }}",
+          "options": {}
+        },
+        "id": "append_to_tab",
+        "name": "Append To Tab",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          912,
+          880
+        ],
+        "credentials": {
+          "googleDocsOAuth2Api": {
+            "id": "M2zVRJdd6mtAgbc0",
+            "name": "Google Docs account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "url": "=https://docs.googleapis.com/v1/documents/{{ $json.documentId }}?includeTabsContent=true",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "googleDocsOAuth2Api",
+          "options": {}
+        },
+        "id": "read_tab",
+        "name": "Read Tab",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          912,
+          1088
+        ],
+        "credentials": {
+          "googleDocsOAuth2Api": {
+            "id": "M2zVRJdd6mtAgbc0",
+            "name": "Google Docs account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const doc = $input.first().json;\nconst targetTabId = $('Validate Request').first().json.tabId;\nconst tabs = doc.tabs || [];\n\nconst tab = tabs.find(t => t.tabProperties?.tabId === targetTabId);\n\nif (!tab) {\n  return [{ json: { success: false, error: `Tab not found: ${targetTabId}` } }];\n}\n\n// Extract text content from the tab\nlet textContent = '';\nconst body = tab.documentTab?.body;\nif (body && body.content) {\n  for (const element of body.content) {\n    if (element.paragraph && element.paragraph.elements) {\n      for (const el of element.paragraph.elements) {\n        if (el.textRun && el.textRun.content) {\n          textContent += el.textRun.content;\n        }\n      }\n    }\n  }\n}\n\nreturn [{\n  json: {\n    success: true,\n    action: 'readTab',\n    documentId: $('Validate Request').first().json.documentId,\n    tabId: targetTabId,\n    tabTitle: tab.tabProperties?.title || 'Untitled',\n    content: textContent\n  }\n}];"
+        },
+        "id": "extract_tab_content",
+        "name": "Extract Tab Content",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1376,
+          1040
+        ]
+      }
+    ],
+    "connections": {
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Validate Request",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Validate Request": {
+        "main": [
+          [
+            {
+              "node": "Route by Action",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Route by Action": {
+        "3": [
+          [
+            {
+              "node": "List Tabs",
+              "type": "0",
+              "index": 0
+            }
+          ]
+        ],
+        "4": [
+          [
+            {
+              "node": "Create Tab",
+              "type": "0",
+              "index": 0
+            },
+            {
+              "node": "List Tabs",
+              "type": "0",
+              "index": 0
+            }
+          ]
+        ],
+        "5": [
+          [
+            {
+              "node": "Append To Tab",
+              "type": "0",
+              "index": 0
+            },
+            {
+              "node": "Create Tab",
+              "type": "0",
+              "index": 0
+            }
+          ]
+        ],
+        "6": [
+          [
+            {
+              "node": "Read Tab",
+              "type": "0",
+              "index": 0
+            },
+            {
+              "node": "Append To Tab",
+              "type": "0",
+              "index": 0
+            }
+          ]
+        ],
+        "7": [
+          [
+            {
+              "node": "Read Tab",
+              "type": "0",
+              "index": 0
+            }
+          ]
+        ],
+        "main": [
+          [
+            {
+              "node": "Append Text",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Insert Text",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Replace Text",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Read Document",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "List Tabs",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Create Tab",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Append To Tab",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Read Tab",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Append Text": {
+        "main": [
+          [
+            {
+              "node": "Success Response",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Insert Text": {
+        "main": [
+          [
+            {
+              "node": "Success Response",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Replace Text": {
+        "main": [
+          [
+            {
+              "node": "Success Response",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Read Document": {
+        "main": [
+          [
+            {
+              "node": "Success Response",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "List Tabs": {
+        "0": [
+          [
+            {
+              "node": "Extract Tabs Info",
+              "type": "0",
+              "index": 0
+            }
+          ]
+        ],
+        "main": [
+          [
+            {
+              "node": "Extract Tabs Info",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Extract Tabs Info": {
+        "0": [
+          [
+            {
+              "node": "Success Response",
+              "type": "0",
+              "index": 0
+            }
+          ]
+        ],
+        "main": [
+          [
+            {
+              "node": "Success Response",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create Tab": {
+        "0": [
+          [
+            {
+              "node": "Success Response",
+              "type": "0",
+              "index": 0
+            }
+          ]
+        ],
+        "main": [
+          [
+            {
+              "node": "Success Response",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Append To Tab": {
+        "0": [
+          [
+            {
+              "node": "Success Response",
+              "type": "0",
+              "index": 0
+            }
+          ]
+        ],
+        "main": [
+          [
+            {
+              "node": "Success Response",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Read Tab": {
+        "0": [
+          [
+            {
+              "node": "Extract Tab Content",
+              "type": "0",
+              "index": 0
+            }
+          ]
+        ],
+        "main": [
+          [
+            {
+              "node": "Extract Tab Content",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Extract Tab Content": {
+        "0": [
+          [
+            {
+              "node": "Success Response",
+              "type": "0",
+              "index": 0
+            }
+          ]
+        ],
+        "main": [
+          [
+            {
+              "node": "Success Response",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Phoebe You",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "activeVersionId": "84dd7bb6-3c14-4f65-b2b7-428f4b7a6af6",
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Request": {
+      "main": [
+        [
+          {
+            "node": "Route by Action",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Action": {
+      "3": [
+        [
+          {
+            "node": "List Tabs",
+            "type": "0",
+            "index": 0
+          }
+        ]
+      ],
+      "4": [
+        [
+          {
+            "node": "Create Tab",
+            "type": "0",
+            "index": 0
+          },
+          {
+            "node": "List Tabs",
+            "type": "0",
+            "index": 0
+          }
+        ]
+      ],
+      "5": [
+        [
+          {
+            "node": "Append To Tab",
+            "type": "0",
+            "index": 0
+          },
+          {
+            "node": "Create Tab",
+            "type": "0",
+            "index": 0
+          }
+        ]
+      ],
+      "6": [
+        [
+          {
+            "node": "Read Tab",
+            "type": "0",
+            "index": 0
+          },
+          {
+            "node": "Append To Tab",
+            "type": "0",
+            "index": 0
+          }
+        ]
+      ],
+      "7": [
+        [
+          {
+            "node": "Read Tab",
+            "type": "0",
+            "index": 0
+          }
+        ]
+      ],
+      "main": [
+        [
+          {
+            "node": "Append Text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Insert Text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Replace Text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Read Document",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "List Tabs",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create Tab",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append To Tab",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Read Tab",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append Text": {
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Text": {
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replace Text": {
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Document": {
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List Tabs": {
+      "0": [
+        [
+          {
+            "node": "Extract Tabs Info",
+            "type": "0",
+            "index": 0
+          }
+        ]
+      ],
+      "main": [
+        [
+          {
+            "node": "Extract Tabs Info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Tabs Info": {
+      "0": [
+        [
+          {
+            "node": "Success Response",
+            "type": "0",
+            "index": 0
+          }
+        ]
+      ],
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Tab": {
+      "0": [
+        [
+          {
+            "node": "Success Response",
+            "type": "0",
+            "index": 0
+          }
+        ]
+      ],
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append To Tab": {
+      "0": [
+        [
+          {
+            "node": "Success Response",
+            "type": "0",
+            "index": 0
+          }
+        ]
+      ],
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Tab": {
+      "0": [
+        [
+          {
+            "node": "Extract Tab Content",
+            "type": "0",
+            "index": 0
+          }
+        ]
+      ],
+      "main": [
+        [
+          {
+            "node": "Extract Tab Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Tab Content": {
+      "0": [
+        [
+          {
+            "node": "Success Response",
+            "type": "0",
+            "index": 0
+          }
+        ]
+      ],
+      "main": [
+        [
+          {
+            "node": "Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-02-05T02:07:07.670Z",
+  "id": "8QXYv7qaRlLop8bm",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "Google Docs Editor API",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "google-docs-editor",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        464
+      ],
+      "webhookId": "google-docs-editor"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body;\n\n// Validate required fields\nif (!body.documentId && !body.documentUrl) {\n  throw new Error('Missing required field: documentId or documentUrl');\n}\n\nif (!body.action) {\n  throw new Error('Missing required field: action');\n}\n\nconst validActions = ['append', 'insert', 'replace', 'read', 'listTabs', 'createTab', 'deleteTab', 'appendToTab', 'readTab'];\nif (!validActions.includes(body.action)) {\n  throw new Error(`Invalid action: ${body.action}. Must be one of: ${validActions.join(', ')}`);\n}\n\n// Content required for write operations\nconst writeActions = ['append', 'insert', 'replace', 'appendToTab'];\nif (writeActions.includes(body.action) && !body.content) {\n  throw new Error('Missing required field: content');\n}\n\nif (body.action === 'replace' && !body.findText) {\n  throw new Error('Missing required field: findText (required for replace action)');\n}\n\n// Tab ID required for tab-specific operations\nconst tabActions = ['deleteTab', 'appendToTab', 'readTab'];\nif (tabActions.includes(body.action) && !body.tabId) {\n  throw new Error('Missing required field: tabId');\n}\n\n// Tab name required for createTab\nif (body.action === 'createTab' && !body.tabName) {\n  throw new Error('Missing required field: tabName');\n}\n\n// Extract document ID from URL if provided\nlet documentId = body.documentId;\nif (!documentId && body.documentUrl) {\n  const match = body.documentUrl.match(/\\/d\\/([a-zA-Z0-9-_]+)/);\n  if (match) {\n    documentId = match[1];\n  } else {\n    throw new Error('Could not extract document ID from URL');\n  }\n}\n\nreturn [{\n  json: {\n    documentId,\n    action: body.action,\n    content: body.content || '',\n    findText: body.findText || '',\n    position: body.position || 'end',\n    matchCase: body.matchCase || false,\n    tabId: body.tabId || '',\n    tabName: body.tabName || 'New Tab'\n  }\n}];"
+      },
+      "id": "validate",
+      "name": "Validate Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        464
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "append",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "insert",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "replace",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "read",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "listTabs",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "createTab",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "appendToTab",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "readTab",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "switch_action",
+      "name": "Route by Action",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        448,
+        368
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "={{ $json.documentId }}"
+      },
+      "id": "read_doc",
+      "name": "Read Document",
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        896,
+        368
+      ],
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "M2zVRJdd6mtAgbc0",
+          "name": "Google Docs account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $json.documentId }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "text": "={{ $json.content }}"
+            }
+          ]
+        }
+      },
+      "id": "append_text",
+      "name": "Append Text",
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        896,
+        -208
+      ],
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "M2zVRJdd6mtAgbc0",
+          "name": "Google Docs account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $json.documentId }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "locationChoice": "index",
+              "text": "={{ $json.content }}"
+            }
+          ]
+        }
+      },
+      "id": "insert_text",
+      "name": "Insert Text",
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        896,
+        -16
+      ],
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "M2zVRJdd6mtAgbc0",
+          "name": "Google Docs account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $json.documentId }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "replaceAll",
+              "text": "={{ $json.content }}",
+              "replaceText": "={{ $json.findText }}",
+              "matchCase": "={{ $json.matchCase }}"
+            }
+          ]
+        }
+      },
+      "id": "replace_text",
+      "name": "Replace Text",
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        896,
+        176
+      ],
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "M2zVRJdd6mtAgbc0",
+          "name": "Google Docs account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "id": "success_response",
+      "name": "Success Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1120,
+        464
+      ]
+    },
+    {
+      "parameters": {
+        "content": "Google Docs Editor API\\n\\n**Endpoint:** POST /webhook/google-docs-editor\\n\\n**Request Body:**\\n```json\\n{\\n  \\\"documentId\\\": \\\"doc-id-here\\\" or \\\"documentUrl\\\": \\\"full-url\\\",\\n  \\\"action\\\": \\\"append|insert|replace|read\\\",\\n  \\\"content\\\": \\\"text to add\\\",\\n  \\\"findText\\\": \\\"text to find\\\" (for replace),\\n  \\\"position\\\": 1 (index for insert)\\n}\\n```",
+        "height": 152,
+        "width": 500
+      },
+      "id": "sticky_usage",
+      "name": "Usage Guide",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -64,
+        -304
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://docs.googleapis.com/v1/documents/{{ $json.documentId }}?includeTabsContent=true",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDocsOAuth2Api",
+        "options": {}
+      },
+      "id": "list_tabs",
+      "name": "List Tabs",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        672,
+        560
+      ],
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "M2zVRJdd6mtAgbc0",
+          "name": "Google Docs account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const doc = $input.first().json;\nconst tabs = doc.tabs || [];\n\nconst tabList = tabs.map(tab => ({\n  tabId: tab.tabProperties?.tabId || '',\n  title: tab.tabProperties?.title || 'Untitled',\n  index: tab.tabProperties?.index || 0\n}));\n\nreturn [{\n  json: {\n    success: true,\n    action: 'listTabs',\n    documentId: $('Validate Request').first().json.documentId,\n    tabs: tabList\n  }\n}];"
+      },
+      "id": "extract_tabs",
+      "name": "Extract Tabs Info",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        560
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Google Docs API does not support creating tabs programmatically\n// Tabs can only be created through the Google Docs UI\n// This node returns an informative error message\n\nconst item = $input.first();\nconst documentId = item.json.documentId;\nconst tabName = item.json.tabName;\n\nreturn [{\n  json: {\n    success: false,\n    action: 'createTab',\n    documentId: documentId,\n    requestedTabName: tabName,\n    error: 'Google Docs API does not support creating tabs programmatically',\n    suggestion: 'Please create the tab manually in Google Docs UI, then use appendToTab or readTab actions with the tab ID'\n  }\n}];"
+      },
+      "id": "create_tab",
+      "name": "Create Tab",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        752
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://docs.googleapis.com/v1/documents/{{ $json.documentId }}:batchUpdate",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDocsOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ requests: [{ insertText: { text: $json.content, endOfSegmentLocation: { tabId: $json.tabId } } }] }) }}",
+        "options": {}
+      },
+      "id": "append_to_tab",
+      "name": "Append To Tab",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        896,
+        944
+      ],
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "M2zVRJdd6mtAgbc0",
+          "name": "Google Docs account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://docs.googleapis.com/v1/documents/{{ $json.documentId }}?includeTabsContent=true",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDocsOAuth2Api",
+        "options": {}
+      },
+      "id": "read_tab",
+      "name": "Read Tab",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        672,
+        1136
+      ],
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "M2zVRJdd6mtAgbc0",
+          "name": "Google Docs account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const doc = $input.first().json;\nconst targetTabId = $('Validate Request').first().json.tabId;\nconst tabs = doc.tabs || [];\n\nconst tab = tabs.find(t => t.tabProperties?.tabId === targetTabId);\n\nif (!tab) {\n  return [{ json: { success: false, error: `Tab not found: ${targetTabId}` } }];\n}\n\n// Extract text content from the tab\nlet textContent = '';\nconst body = tab.documentTab?.body;\nif (body && body.content) {\n  for (const element of body.content) {\n    if (element.paragraph && element.paragraph.elements) {\n      for (const el of element.paragraph.elements) {\n        if (el.textRun && el.textRun.content) {\n          textContent += el.textRun.content;\n        }\n      }\n    }\n  }\n}\n\nreturn [{\n  json: {\n    success: true,\n    action: 'readTab',\n    documentId: $('Validate Request').first().json.documentId,\n    tabId: targetTabId,\n    tabTitle: tab.tabProperties?.title || 'Untitled',\n    content: textContent\n  }\n}];"
+      },
+      "id": "extract_tab_content",
+      "name": "Extract Tab Content",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        1136
+      ]
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Los_Angeles",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": true,
+    "timeSavedMode": "fixed"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-05T02:07:07.674Z",
+      "createdAt": "2026-02-05T02:07:07.674Z",
+      "role": "workflow:owner",
+      "workflowId": "8QXYv7qaRlLop8bm",
+      "projectId": "SzgLfYyy3lWDJHJA"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-02-11T01:59:32.211Z",
+      "createdAt": "2026-02-11T01:57:12.706Z",
+      "id": "Wd8NzbnnACnDjoXi",
+      "name": "Productivity"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2026-02-11T01:59:37.768Z",
+  "versionId": "8d02fc08-0759-4ecb-ae7c-9ce497f0f2ba"
+}
