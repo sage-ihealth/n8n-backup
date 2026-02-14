@@ -1,0 +1,534 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "HTTP Request - Latest 1 Message": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Message a model1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Append to Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Message a model2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-09T22:09:00.400Z",
+  "id": "R7RgKtXG0CFc5sfK",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "Mobile App & Device Complaints",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "https://chat.googleapis.com/v1/spaces/AAQAEnnivow/messages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleChatOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "pageSize",
+              "value": "2"
+            },
+            {
+              "name": "orderBy",
+              "value": "createTime desc"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -656,
+        -816
+      ],
+      "id": "9780630f-99f8-4319-9563-41db6396382e",
+      "name": "HTTP Request - Latest 1 Message",
+      "credentials": {
+        "googleChatOAuth2Api": {
+          "id": "JWXrbxNG7Kq5QJ8H",
+          "name": "Chat account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items\nconst output = [];\n\nfor (const item of $input.all()) {\n  const messages = item.json.messages || [];\n\n  for (const msg of messages) {\n    // 优先级：formattedText > text > argumentText\n    const text =\n      msg.formattedText ||\n      msg.text ||\n      msg.argumentText ||\n      '';\n\n    if (!text.trim()) continue;\n\n    output.push({\n      json: {\n        messageId: msg.name,\n        text,\n        createTime: msg.createTime,\n        sender: msg.sender?.name || null,\n        thread: msg.thread?.name || null,\n        hasAttachment: Array.isArray(msg.attachment) && msg.attachment.length > 0\n      }\n    });\n  }\n}\n\nreturn output;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -432,
+        -816
+      ],
+      "id": "6f3170f9-9751-48f5-ac7c-b443cab12677",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "claude-opus-4-5-20251101",
+          "mode": "list",
+          "cachedResultName": "claude-opus-4-5-20251101"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "You are a mobile app and medical device complaint triage assistant.\n\nYour task is to analyze the customer message and output a SINGLE valid JSON object\nthat STRICTLY follows the schema below.\n\n⚠️ OUTPUT RULES (MANDATORY):\n- Output MUST be valid JSON\n- Output MUST match the schema exactly\n- Do NOT include explanations, markdown, or extra text\n- Do NOT include fields not listed\n- If unsure, choose conservative values\n- If classification is NOT \"Complaint\", set severity = \"Not Applicable\"\n\nfor messageId, sender, createdTime , extract from user's input\n\nJSON SCHEMA:\n{\n  \"classification\": \"Complaint | QA Review | Other\",\n  \"severity\": \"Blocker | Major | Minor | Enhancement | Not Applicable\",\n  \"product_type\": \"SaMD | Physical Device | Both | Unknown\",\n  \"summary\": \"string (1–2 sentences)\",\n  \"fda_reportable\": \"Yes | No | Unclear\",\n  \"confidence\": number (0.0 to 1.0),\n  \"messageId”: messageId,\n  \"sender”: sender,\n  \"createdTime”: createdTime,\n  \"customerText\":customerText\n}\n\nDEFINITIONS:\n\nComplaint:\nA record of actual or potential behavior of a medical device software or physical device\nthat a user or other interested person believes to be unsafe, inappropriate for intended use,\nor contrary to specification.\n\nQA Review:\nUnclear cases, early signals, partial information, or potential risk that requires human review.\n\nOther:\nNeutral comments, greetings, general questions, or unrelated discussion.\n\nSeverity (ONLY if Complaint):\n- Blocker: crash, data loss, complete function failure, risk of serious injury\n- Major: main function partially unavailable, persistent malfunction\n- Minor: limited impact, workaround exists\n- Enhancement: usability or cosmetic issues\n- Not Applicable: when not a Complaint\n\nFDA Reportable:\nYes / No / Unclear based on whether the issue suggests a device may have caused or\ncould cause serious injury or death if it recurs.\n\nCustomer message:\n<message>{{$json.feedback}}</message>\n",
+              "role": "assistant"
+            },
+            {
+              "content": "=\nCustomer message: <message> {{ $json.text }}</message>\ncreatedTime: {{ $json.createTime }}\nmessageId: {{ $json.messageId }},\nsender: {{ $json.sender }}\ncustomerText: {{ $json.text }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.anthropic",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        -912
+      ],
+      "id": "a8e5c90c-58ef-46f9-9a6a-144e456342a1",
+      "name": "Message a model",
+      "credentials": {
+        "anthropicApi": {
+          "id": "JvTJW1grSbIcwc1m",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "0c1a69af-d4c7-43be-a42e-cb03d0706c85",
+              "leftValue": "={{ $json.content[0].text }}",
+              "rightValue": "Complaint",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "4ec87a5f-1d8e-4f0e-942d-f86340515b43",
+              "leftValue": "={{ $json.content[0].text }}",
+              "rightValue": "QA Review",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "d948729d-e8b9-4ac1-95c7-d8fd337c8797",
+              "leftValue": "={{ $json.content[0].text }}",
+              "rightValue": "Other",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        144,
+        -912
+      ],
+      "id": "c8918502-053d-4dc5-aa58-84f237a122fd",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "jsCode": "const results = [];\n\nfor (const item of $input.all()) {\n  const text =\n    item.json?.content?.[0]?.text;\n\n  if (!text) continue;\n\n  // 去掉 ```json 和 ```\n  const cleaned = text\n    .replace(/```json\\s*/i, '')\n    .replace(/```/g, '')\n    .trim();\n\n  try {\n    const parsed = JSON.parse(cleaned);\n    results.push({ json: parsed });\n  } catch (err) {\n    results.push({\n      json: {\n        error: 'JSON_PARSE_FAILED',\n        rawText: text\n      }\n    });\n  }\n}\n\nreturn results;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        368,
+        -912
+      ],
+      "id": "98a77490-2f5a-4f36-b8ff-7c497a0e8cdd",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1F1dH3ZNCTXEWyoTabcv9heVxyKK7yf096aeIIUWAmgc",
+          "mode": "list",
+          "cachedResultName": "chat_messages_20251130",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1F1dH3ZNCTXEWyoTabcv9heVxyKK7yf096aeIIUWAmgc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1F1dH3ZNCTXEWyoTabcv9heVxyKK7yf096aeIIUWAmgc/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "sender": "={{ $json.sender }}",
+            "classification": "={{ $json.classification }}",
+            "severity": "={{ $json.severity }}",
+            "message_text": "={{ $json.summary }}",
+            "fda_reportable": "={{ $json.fda_reportable }}",
+            "confidence": "={{ $json.confidence }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "message_text",
+              "displayName": "message_text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sender",
+              "displayName": "sender",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sender_type",
+              "displayName": "sender_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "create_time",
+              "displayName": "create_time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "space",
+              "displayName": "space",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "thread",
+              "displayName": "thread",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "classification",
+              "displayName": "classification",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "severity",
+              "displayName": "severity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "product_type",
+              "displayName": "product_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "summary",
+              "displayName": "summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fda_reportable",
+              "displayName": "fda_reportable",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "confidence",
+              "displayName": "confidence",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "source",
+              "displayName": "source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ingested_at",
+              "displayName": "ingested_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "8c2f94dc-3704-4f58-866a-da81875581f6",
+      "name": "Append to Google Sheets1",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        592,
+        -912
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "E92SBl4Szm9AuPqL",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-pro",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-pro"
+        },
+        "messages": {
+          "values": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        -720
+      ],
+      "id": "6ed6210c-8523-4282-9c9e-673f8ea1bce2",
+      "name": "Message a model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "g6PYL0GmL0TKWpbu",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -656,
+        -496
+      ],
+      "id": "e8966a18-1287-4e44-8355-8b0be718b043",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "responses": {
+          "values": [
+            {}
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        -432,
+        -496
+      ],
+      "id": "192c0022-0601-417c-9665-c0effbae3461",
+      "name": "Message a model2",
+      "credentials": {
+        "openAiApi": {
+          "id": "cYOjTQrkcPZ8DHDh",
+          "name": "OpenAi account 2"
+        }
+      }
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {
+    "Message a model": [
+      {
+        "json": {
+          "content": [
+            {
+              "type": "text",
+              "text": "```json\n{\n  \"classification\": \"Other\",\n  \"severity\": \"Not Applicable\",\n  \"product_type\": \"Unknown\",\n  \"summary\": \"Customer service follow-up confirming patient notification and tracking number provided.\",\n  \"fda_reportable\": \"No\",\n  \"confidence\": 0.95,\n  \"messageId\": \"spaces/AAQAEnnivow/messages/avy2k-ZPaD8.hrdA108nvGg\",\n  \"sender\": \"users/114468165949712495672\",\n  \"createdTime\": \"2026-01-08T22:41:32.232031Z\",\n  \"customerText\": \"Okay, thank you. I let the pt know and provided him with the tracking number.\"\n}\n```"
+            }
+          ]
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      },
+      {
+        "json": {
+          "content": [
+            {
+              "type": "text",
+              "text": "```json\n{\n  \"classification\": \"Other\",\n  \"severity\": \"Not Applicable\",\n  \"product_type\": \"Unknown\",\n  \"summary\": \"Internal operational message regarding a missed order due to human error, now being addressed for shipment.\",\n  \"fda_reportable\": \"No\",\n  \"confidence\": 0.92,\n  \"messageId\": \"spaces/AAQAEnnivow/messages/avy2k-ZPaD8.N0uLQdQseaE\",\n  \"sender\": \"users/115251264097655582093\",\n  \"createdTime\": \"2026-01-08T22:39:22.999327Z\",\n  \"customerText\": \"Our apologies we missed a day of order by human error from December and we just notice it on Tuesday. Order has been uploaded and should be ship up as soon as possible.\"\n}\n```"
+            }
+          ]
+        },
+        "pairedItem": {
+          "item": 1
+        }
+      }
+    ]
+  },
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-09T22:09:00.824Z",
+      "createdAt": "2026-01-09T22:09:00.824Z",
+      "role": "workflow:owner",
+      "workflowId": "R7RgKtXG0CFc5sfK",
+      "projectId": "IGL0EzJNN8XZ65mm"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-01-21T22:05:24.000Z",
+  "versionId": "eb8f9a05-7521-4885-873c-d761e77b69f7"
+}
