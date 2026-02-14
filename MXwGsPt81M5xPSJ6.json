@@ -1,0 +1,2024 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-01-16T11:28:16.724Z",
+    "createdAt": "2026-01-16T11:28:16.724Z",
+    "versionId": "218ca7e4-e9ba-4f98-b725-c16f420cd823",
+    "workflowId": "MXwGsPt81M5xPSJ6",
+    "nodes": [
+      {
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "https://docs.google.com/spreadsheets/d/1fUhO_l8s7yaQgfmglGdEnWew0HdwV7PgrKyvzmKnYgM/edit?gid=0#gid=0",
+            "mode": "url"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "JAN",
+            "mode": "name"
+          },
+          "columns": {
+            "mappingMode": "autoMapInputData",
+            "value": {},
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "Order #",
+                "displayName": "Order #",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Order Date",
+                "displayName": "Order Date",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Requested by",
+                "displayName": "Requested by",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Clinic ID",
+                "displayName": "Clinic ID",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Flow",
+                "displayName": "Flow",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Recipient",
+                "displayName": "Recipient",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Shipping Address 1",
+                "displayName": "Shipping Address 1",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Shipping Address 2",
+                "displayName": "Shipping Address 2",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "City",
+                "displayName": "City",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "State",
+                "displayName": "State",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Zipcode",
+                "displayName": "Zipcode",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Memo/Note",
+                "displayName": "Memo/Note",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "SKU 1",
+                "displayName": "SKU 1",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Qty 1",
+                "displayName": "Qty 1",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "SKU 2",
+                "displayName": "SKU 2",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Qty 2",
+                "displayName": "Qty 2",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "SKU 3",
+                "displayName": "SKU 3",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Qty 3",
+                "displayName": "Qty 3",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "SKU 4",
+                "displayName": "SKU 4",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Qty 4",
+                "displayName": "Qty 4",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "SKU 5",
+                "displayName": "SKU 5",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Qty 5",
+                "displayName": "Qty 5",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "SKU 6",
+                "displayName": "SKU 6",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Qty 6",
+                "displayName": "Qty 6",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "SKU 7",
+                "displayName": "SKU 7",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Qty 7",
+                "displayName": "Qty 7",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Customer Internal ID",
+                "displayName": "Customer Internal ID",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Class",
+                "displayName": "Class",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Department",
+                "displayName": "Department",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Carrier",
+                "displayName": "Carrier",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Tracking Number",
+                "displayName": "Tracking Number",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          -112,
+          -240
+        ],
+        "id": "e03d271c-b277-4b3b-8f2c-16cb17d8dd98",
+        "name": "Append row in sheet",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "DUxiKNrgVSTJhacl",
+            "name": "Google Sheets account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const items = $input.all();\n\nfor (const item of items) {\n  const original = item.json;\n\n  // Build Order #\n  const orderDate = original[\"Order Date\"]; // MM/DD/YYYY\n  const [month, day, year] = orderDate.split(\"/\");\n\n  const yymmdd =\n    year.slice(-2) +\n    month.padStart(2, \"0\") +\n    day.padStart(2, \"0\");\n\n  const orderNumber = `PO${yymmdd}-${original.row_number - 1}`;\n\n  // Reconstruct object in correct column order\n  item.json = {\n    row_number: original.row_number,\n    \"Order #\": orderNumber,\n    \"Order Date\": original[\"Order Date\"],\n    ...Object.fromEntries(\n      Object.entries(original).filter(\n        ([key]) => ![\"row_number\", \"Order Date\"].includes(key)\n      )\n    )\n  };\n}\n\nreturn items;"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -336,
+          -240
+        ],
+        "id": "20bdcec2-f030-4a47-854e-2d58b6d5ed33",
+        "name": "Code in JavaScript"
+      },
+      {
+        "parameters": {
+          "jsCode": "const items = $input.all();\n\nfor (const item of items) {\n  const original = item.json;\n\n  // Build Order #\n  const orderDate = original[\"Order Date\"]; // MM/DD/YYYY\n  const [month, day, year] = orderDate.split(\"/\");\n\n  const yymmdd =\n    year.slice(-2) +\n    month.padStart(2, \"0\") +\n    day.padStart(2, \"0\");\n\n  const orderNumber = `CO${yymmdd}-${original.row_number - 2}`;\n\n  // Reconstruct object in correct column order\n  item.json = {\n    row_number: original.row_number,\n    \"Order #\": orderNumber,\n    \"Order Date\": original[\"Order Date\"],\n    ...Object.fromEntries(\n      Object.entries(original).filter(\n        ([key]) => ![\"row_number\", \"Order Date\"].includes(key)\n      )\n    )\n  };\n}\n\nreturn items;"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -336,
+          -48
+        ],
+        "id": "ba833183-5aac-4b42-be74-f1860cf127ad",
+        "name": "Code in JavaScript1"
+      },
+      {
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "https://docs.google.com/spreadsheets/d/1fUhO_l8s7yaQgfmglGdEnWew0HdwV7PgrKyvzmKnYgM/edit?gid=0#gid=0",
+            "mode": "url"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "JAN",
+            "mode": "name"
+          },
+          "columns": {
+            "mappingMode": "autoMapInputData",
+            "value": {},
+            "matchingColumns": [],
+            "schema": [
+              {
+                "id": "Order #",
+                "displayName": "Order #",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Order Date",
+                "displayName": "Order Date",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Requested by",
+                "displayName": "Requested by",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Clinic ID",
+                "displayName": "Clinic ID",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Flow",
+                "displayName": "Flow",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Recipient",
+                "displayName": "Recipient",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Shipping Address 1",
+                "displayName": "Shipping Address 1",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Shipping Address 2",
+                "displayName": "Shipping Address 2",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "City",
+                "displayName": "City",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "State",
+                "displayName": "State",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Zipcode",
+                "displayName": "Zipcode",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Memo/Note",
+                "displayName": "Memo/Note",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "SKU 1",
+                "displayName": "SKU 1",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Qty 1",
+                "displayName": "Qty 1",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "SKU 2",
+                "displayName": "SKU 2",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Qty 2",
+                "displayName": "Qty 2",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "SKU 3",
+                "displayName": "SKU 3",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Qty 3",
+                "displayName": "Qty 3",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "SKU 4",
+                "displayName": "SKU 4",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Qty 4",
+                "displayName": "Qty 4",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "SKU 5",
+                "displayName": "SKU 5",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Qty 5",
+                "displayName": "Qty 5",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "SKU 6",
+                "displayName": "SKU 6",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Qty 6",
+                "displayName": "Qty 6",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "SKU 7",
+                "displayName": "SKU 7",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Qty 7",
+                "displayName": "Qty 7",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Customer Internal ID",
+                "displayName": "Customer Internal ID",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Class",
+                "displayName": "Class",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Department",
+                "displayName": "Department",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Carrier",
+                "displayName": "Carrier",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Tracking Number",
+                "displayName": "Tracking Number",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          -112,
+          -48
+        ],
+        "id": "b511a1d9-22c0-4f27-b513-238d112e1042",
+        "name": "Append row in sheet1",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "DUxiKNrgVSTJhacl",
+            "name": "Google Sheets account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "https://docs.google.com/spreadsheets/d/1KxEcmpUsgbMtvgbTWckv7MtmcPKh6nztKh3Nakddsnk/edit?pli=1&gid=1501290635#gid=1501290635",
+            "mode": "url"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 1501290635,
+            "mode": "list",
+            "cachedResultName": "[New] Patient Order",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1KxEcmpUsgbMtvgbTWckv7MtmcPKh6nztKh3Nakddsnk/edit#gid=1501290635"
+          },
+          "filtersUI": {
+            "values": [
+              {
+                "lookupColumn": "Order Date",
+                "lookupValue": "={{$today.toLocaleString()}}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          -560,
+          -240
+        ],
+        "id": "920c7335-458b-489f-8b1b-d5c895c59b83",
+        "name": "PO: Get row(s) in sheet",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "DUxiKNrgVSTJhacl",
+            "name": "Google Sheets account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "https://docs.google.com/spreadsheets/d/1KxEcmpUsgbMtvgbTWckv7MtmcPKh6nztKh3Nakddsnk/edit?pli=1&gid=1501290635#gid=1501290635",
+            "mode": "url"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 1189721202,
+            "mode": "list",
+            "cachedResultName": "[New] Clinic Order",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1KxEcmpUsgbMtvgbTWckv7MtmcPKh6nztKh3Nakddsnk/edit#gid=1189721202"
+          },
+          "filtersUI": {
+            "values": [
+              {
+                "lookupColumn": "Order Date",
+                "lookupValue": "={{$today.toLocaleString()}}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          -560,
+          -48
+        ],
+        "id": "4b6e6757-8934-4324-99cc-5a120cb9d840",
+        "name": "CO: Get row(s) in sheet1",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "DUxiKNrgVSTJhacl",
+            "name": "Google Sheets account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "triggerAtHour": 16
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          -784,
+          -144
+        ],
+        "id": "e72febc5-0ed5-4162-a2f9-a07a1dfdfff3",
+        "name": "Schedule Trigger 4pm Daily"
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3.2,
+        "position": [
+          112,
+          -144
+        ],
+        "id": "2e337b53-5ee0-4bae-97e8-87ce1b94ab1b",
+        "name": "Merge",
+        "alwaysOutputData": false
+      },
+      {
+        "parameters": {
+          "binaryPropertyName": "=PO_CO_{{$today.toLocaleString()}}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.convertToFile",
+        "typeVersion": 1.1,
+        "position": [
+          320,
+          -144
+        ],
+        "id": "7b0d9663-bee3-4c8f-a197-cb3c0c72263d",
+        "name": "Convert to File"
+      },
+      {
+        "parameters": {
+          "sendTo": "mavis.tsoi@ihealthlabs.com",
+          "subject": "=",
+          "message": "=Please see attachment {{$today.toLocaleString()}} for data.",
+          "options": {
+            "attachmentsUi": {
+              "attachmentsBinary": [
+                {
+                  "property": "=PO_CO_{{$today.toLocaleString()}}"
+                }
+              ]
+            }
+          }
+        },
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.2,
+        "position": [
+          528,
+          -144
+        ],
+        "id": "232e40e3-c2e6-4a2e-9a92-315e17eabc8e",
+        "name": "Send a message",
+        "webhookId": "8ee74be6-ecee-480b-b1a1-dc02b36bb7ca",
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "l127qbpdBjvhIX1W",
+            "name": "Gmail account 3"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Code in JavaScript": {
+        "main": [
+          [
+            {
+              "node": "Append row in sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript1": {
+        "main": [
+          [
+            {
+              "node": "Append row in sheet1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "PO: Get row(s) in sheet": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "CO: Get row(s) in sheet1": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Schedule Trigger 4pm Daily": {
+        "main": [
+          [
+            {
+              "node": "PO: Get row(s) in sheet",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "CO: Get row(s) in sheet1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Append row in sheet": {
+        "main": [
+          [
+            {
+              "node": "Merge",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Append row in sheet1": {
+        "main": [
+          [
+            {
+              "node": "Merge",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Merge": {
+        "main": [
+          [
+            {
+              "node": "Convert to File",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Convert to File": {
+        "main": [
+          [
+            {
+              "node": "Send a message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Mavis Tsoi",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "activeVersionId": "218ca7e4-e9ba-4f98-b725-c16f420cd823",
+  "connections": {
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PO: Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CO: Get row(s) in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger 4pm Daily": {
+      "main": [
+        [
+          {
+            "node": "PO: Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "CO: Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-13T19:25:31.254Z",
+  "id": "MXwGsPt81M5xPSJ6",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "Daily PO+CO Order",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1fUhO_l8s7yaQgfmglGdEnWew0HdwV7PgrKyvzmKnYgM/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "JAN",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Order #",
+              "displayName": "Order #",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Order Date",
+              "displayName": "Order Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Requested by",
+              "displayName": "Requested by",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Clinic ID",
+              "displayName": "Clinic ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Flow",
+              "displayName": "Flow",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Recipient",
+              "displayName": "Recipient",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Shipping Address 1",
+              "displayName": "Shipping Address 1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Shipping Address 2",
+              "displayName": "Shipping Address 2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "City",
+              "displayName": "City",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "State",
+              "displayName": "State",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Zipcode",
+              "displayName": "Zipcode",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Memo/Note",
+              "displayName": "Memo/Note",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SKU 1",
+              "displayName": "SKU 1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Qty 1",
+              "displayName": "Qty 1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SKU 2",
+              "displayName": "SKU 2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Qty 2",
+              "displayName": "Qty 2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SKU 3",
+              "displayName": "SKU 3",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Qty 3",
+              "displayName": "Qty 3",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SKU 4",
+              "displayName": "SKU 4",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Qty 4",
+              "displayName": "Qty 4",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SKU 5",
+              "displayName": "SKU 5",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Qty 5",
+              "displayName": "Qty 5",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SKU 6",
+              "displayName": "SKU 6",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Qty 6",
+              "displayName": "Qty 6",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SKU 7",
+              "displayName": "SKU 7",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Qty 7",
+              "displayName": "Qty 7",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Customer Internal ID",
+              "displayName": "Customer Internal ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Class",
+              "displayName": "Class",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Department",
+              "displayName": "Department",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Carrier",
+              "displayName": "Carrier",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Tracking Number",
+              "displayName": "Tracking Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -112,
+        -240
+      ],
+      "id": "e03d271c-b277-4b3b-8f2c-16cb17d8dd98",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "DUxiKNrgVSTJhacl",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nfor (const item of items) {\n  const original = item.json;\n\n  // Build Order #\n  const orderDate = original[\"Order Date\"]; // MM/DD/YYYY\n  const [month, day, year] = orderDate.split(\"/\");\n\n  const yymmdd =\n    year.slice(-2) +\n    month.padStart(2, \"0\") +\n    day.padStart(2, \"0\");\n\n  const orderNumber = `PO${yymmdd}-${original.row_number - 1}`;\n\n  // Reconstruct object in correct column order\n  item.json = {\n    row_number: original.row_number,\n    \"Order #\": orderNumber,\n    \"Order Date\": original[\"Order Date\"],\n    ...Object.fromEntries(\n      Object.entries(original).filter(\n        ([key]) => ![\"row_number\", \"Order Date\"].includes(key)\n      )\n    )\n  };\n}\n\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -336,
+        -240
+      ],
+      "id": "20bdcec2-f030-4a47-854e-2d58b6d5ed33",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nfor (const item of items) {\n  const original = item.json;\n\n  // Build Order #\n  const orderDate = original[\"Order Date\"]; // MM/DD/YYYY\n  const [month, day, year] = orderDate.split(\"/\");\n\n  const yymmdd =\n    year.slice(-2) +\n    month.padStart(2, \"0\") +\n    day.padStart(2, \"0\");\n\n  const orderNumber = `CO${yymmdd}-${original.row_number - 2}`;\n\n  // Reconstruct object in correct column order\n  item.json = {\n    row_number: original.row_number,\n    \"Order #\": orderNumber,\n    \"Order Date\": original[\"Order Date\"],\n    ...Object.fromEntries(\n      Object.entries(original).filter(\n        ([key]) => ![\"row_number\", \"Order Date\"].includes(key)\n      )\n    )\n  };\n}\n\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -336,
+        -48
+      ],
+      "id": "ba833183-5aac-4b42-be74-f1860cf127ad",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1fUhO_l8s7yaQgfmglGdEnWew0HdwV7PgrKyvzmKnYgM/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "JAN",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Order #",
+              "displayName": "Order #",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Order Date",
+              "displayName": "Order Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Requested by",
+              "displayName": "Requested by",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Clinic ID",
+              "displayName": "Clinic ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Flow",
+              "displayName": "Flow",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Recipient",
+              "displayName": "Recipient",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Shipping Address 1",
+              "displayName": "Shipping Address 1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Shipping Address 2",
+              "displayName": "Shipping Address 2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "City",
+              "displayName": "City",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "State",
+              "displayName": "State",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Zipcode",
+              "displayName": "Zipcode",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Memo/Note",
+              "displayName": "Memo/Note",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SKU 1",
+              "displayName": "SKU 1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Qty 1",
+              "displayName": "Qty 1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SKU 2",
+              "displayName": "SKU 2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Qty 2",
+              "displayName": "Qty 2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SKU 3",
+              "displayName": "SKU 3",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Qty 3",
+              "displayName": "Qty 3",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SKU 4",
+              "displayName": "SKU 4",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Qty 4",
+              "displayName": "Qty 4",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SKU 5",
+              "displayName": "SKU 5",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Qty 5",
+              "displayName": "Qty 5",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SKU 6",
+              "displayName": "SKU 6",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Qty 6",
+              "displayName": "Qty 6",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SKU 7",
+              "displayName": "SKU 7",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Qty 7",
+              "displayName": "Qty 7",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Customer Internal ID",
+              "displayName": "Customer Internal ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Class",
+              "displayName": "Class",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Department",
+              "displayName": "Department",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Carrier",
+              "displayName": "Carrier",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Tracking Number",
+              "displayName": "Tracking Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -112,
+        -48
+      ],
+      "id": "b511a1d9-22c0-4f27-b513-238d112e1042",
+      "name": "Append row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "DUxiKNrgVSTJhacl",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1KxEcmpUsgbMtvgbTWckv7MtmcPKh6nztKh3Nakddsnk/edit?pli=1&gid=1501290635#gid=1501290635",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1501290635,
+          "mode": "list",
+          "cachedResultName": "[New] Patient Order",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1KxEcmpUsgbMtvgbTWckv7MtmcPKh6nztKh3Nakddsnk/edit#gid=1501290635"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Order Date",
+              "lookupValue": "={{$today.toLocaleString()}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -560,
+        -240
+      ],
+      "id": "920c7335-458b-489f-8b1b-d5c895c59b83",
+      "name": "PO: Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "DUxiKNrgVSTJhacl",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/1KxEcmpUsgbMtvgbTWckv7MtmcPKh6nztKh3Nakddsnk/edit?pli=1&gid=1501290635#gid=1501290635",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1189721202,
+          "mode": "list",
+          "cachedResultName": "[New] Clinic Order",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1KxEcmpUsgbMtvgbTWckv7MtmcPKh6nztKh3Nakddsnk/edit#gid=1189721202"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Order Date",
+              "lookupValue": "={{$today.toLocaleString()}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -560,
+        -48
+      ],
+      "id": "4b6e6757-8934-4324-99cc-5a120cb9d840",
+      "name": "CO: Get row(s) in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "DUxiKNrgVSTJhacl",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 16
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -784,
+        -144
+      ],
+      "id": "e72febc5-0ed5-4162-a2f9-a07a1dfdfff3",
+      "name": "Schedule Trigger 4pm Daily"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        112,
+        -144
+      ],
+      "id": "2e337b53-5ee0-4bae-97e8-87ce1b94ab1b",
+      "name": "Merge",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "binaryPropertyName": "=PO_CO_{{$today.toLocaleString()}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        320,
+        -144
+      ],
+      "id": "7b0d9663-bee3-4c8f-a197-cb3c0c72263d",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "sendTo": "mavis.tsoi@ihealthlabs.com",
+        "subject": "=",
+        "message": "=Please see attachment {{$today.toLocaleString()}} for data.",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {
+                "property": "=PO_CO_{{$today.toLocaleString()}}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        528,
+        -144
+      ],
+      "id": "232e40e3-c2e6-4a2e-9a92-315e17eabc8e",
+      "name": "Send a message",
+      "webhookId": "8ee74be6-ecee-480b-b1a1-dc02b36bb7ca",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "l127qbpdBjvhIX1W",
+          "name": "Gmail account 3"
+        }
+      }
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timeSavedMode": "fixed",
+    "timezone": "America/Los_Angeles",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-13T19:25:31.263Z",
+      "createdAt": "2026-01-13T19:25:31.263Z",
+      "role": "workflow:owner",
+      "workflowId": "MXwGsPt81M5xPSJ6",
+      "projectId": "nqOBVVqnjms5roYQ"
+    }
+  ],
+  "staticData": {
+    "node:Schedule Trigger 4pm Daily": {
+      "recurrenceRules": []
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2026-02-06T21:04:35.421Z",
+  "versionId": "218ca7e4-e9ba-4f98-b725-c16f420cd823"
+}
