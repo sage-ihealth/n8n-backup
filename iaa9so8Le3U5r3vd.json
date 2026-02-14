@@ -1,0 +1,800 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-01-16T18:51:47.000Z",
+    "createdAt": "2026-01-16T18:51:47.000Z",
+    "versionId": "bc49cf63-82ff-4068-b534-9da1959cf7cc",
+    "workflowId": "iaa9so8Le3U5r3vd",
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "daysInterval": 10,
+                "triggerAtHour": 10
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          0,
+          0
+        ],
+        "id": "d3b4d472-13bf-4524-b423-7a9b4654ffa3",
+        "name": "Schedule Trigger"
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "11H63fk7NUiBDQjOHzVojYs1SA42yJR2rFhDykHbb49Q",
+            "mode": "list",
+            "cachedResultName": "Sep'25 Billing Email Templates",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11H63fk7NUiBDQjOHzVojYs1SA42yJR2rFhDykHbb49Q/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Batch 1",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11H63fk7NUiBDQjOHzVojYs1SA42yJR2rFhDykHbb49Q/edit#gid=0"
+          },
+          "filtersUI": {
+            "values": [
+              {
+                "lookupColumn": "Attachment"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          208,
+          0
+        ],
+        "id": "5b9ddba5-f173-43c0-b3ea-332d03721126",
+        "name": "Get row(s) in sheet",
+        "alwaysOutputData": true,
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "E92SBl4Szm9AuPqL",
+            "name": "Google Sheets account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "bf0e31e0-3ec6-4faa-8de2-29c3e8ef4851",
+                "leftValue": "={{ $json.Status }}",
+                "rightValue": "Sent",
+                "operator": {
+                  "type": "string",
+                  "operation": "notEquals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          416,
+          0
+        ],
+        "id": "cf76906e-0827-4f73-bb27-e2edea124aa4",
+        "name": "If"
+      },
+      {
+        "parameters": {
+          "jsCode": "function _generateMonthYear() {\n  const now = new Date();\n  // 上一个月：先到本月 1 号，再减一天\n  const lastMonthDate = new Date(now.getFullYear(), now.getMonth(), 1);\n  lastMonthDate.setDate(0);\n\n  const monthNames = [\n    'January', 'February', 'March', 'April', 'May', 'June',\n    'July', 'August', 'September', 'October', 'November', 'December'\n  ];\n\n  return `${monthNames[lastMonthDate.getMonth()]} ${lastMonthDate.getFullYear()}`;\n}\n\nreturn items.map(item => {\n  const data = item.json;\n\n  // ✅ 默认直接生成真实 Month Year\n  let reportMonth = _generateMonthYear();\n\n// ✅ 替换 Subject 中的 [Month/Year]\n  const updatedSubject = data.Subject\n    ? data.Subject.replace('[Month/Year]', reportMonth)\n    : '';\n\n  const name = data.Name || '';\n  const attachmentUrl = data.Attachment || '';\n\n  const html = `\n   <!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>iHealth Billing Report</title>\n  <style>\n    body {\n      margin: 0;\n      padding: 0;\n      background-color: #f4f4f7;\n      font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\",\n                   Roboto, Helvetica, Arial, sans-serif;\n      color: #333333;\n    }\n    .container {\n      max-width: 600px;\n      margin: 30px auto;\n      background-color: #ffffff;\n      border-radius: 8px;\n      overflow: hidden;\n      box-shadow: 0 2px 6px rgba(0,0,0,0.06);\n    }\n    .header-bar {\n      height: 6px;\n     }\n    .content {\n      padding: 40px;\n      line-height: 1.6;\n      font-size: 16px;\n    }\n    p {\n      margin: 0 0 18px 0;\n    }\n    .greeting {\n      font-weight: 500;\n    }\n    .highlight {\n      font-weight: 600;\n    }\n    .callout {\n      background-color: #fff4e5;\n      border-left: 4px solid #F05F22;\n      padding: 16px 18px;\n      margin: 25px 0;\n      border-radius: 4px;\n      font-size: 15px;\n    }\n    .divider {\n      height: 1px;\n      background-color: #eeeeee;\n      margin: 30px 0;\n    }\n    .footer {\n      background-color: #f8f9fa;\n      padding: 22px 40px;\n      text-align: center;\n      font-size: 13px;\n      color: #777777;\n    }\n    .footer a {\n      color: #F05F22;\n      text-decoration: none;\n      font-weight: 600;\n    }\n  </style>\n</head>\n\n<body>\n  <div class=\"container\">\n    <div class=\"header-bar\"></div>\n\n    <div class=\"content\">\n      <p class=\"greeting\">\n        Dear ${name ? name + ',' : ''}\n      </p>\n\n      <p>\n        Please find attached the iHealth billing report for\n        <span class=\"highlight\">[Month/Year]</span>.\n      </p>\n\n      <p>\n        Kindly download the attached billing summary report to submit with\n        insurance &amp; receive reimbursement to enjoy the rewards of our\n        shared efforts.\n      </p>\n\n      <p class=\"highlight\">\n        Please use the DOS matched with each CPT.\n      </p>\n\n      <div class=\"callout\">\n        <strong>❗Insurance Discrepancy Notification Request</strong><br>\n        Please inform us immediately of any patients whose current insurance\n        differs from our billing report. This will help us maintain an accurate\n        consistent record of patients' insurance and reduce potential billing\n        errors.\n      </div>\n\n      <div class=\"divider\"></div>\n\n      <p>\n        Your partnership is very important to us. Thank you again for your\n        participation in our program. Please feel free to reach our Billing\n        Team\n        <a href=\"mailto:billing@ihealthlabs.com\">billing@ihealthlabs.com</a>\n        with any questions or concerns surrounding iHealth billing.\n      </p>\n    </div>\n\n    <div class=\"footer\">\n      © iHealth Labs. All rights reserved.\n    </div>\n  </div>\n</body>\n</html>\n\n`;\n  const html_new = html\n    ? html.replace('[Month/Year]', reportMonth)\n    : '';\n  return {\n    json: {\n      ...data,\n      Subject: updatedSubject,\n      To: data.To ? data.To.replace(/\\n/g, ',') : '',\n      CC: data.CC ? data.CC.replace(/\\n/g, ',') : '',\n      BCC: data.BCC ? data.BCC.replace(/\\n/g, ',') : '',\n      mailContent: html_new\n    }\n  };\n});\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          672,
+          -16
+        ],
+        "id": "9f5147b4-9ff3-4e0b-8fa4-f227c64201a7",
+        "name": "Code in JavaScript",
+        "alwaysOutputData": true,
+        "executeOnce": false
+      },
+      {
+        "parameters": {
+          "sendTo": "={{ $json.To }}",
+          "subject": "={{ $json.Subject }}",
+          "message": "={{ $json.mailContent }}",
+          "options": {
+            "bccList": "={{ $json.BCC }}",
+            "ccList": "={{ $json.CC }}"
+          }
+        },
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.2,
+        "position": [
+          896,
+          -16
+        ],
+        "id": "dc0d903e-33fa-49ab-aefe-d7a7ac422f9b",
+        "name": "Send a message",
+        "webhookId": "76dca23f-3a36-4d7f-bfcf-53bff7db8f48",
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "Oe4ZSvjuC20qxPCu",
+            "name": "Gmail account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "documentId": {
+            "__rl": true,
+            "value": "11H63fk7NUiBDQjOHzVojYs1SA42yJR2rFhDykHbb49Q",
+            "mode": "list",
+            "cachedResultName": "Jul'25 Billing Email Templates",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11H63fk7NUiBDQjOHzVojYs1SA42yJR2rFhDykHbb49Q/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "Batch 1",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11H63fk7NUiBDQjOHzVojYs1SA42yJR2rFhDykHbb49Q/edit#gid=0"
+          },
+          "columns": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "Status": "Sent",
+              "Sent By": "n8n",
+              "Sent Date": "={{ $now.format('yyyy-MM-dd') }}",
+              "row_number": "={{ $('Code in JavaScript').item.json.row_number }}"
+            },
+            "matchingColumns": [
+              "row_number"
+            ],
+            "schema": [
+              {
+                "id": "From",
+                "displayName": "From",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "Subject",
+                "displayName": "Subject",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "To",
+                "displayName": "To",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "CC",
+                "displayName": "CC",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "BCC",
+                "displayName": "BCC",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "Content",
+                "displayName": "Content",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "Name",
+                "displayName": "Name",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "Attachment",
+                "displayName": "Attachment",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": true
+              },
+              {
+                "id": "Status",
+                "displayName": "Status",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Sent Date",
+                "displayName": "Sent Date",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "Sent By",
+                "displayName": "Sent By",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true
+              },
+              {
+                "id": "row_number",
+                "displayName": "row_number",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "readOnly": true,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          1104,
+          -16
+        ],
+        "id": "4a3a73b6-3b02-4749-932c-661710c6eb13",
+        "name": "Update row in sheet",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "E92SBl4Szm9AuPqL",
+            "name": "Google Sheets account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Schedule Trigger": {
+        "main": [
+          [
+            {
+              "node": "Get row(s) in sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get row(s) in sheet": {
+        "main": [
+          [
+            {
+              "node": "If",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          []
+        ]
+      },
+      "Code in JavaScript": {
+        "main": [
+          [
+            {
+              "node": "Send a message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Send a message": {
+        "main": [
+          [
+            {
+              "node": "Update row in sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "sage gu",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "activeVersionId": "bc49cf63-82ff-4068-b534-9da1959cf7cc",
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-09T00:50:11.551Z",
+  "id": "iaa9so8Le3U5r3vd",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "Billing Monthly Email Sender to Provider",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "daysInterval": 10,
+              "triggerAtHour": 10
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d3b4d472-13bf-4524-b423-7a9b4654ffa3",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "11H63fk7NUiBDQjOHzVojYs1SA42yJR2rFhDykHbb49Q",
+          "mode": "list",
+          "cachedResultName": "Sep'25 Billing Email Templates",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11H63fk7NUiBDQjOHzVojYs1SA42yJR2rFhDykHbb49Q/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Batch 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11H63fk7NUiBDQjOHzVojYs1SA42yJR2rFhDykHbb49Q/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Attachment"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        208,
+        0
+      ],
+      "id": "5b9ddba5-f173-43c0-b3ea-332d03721126",
+      "name": "Get row(s) in sheet",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "E92SBl4Szm9AuPqL",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "bf0e31e0-3ec6-4faa-8de2-29c3e8ef4851",
+              "leftValue": "={{ $json.Status }}",
+              "rightValue": "Sent",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        416,
+        0
+      ],
+      "id": "cf76906e-0827-4f73-bb27-e2edea124aa4",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "jsCode": "function _generateMonthYear() {\n  const now = new Date();\n  // 上一个月：先到本月 1 号，再减一天\n  const lastMonthDate = new Date(now.getFullYear(), now.getMonth(), 1);\n  lastMonthDate.setDate(0);\n\n  const monthNames = [\n    'January', 'February', 'March', 'April', 'May', 'June',\n    'July', 'August', 'September', 'October', 'November', 'December'\n  ];\n\n  return `${monthNames[lastMonthDate.getMonth()]} ${lastMonthDate.getFullYear()}`;\n}\n\nreturn items.map(item => {\n  const data = item.json;\n\n  // ✅ 默认直接生成真实 Month Year\n  let reportMonth = _generateMonthYear();\n\n// ✅ 替换 Subject 中的 [Month/Year]\n  const updatedSubject = data.Subject\n    ? data.Subject.replace('[Month/Year]', reportMonth)\n    : '';\n\n  const name = data.Name || '';\n  const attachmentUrl = data.Attachment || '';\n\n  const html = `\n   <!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>iHealth Billing Report</title>\n  <style>\n    body {\n      margin: 0;\n      padding: 0;\n      background-color: #f4f4f7;\n      font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\",\n                   Roboto, Helvetica, Arial, sans-serif;\n      color: #333333;\n    }\n    .container {\n      max-width: 600px;\n      margin: 30px auto;\n      background-color: #ffffff;\n      border-radius: 8px;\n      overflow: hidden;\n      box-shadow: 0 2px 6px rgba(0,0,0,0.06);\n    }\n    .header-bar {\n      height: 6px;\n     }\n    .content {\n      padding: 40px;\n      line-height: 1.6;\n      font-size: 16px;\n    }\n    p {\n      margin: 0 0 18px 0;\n    }\n    .greeting {\n      font-weight: 500;\n    }\n    .highlight {\n      font-weight: 600;\n    }\n    .callout {\n      background-color: #fff4e5;\n      border-left: 4px solid #F05F22;\n      padding: 16px 18px;\n      margin: 25px 0;\n      border-radius: 4px;\n      font-size: 15px;\n    }\n    .divider {\n      height: 1px;\n      background-color: #eeeeee;\n      margin: 30px 0;\n    }\n    .footer {\n      background-color: #f8f9fa;\n      padding: 22px 40px;\n      text-align: center;\n      font-size: 13px;\n      color: #777777;\n    }\n    .footer a {\n      color: #F05F22;\n      text-decoration: none;\n      font-weight: 600;\n    }\n  </style>\n</head>\n\n<body>\n  <div class=\"container\">\n    <div class=\"header-bar\"></div>\n\n    <div class=\"content\">\n      <p class=\"greeting\">\n        Dear ${name ? name + ',' : ''}\n      </p>\n\n      <p>\n        Please find attached the iHealth billing report for\n        <span class=\"highlight\">[Month/Year]</span>.\n      </p>\n\n      <p>\n        Kindly download the attached billing summary report to submit with\n        insurance &amp; receive reimbursement to enjoy the rewards of our\n        shared efforts.\n      </p>\n\n      <p class=\"highlight\">\n        Please use the DOS matched with each CPT.\n      </p>\n\n      <div class=\"callout\">\n        <strong>❗Insurance Discrepancy Notification Request</strong><br>\n        Please inform us immediately of any patients whose current insurance\n        differs from our billing report. This will help us maintain an accurate\n        consistent record of patients' insurance and reduce potential billing\n        errors.\n      </div>\n\n      <div class=\"divider\"></div>\n\n      <p>\n        Your partnership is very important to us. Thank you again for your\n        participation in our program. Please feel free to reach our Billing\n        Team\n        <a href=\"mailto:billing@ihealthlabs.com\">billing@ihealthlabs.com</a>\n        with any questions or concerns surrounding iHealth billing.\n      </p>\n    </div>\n\n    <div class=\"footer\">\n      © iHealth Labs. All rights reserved.\n    </div>\n  </div>\n</body>\n</html>\n\n`;\n  const html_new = html\n    ? html.replace('[Month/Year]', reportMonth)\n    : '';\n  return {\n    json: {\n      ...data,\n      Subject: updatedSubject,\n      To: data.To ? data.To.replace(/\\n/g, ',') : '',\n      CC: data.CC ? data.CC.replace(/\\n/g, ',') : '',\n      BCC: data.BCC ? data.BCC.replace(/\\n/g, ',') : '',\n      mailContent: html_new\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        -16
+      ],
+      "id": "9f5147b4-9ff3-4e0b-8fa4-f227c64201a7",
+      "name": "Code in JavaScript",
+      "alwaysOutputData": true,
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.To }}",
+        "subject": "={{ $json.Subject }}",
+        "message": "={{ $json.mailContent }}",
+        "options": {
+          "bccList": "={{ $json.BCC }}",
+          "ccList": "={{ $json.CC }}"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        896,
+        -16
+      ],
+      "id": "dc0d903e-33fa-49ab-aefe-d7a7ac422f9b",
+      "name": "Send a message",
+      "webhookId": "76dca23f-3a36-4d7f-bfcf-53bff7db8f48",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Oe4ZSvjuC20qxPCu",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "11H63fk7NUiBDQjOHzVojYs1SA42yJR2rFhDykHbb49Q",
+          "mode": "list",
+          "cachedResultName": "Jul'25 Billing Email Templates",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11H63fk7NUiBDQjOHzVojYs1SA42yJR2rFhDykHbb49Q/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Batch 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/11H63fk7NUiBDQjOHzVojYs1SA42yJR2rFhDykHbb49Q/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Status": "Sent",
+            "Sent By": "n8n",
+            "Sent Date": "={{ $now.format('yyyy-MM-dd') }}",
+            "row_number": "={{ $('Code in JavaScript').item.json.row_number }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "From",
+              "displayName": "From",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Subject",
+              "displayName": "Subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "To",
+              "displayName": "To",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "CC",
+              "displayName": "CC",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "BCC",
+              "displayName": "BCC",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Content",
+              "displayName": "Content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Attachment",
+              "displayName": "Attachment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Sent Date",
+              "displayName": "Sent Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Sent By",
+              "displayName": "Sent By",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1104,
+        -16
+      ],
+      "id": "4a3a73b6-3b02-4749-932c-661710c6eb13",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "E92SBl4Szm9AuPqL",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {
+    "Code in JavaScript": [
+      {
+        "json": {
+          "row_number": 4,
+          "From": "billing@ihealthlabs.com",
+          "Subject": "iHealth December 2025 - APCM, CCM & RPM Billing Report - Org # 1 - FMG (Dr. Zandi)",
+          "To": "sage.gu@ihealthlabs.com",
+          "CC": "merphyseptember@gmail.com",
+          "BCC": "sage.gu.au@gmail.com",
+          "Content": "Please find attached the iHealth billing report for [Month/Year].\n\nKindly download the attached billing summary report to submit with insurance & receive reimbursement to enjoy the rewards of our shared efforts. \n\nPlease use the DOS matched with each CPT.\n\n❗Insurance Discrepancy Notification Request | Please inform us immediately of any patients whose current insurance differs from our billing report. This will help us maintain an accurate consistent record of patients' insurance and reduce potential billing errors.\n\nYour partnership is very important to us. Thank you again for your participation in our program. Please feel free to reach our Billing Team [billing@ihealthlabs.com] with any questions or concerns surrounding iHealth billing.",
+          "Name": "Dr. Zandi and Yvonne",
+          "Attachment": "https://docs.google.com/spreadsheets/d/1F1dH3ZNCTXEWyoTabcv9heVxyKK7yf096aeIIUWAmgc/edit?gid=0#gid=0",
+          "Status": " ",
+          "Sent Date": "1/9/2026",
+          "Sent By": "n8n",
+          "mailContent": "\n   <!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>iHealth Billing Report</title>\n  <style>\n    body {\n      margin: 0;\n      padding: 0;\n      background-color: #f4f4f7;\n      font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\",\n                   Roboto, Helvetica, Arial, sans-serif;\n      color: #333333;\n    }\n    .container {\n      max-width: 600px;\n      margin: 30px auto;\n      background-color: #ffffff;\n      border-radius: 8px;\n      overflow: hidden;\n      box-shadow: 0 2px 6px rgba(0,0,0,0.06);\n    }\n    .header-bar {\n      height: 6px;\n      background-color: #F05F22;\n    }\n    .content {\n      padding: 40px;\n      line-height: 1.6;\n      font-size: 16px;\n    }\n    p {\n      margin: 0 0 18px 0;\n    }\n    .greeting {\n      font-weight: 500;\n    }\n    .highlight {\n      font-weight: 600;\n    }\n    .callout {\n      background-color: #fff4e5;\n      border-left: 4px solid #F05F22;\n      padding: 16px 18px;\n      margin: 25px 0;\n      border-radius: 4px;\n      font-size: 15px;\n    }\n    .divider {\n      height: 1px;\n      background-color: #eeeeee;\n      margin: 30px 0;\n    }\n    .footer {\n      background-color: #f8f9fa;\n      padding: 22px 40px;\n      text-align: center;\n      font-size: 13px;\n      color: #777777;\n    }\n    .footer a {\n      color: #F05F22;\n      text-decoration: none;\n      font-weight: 600;\n    }\n  </style>\n</head>\n\n<body>\n  <div class=\"container\">\n    <div class=\"header-bar\"></div>\n\n    <div class=\"content\">\n      <p class=\"greeting\">\n        Dear Dr. Zandi and Yvonne,\n      </p>\n\n      <p>\n        Please find attached the iHealth billing report for\n        <span class=\"highlight\">December 2025</span>.\n      </p>\n\n      <p>\n        Kindly download the attached billing summary report to submit with\n        insurance &amp; receive reimbursement to enjoy the rewards of our\n        shared efforts.\n      </p>\n\n      <p class=\"highlight\">\n        Please use the DOS matched with each CPT.\n      </p>\n\n      <div class=\"callout\">\n        <strong>❗Insurance Discrepancy Notification Request</strong><br>\n        Please inform us immediately of any patients whose current insurance\n        differs from our billing report. This will help us maintain an accurate\n        consistent record of patients' insurance and reduce potential billing\n        errors.\n      </div>\n\n      <div class=\"divider\"></div>\n\n      <p>\n        Your partnership is very important to us. Thank you again for your\n        participation in our program. Please feel free to reach our Billing\n        Team\n        <a href=\"mailto:billing@ihealthlabs.com\">billing@ihealthlabs.com</a>\n        with any questions or concerns surrounding iHealth billing.\n      </p>\n    </div>\n\n    <div class=\"footer\">\n      © iHealth Labs. All rights reserved.\n    </div>\n  </div>\n</body>\n</html>\n\n"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-09T00:50:11.557Z",
+      "createdAt": "2026-01-09T00:50:11.557Z",
+      "role": "workflow:owner",
+      "workflowId": "iaa9so8Le3U5r3vd",
+      "projectId": "IGL0EzJNN8XZ65mm"
+    }
+  ],
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": [
+        12
+      ]
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2026-02-06T05:43:01.633Z",
+  "versionId": "bc49cf63-82ff-4068-b534-9da1959cf7cc"
+}
