@@ -1,0 +1,373 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Clean Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean Data": {
+      "main": [
+        [
+          {
+            "node": "Route Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route Request": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Message a model1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Send Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-30T00:50:02.819Z",
+  "id": "UnDSZuniZt0fwM1DKfHB6",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "Meeting Manager",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "a75624a4-9484-46df-ab82-85949529d420",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -528,
+        -400
+      ],
+      "id": "1901d791-31d2-46ea-9a2e-b6cb6e0e21f8",
+      "name": "Webhook",
+      "webhookId": "a75624a4-9484-46df-ab82-85949529d420"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "assignment_1",
+              "name": "chat_text",
+              "value": "={{ $json.body?.message?.argumentText || $json.body?.message?.text || \"\" }}",
+              "type": "string"
+            },
+            {
+              "id": "assignment_2",
+              "name": "space_id",
+              "value": "={{ $json.body.message.space.name }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0342a16c-3962-4ed1-a52d-7fdcfa365d51",
+      "name": "Clean Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -304,
+        -400
+      ]
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $json.chat_text.toLowerCase() }}",
+        "rules": {
+          "rules": [
+            {
+              "operation": "contains",
+              "value2": "agenda",
+              "output": "=0"
+            },
+            {
+              "operation": "contains",
+              "value2": "rewrite",
+              "output": "=1"
+            }
+          ]
+        },
+        "fallbackOutput": 2
+      },
+      "id": "b68cbd12-e79d-45ae-8034-7c4165fcdff9",
+      "name": "Route Request",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        -432
+      ]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "ft:gpt-4o-mini-2024-07-18:ihealth::A0qMHz3Q",
+          "mode": "list"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=write a meeting agenda for {{ $json.chat_text }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        144,
+        -496
+      ],
+      "id": "ef695ce3-fb82-4152-a948-a35611298e73",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "pTwehq7p5zxhlHdV",
+          "name": "OpenAi account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "spaceId": "={{ $node[\"Clean Data\"].json[\"space_id\"] }}",
+        "messageUi": {
+          "text": "={{ $json.content }}"
+        },
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        496,
+        -496
+      ],
+      "id": "c8793160-f79f-44da-a151-b1696cd60794",
+      "name": "Send Reply",
+      "webhookId": "e4471b0e-18c7-407e-9f8a-eb2f15111d54",
+      "credentials": {
+        "googleApi": {
+          "id": "wIQGDiOt8bBOhfng",
+          "name": "Google Service Account account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "ft:gpt-4o-mini-2024-07-18:ihealth::A0qMHz3Q",
+          "mode": "list"
+        },
+        "responses": {
+          "values": [
+            {}
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        144,
+        -304
+      ],
+      "id": "a32b02bf-d08c-4abc-938c-eb7dec415081",
+      "name": "Message a model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "pTwehq7p5zxhlHdV",
+          "name": "OpenAi account 5"
+        }
+      }
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n.ihealth-eng.com",
+            "user-agent": "Google-Dynamite",
+            "content-length": "3146",
+            "accept-encoding": "gzip, deflate, br",
+            "authorization": "Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6Ijg2MzBhNzFiZDZlYzFjNjEyNTdhMjdmZjJlZmQ5MTg3MmVjYWIxZjYiLCJ0eXAiOiJKV1QifQ.eyJhdWQiOiJodHRwczovL244bi5paGVhbHRoLWVuZy5jb20vd2ViaG9vay10ZXN0L2E3NTYyNGE0LTk0ODQtNDZkZi1hYjgyLTg1OTQ5NTI5ZDQyMCIsImF6cCI6IjEwNjM1MjA0Mzg5OTQzNzUyMzQwNyIsImVtYWlsIjoiY2hhdEBzeXN0ZW0uZ3NlcnZpY2VhY2NvdW50LmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJleHAiOjE3NzAxNjQwMzEsImlhdCI6MTc3MDE2MDQzMSwiaXNzIjoiaHR0cHM6Ly9hY2NvdW50cy5nb29nbGUuY29tIiwic3ViIjoiMTA2MzUyMDQzODk5NDM3NTIzNDA3In0.O29pIOknFOI3qj56RteaJ7DhCXw2frDHwXMVJbqscADVxLTfsohzQ-LPa0x5YBsNyU5Z0H0WM6Q84BVmZLm4EwpYF9mftnp9eWZLQ9BbryMndYfY7yLjzazJY3x0LbceieMCiQB0nCHif03ULNs29WaafBgM8PWbJlSRK1775XnwUYYuJXBy7NvtEIp24gMcSY35l1RwWbHfT54z1CAZdfMOTyxfx2gK1QiGgrviz35AEwmYhLbTlZDUSK8uMlPYA4BnjxvB4Elc2Hc_mc7uPj0dZ84QmHQn6cfptvkfCtGzCNqAmmM8dMws3j529xfkwRD9xu4IPsvtC9_KPOfelg",
+            "content-type": "application/json; charset=utf-8",
+            "from": "",
+            "x-forwarded-for": "40.0.157.240",
+            "x-forwarded-host": "n8n.ihealth-eng.com",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-7f9b6df58f-wz5km",
+            "x-real-ip": "40.0.157.240"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "type": "MESSAGE",
+            "eventTime": "2026-02-03T23:13:51.503567Z",
+            "message": {
+              "name": "spaces/AAQAKTJa4Fc/messages/KdC4uwRyl9Q.KdC4uwRyl9Q",
+              "sender": {
+                "name": "users/113308919946198603523",
+                "displayName": "Yichen Sun",
+                "avatarUrl": "https://lh3.googleusercontent.com/a/ACg8ocKpsNQDgv7LRjIta3e-X42rpgwzZCgbJqLqOePkaM-gzFdH5SY=k-no",
+                "email": "yichen.sun@ihealthlabs.com",
+                "type": "HUMAN",
+                "domainId": "0z1k2em"
+              },
+              "createTime": "2026-02-03T23:13:51.503567Z",
+              "text": "@n8n-gchat-bot agenda test",
+              "annotations": [
+                {
+                  "type": "USER_MENTION",
+                  "startIndex": 0,
+                  "length": 14,
+                  "userMention": {
+                    "user": {
+                      "name": "users/108829247138471013355",
+                      "displayName": "n8n-gchat-bot",
+                      "avatarUrl": "https://lh4.googleusercontent.com/proxy/NPeHynM5XMnTYZeJVZYNYwB6lP5_tu3R-LuWi8Vw6Q2yY0YqIQrBvsCVLDx77wvKYpksOHUKPJooHqGbOGpZoeOXyHbKizlqGb96pv7A8aGMhqKxnqDx2IqB-BvVtoZoH8p2bM0g",
+                      "type": "BOT"
+                    },
+                    "type": "MENTION"
+                  }
+                }
+              ],
+              "thread": {
+                "name": "spaces/AAQAKTJa4Fc/threads/KdC4uwRyl9Q",
+                "retentionSettings": {
+                  "state": "PERMANENT"
+                }
+              },
+              "space": {
+                "name": "spaces/AAQAKTJa4Fc",
+                "type": "ROOM",
+                "displayName": "Yichen Meeting Manager",
+                "spaceThreadingState": "THREADED_MESSAGES",
+                "spaceType": "SPACE",
+                "spaceHistoryState": "HISTORY_ON",
+                "lastActiveTime": "2026-02-03T23:13:51.503567Z",
+                "membershipCount": {
+                  "joinedDirectHumanUserCount": 1
+                },
+                "customer": "customers/C00z1k2em",
+                "spaceUri": "https://chat.google.com/room/AAQAKTJa4Fc?cls=11"
+              },
+              "argumentText": " agenda test",
+              "retentionSettings": {
+                "state": "PERMANENT"
+              },
+              "messageHistoryState": "HISTORY_ON",
+              "formattedText": "@n8n-gchat-bot agenda test"
+            },
+            "user": {
+              "name": "users/113308919946198603523",
+              "displayName": "Yichen Sun",
+              "avatarUrl": "https://lh3.googleusercontent.com/a/ACg8ocKpsNQDgv7LRjIta3e-X42rpgwzZCgbJqLqOePkaM-gzFdH5SY=k-no",
+              "email": "yichen.sun@ihealthlabs.com",
+              "type": "HUMAN",
+              "domainId": "0z1k2em"
+            },
+            "space": {
+              "name": "spaces/AAQAKTJa4Fc",
+              "type": "ROOM",
+              "displayName": "Yichen Meeting Manager",
+              "spaceThreadingState": "THREADED_MESSAGES",
+              "spaceType": "SPACE",
+              "spaceHistoryState": "HISTORY_ON",
+              "lastActiveTime": "2026-02-03T23:13:51.503567Z",
+              "membershipCount": {
+                "joinedDirectHumanUserCount": 1
+              },
+              "customer": "customers/C00z1k2em",
+              "spaceUri": "https://chat.google.com/room/AAQAKTJa4Fc?cls=11"
+            },
+            "configCompleteRedirectUrl": "https://chat.google.com/api/bot_config_complete?token=AGSmvGNTuS7vfV8DkzJJIfWTjk5DAUuxLc33vApubAFWxnJlS2xHpi6FVgXyEXcRcDjYOE0nGMsrUk0GuVzp8HFyNu9_fy1b9JjrM9itgCXRfpfLXARRaB9BhNDtvZa6kAtPltcADVm9nZoc-0Mv1SH9CA%3D%3D",
+            "common": {
+              "userLocale": "en",
+              "hostApp": "CHAT",
+              "timeZone": {
+                "id": "America/Los_Angeles",
+                "offset": -28800000
+              }
+            },
+            "thread": {
+              "name": "spaces/AAQAKTJa4Fc/threads/KdC4uwRyl9Q"
+            }
+          },
+          "webhookUrl": "http://localhost:5678/webhook-test/a75624a4-9484-46df-ab82-85949529d420",
+          "executionMode": "test"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-30T00:50:02.822Z",
+      "createdAt": "2026-01-30T00:50:02.822Z",
+      "role": "workflow:owner",
+      "workflowId": "UnDSZuniZt0fwM1DKfHB6",
+      "projectId": "wPHCz8dAeyUSV9Av"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-02-13T19:19:39.780Z",
+  "versionId": "8175da01-2b59-4c12-974c-cbbd9f667f2d"
+}
