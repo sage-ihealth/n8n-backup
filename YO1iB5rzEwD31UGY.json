@@ -1,0 +1,263 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Patient Info Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Call 'Tool - Get Patient Info'",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Set Patient ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Patient ID": {
+      "main": [
+        [
+          {
+            "node": "Call 'Tool - Get Patient Info'1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-13T00:49:09.389Z",
+  "id": "YO1iB5rzEwD31UGY",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "Patient Info Chat Assistant",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "position": [
+        -96,
+        40
+      ],
+      "id": "73d45812-eb05-4603-94a3-b8f8c2c12e1c",
+      "typeVersion": 1.4,
+      "webhookId": "a56176b6-8030-4f3b-b237-82d6618a4a12"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "你是一个医疗账单助手，可以帮助查询患者信息。\n\n当用户询问患者信息时，使用get_patient_info工具来获取数据。\n\n关键信息说明：\n- Patient ID: 患者的唯一标识符 \n\nget_patient_info工具会根据Patient ID: 请求病人信息，\n\nassigned ca在返回里面"
+        }
+      },
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        128,
+        -64
+      ],
+      "id": "3f0865db-10d2-4343-933c-bbac416f613b",
+      "typeVersion": 3
+    },
+    {
+      "parameters": {
+        "name": "get_patient_info",
+        "description": "获取患者的详细信息。需要提供患者的Patient ID（24位十六进制字符串） 如65305128eef17d0013d112a4",
+        "workflowId": "=hrULKcd0Evgg74VH",
+        "specifyInputSchema": true,
+        "jsonSchemaExample": "{\n  \"parameters\": {\n    \"name\": \"get_patient_info\",\n    \"description\": \"获取患者的详细信息。需要提供患者的Patient ID（24位十六进制字符串）如65305128eef17d0013d112a4\",\n    \"workflowId\": \"NIqWlHosWBIMwqHT\",\n    \"specifyInputSchema\": true,\n    \"inputSchema\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"patientId\": {\n          \"type\": \"string\",\n          \"description\": \"患者的ID，24位十六进制字符串\"\n        }\n      },\n      \"required\": [\"patientId\"]\n    }\n  }\n}"
+      },
+      "name": "Get Patient Info Tool",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "position": [
+        264,
+        160
+      ],
+      "typeVersion": 1.1,
+      "id": "51dcd0a4-0974-4355-a14b-b20676e424c2"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5.2",
+          "mode": "list",
+          "cachedResultName": "gpt-5.2"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        136,
+        160
+      ],
+      "id": "88d755ee-3985-4d76-bb18-83f1a623b0c5",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "cYOjTQrkcPZ8DHDh",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -96,
+        368
+      ],
+      "id": "6b57e909-91c6-4e82-af36-1e02a663b450",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "hrULKcd0Evgg74VH",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/hrULKcd0Evgg74VH",
+          "cachedResultName": "Tool - Get Patient Info"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        128,
+        368
+      ],
+      "id": "76c7447d-a8ef-4a1c-b93f-8add51ffb669",
+      "name": "Call 'Tool - Get Patient Info'"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "test-patient-id",
+              "name": "patientId",
+              "value": "65305128eef17d0013d112a4",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        400,
+        480
+      ],
+      "id": "b25c4dbc-6f64-4587-81b1-cee7025abb33",
+      "name": "Set Patient ID"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "hrULKcd0Evgg74VH",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/hrULKcd0Evgg74VH",
+          "cachedResultName": "Tool - Get Patient Info"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "patientId": "={{$json.patientId}}"
+          }
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        624,
+        480
+      ],
+      "id": "883d52cf-0d20-4928-98b2-db1e66ff7a11",
+      "name": "Call 'Tool - Get Patient Info'1"
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-13T00:49:09.396Z",
+      "createdAt": "2026-01-13T00:49:09.396Z",
+      "role": "workflow:owner",
+      "workflowId": "YO1iB5rzEwD31UGY",
+      "projectId": "IGL0EzJNN8XZ65mm"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-01-13T01:21:28.223Z",
+  "versionId": "712ca591-f4d8-4ccd-b5a9-9ca67e2177b6"
+}
