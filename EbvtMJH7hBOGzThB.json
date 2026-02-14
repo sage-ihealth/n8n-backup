@@ -1,0 +1,149 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2025-11-19T18:13:17.797Z",
+  "id": "EbvtMJH7hBOGzThB",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "test",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {
+          "responseMode": "responseNodes"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "171b6a2e-d6ea-4628-a7ef-c0a41e8d5128",
+      "name": "When chat message received",
+      "webhookId": "b5c2623e-3030-40a7-b3bb-49c33bfb3c74"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a helpful assistant"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        192,
+        0
+      ],
+      "id": "7b08e980-705d-47e7-af22-343a1cdc53ef",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        80,
+        208
+      ],
+      "id": "01532dcc-bc6a-4406-a70a-97ee8b56042b",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "VtbiJs5HMh2j1vPr",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        224,
+        208
+      ],
+      "id": "f3fb381c-c344-4fa1-9b88-955769dd366c",
+      "name": "Simple Memory"
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {
+    "When chat message received": [
+      {
+        "json": {
+          "sessionId": "822057cc079042f0b037339313dd8991",
+          "action": "sendMessage",
+          "chatInput": "hi"
+        }
+      }
+    ]
+  },
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [
+    {
+      "updatedAt": "2025-11-19T18:13:17.804Z",
+      "createdAt": "2025-11-19T18:13:17.804Z",
+      "role": "workflow:owner",
+      "workflowId": "EbvtMJH7hBOGzThB",
+      "projectId": "IXgyKSoq6RADLFoU"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2025-11-19T22:58:49.000Z",
+  "versionId": "733baeec-80db-4441-b1b2-ece532798ba9"
+}
