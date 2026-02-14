@@ -1,0 +1,436 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-01-22T00:35:39.599Z",
+    "createdAt": "2026-01-22T00:35:39.599Z",
+    "versionId": "f8ebf6c2-af09-4fbc-8448-dbffb1c02e3e",
+    "workflowId": "2nnULznHVKHvAxh3",
+    "nodes": [
+      {
+        "parameters": {
+          "pollTimes": {
+            "item": [
+              {
+                "mode": "everyHour",
+                "minute": 15
+              },
+              {
+                "mode": "everyHour",
+                "minute": 30
+              },
+              {
+                "mode": "everyHour",
+                "minute": 45
+              },
+              {
+                "mode": "everyHour"
+              }
+            ]
+          },
+          "documentId": {
+            "__rl": true,
+            "value": "1C3ne5XoVsaFefZvsI2nWreQ-bqU-1grWLmCHFsAlo30",
+            "mode": "list",
+            "cachedResultName": "PayerKeywords",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1C3ne5XoVsaFefZvsI2nWreQ-bqU-1grWLmCHFsAlo30/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "payerMapping",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1C3ne5XoVsaFefZvsI2nWreQ-bqU-1grWLmCHFsAlo30/edit#gid=0"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheetsTrigger",
+        "typeVersion": 1,
+        "position": [
+          128,
+          0
+        ],
+        "id": "71308d1f-3926-44e4-9d27-b50af7808904",
+        "name": "ListenChanges",
+        "executeOnce": false,
+        "credentials": {
+          "googleSheetsTriggerOAuth2Api": {
+            "id": "69YZGMtkXsKBc0Mz",
+            "name": "N8N google client"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1C3ne5XoVsaFefZvsI2nWreQ-bqU-1grWLmCHFsAlo30",
+            "mode": "list",
+            "cachedResultName": "PayerKeywords",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1C3ne5XoVsaFefZvsI2nWreQ-bqU-1grWLmCHFsAlo30/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "gid=0",
+            "mode": "list",
+            "cachedResultName": "payerMapping",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1C3ne5XoVsaFefZvsI2nWreQ-bqU-1grWLmCHFsAlo30/edit#gid=0"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          352,
+          0
+        ],
+        "id": "2df2ee87-6dbc-45ac-b242-ab815e7c40df",
+        "name": "GetRowsFromSheet",
+        "executeOnce": true,
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "AkxcXiliPoTpkXRS",
+            "name": "N8N googlesheet"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const resultMap = {};\n\nconst timestamp = Date.now();\n\nfor (const item of $input.all()) {\n  const { payerTag, keyWords } = item.json;\n\n  if (!resultMap[payerTag]) {\n    resultMap[payerTag] = {\n      payerTag,\n      keyWords: [],\n      timestamp: timestamp\n    };\n  }\n\n  resultMap[payerTag].keyWords.push(keyWords);\n}\n\nreturn Object.values(resultMap).map(obj => ({\n  json: obj\n}));"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          592,
+          0
+        ],
+        "id": "082af733-d0b1-4b44-85b2-1e7a157d4ccf",
+        "name": "TransformData"
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "collection": "payer_keywords",
+          "updateKey": "payerTag",
+          "fields": "payerTag,keyWords,timestamp",
+          "upsert": true,
+          "options": {}
+        },
+        "type": "n8n-nodes-base.mongoDb",
+        "typeVersion": 1.2,
+        "position": [
+          816,
+          0
+        ],
+        "id": "4411d68d-e873-445a-91c2-2e868662a8c3",
+        "name": "UpdatePayerKeywords",
+        "credentials": {
+          "mongoDb": {
+            "id": "LUAtqhAorJGKWLeb",
+            "name": "UnifiedCare"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "ListenChanges": {
+        "main": [
+          [
+            {
+              "node": "GetRowsFromSheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "GetRowsFromSheet": {
+        "main": [
+          [
+            {
+              "node": "TransformData",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "TransformData": {
+        "main": [
+          [
+            {
+              "node": "UpdatePayerKeywords",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Lu Ouyang",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "activeVersionId": "f8ebf6c2-af09-4fbc-8448-dbffb1c02e3e",
+  "connections": {
+    "ListenChanges": {
+      "main": [
+        [
+          {
+            "node": "Delete documents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GetRowsFromSheet": {
+      "main": [
+        [
+          {
+            "node": "TransformData",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TransformData": {
+      "main": [
+        [
+          {
+            "node": "UpdatePayerKeywords",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "UpdatePayerKeywords": {
+      "main": [
+        []
+      ]
+    },
+    "Delete documents": {
+      "main": [
+        [
+          {
+            "node": "GetRowsFromSheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-15T18:47:25.213Z",
+  "id": "2nnULznHVKHvAxh3",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "PayerTagMappingUpdate",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyHour",
+              "minute": 15
+            },
+            {
+              "mode": "everyHour",
+              "minute": 30
+            },
+            {
+              "mode": "everyHour",
+              "minute": 45
+            },
+            {
+              "mode": "everyHour"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1C3ne5XoVsaFefZvsI2nWreQ-bqU-1grWLmCHFsAlo30",
+          "mode": "list",
+          "cachedResultName": "PayerKeywords",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1C3ne5XoVsaFefZvsI2nWreQ-bqU-1grWLmCHFsAlo30/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "payerMapping",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1C3ne5XoVsaFefZvsI2nWreQ-bqU-1grWLmCHFsAlo30/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        0
+      ],
+      "id": "71308d1f-3926-44e4-9d27-b50af7808904",
+      "name": "ListenChanges",
+      "executeOnce": false,
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "69YZGMtkXsKBc0Mz",
+          "name": "N8N google client"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1C3ne5XoVsaFefZvsI2nWreQ-bqU-1grWLmCHFsAlo30",
+          "mode": "list",
+          "cachedResultName": "PayerKeywords",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1C3ne5XoVsaFefZvsI2nWreQ-bqU-1grWLmCHFsAlo30/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "payerMapping",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1C3ne5XoVsaFefZvsI2nWreQ-bqU-1grWLmCHFsAlo30/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        352,
+        0
+      ],
+      "id": "2df2ee87-6dbc-45ac-b242-ab815e7c40df",
+      "name": "GetRowsFromSheet",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "AkxcXiliPoTpkXRS",
+          "name": "N8N googlesheet"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all()\n  .map(item => item.json)\n  .filter(r =>\n    r[\"tag\"]?.trim() &&\n    r[\"keyWord\"]?.trim() &&\n    r[\"matchType\"]?.trim() &&\n    r[\"tagType\"]?.trim()\n  ).map(\n    r => ({\n    json: {\n      seq: r.row_number,\n      label: r.tag.trim(),\n      keyword: r.keyWord.trim(),\n      matchType: r.matchType.trim(),\n      type: r.tagType.trim()\n    }\n  })\n  );"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        592,
+        0
+      ],
+      "id": "082af733-d0b1-4b44-85b2-1e7a157d4ccf",
+      "name": "TransformData"
+    },
+    {
+      "parameters": {
+        "operation": "findOneAndReplace",
+        "collection": "payer_tag_keywords",
+        "updateKey": "seq",
+        "fields": "seq,label,keyword,matchType,type",
+        "upsert": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        800,
+        0
+      ],
+      "id": "4411d68d-e873-445a-91c2-2e868662a8c3",
+      "name": "UpdatePayerKeywords",
+      "alwaysOutputData": false,
+      "credentials": {
+        "mongoDb": {
+          "id": "LUAtqhAorJGKWLeb",
+          "name": "UnifiedCare"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "collection": "payer_tag_keywords"
+      },
+      "type": "n8n-nodes-base.mongoDb",
+      "typeVersion": 1.2,
+      "position": [
+        176,
+        0
+      ],
+      "id": "3fe7441f-e628-4d48-9907-167ab5f93c89",
+      "name": "Delete documents",
+      "executeOnce": true,
+      "credentials": {
+        "mongoDb": {
+          "id": "LUAtqhAorJGKWLeb",
+          "name": "UnifiedCare"
+        }
+      }
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-15T18:47:25.217Z",
+      "createdAt": "2026-01-15T18:47:25.217Z",
+      "role": "workflow:owner",
+      "workflowId": "2nnULznHVKHvAxh3",
+      "projectId": "eMUywwHEm5lrOsOi"
+    }
+  ],
+  "staticData": {
+    "node:Google Sheets Trigger": {
+      "documentId": "1C3ne5XoVsaFefZvsI2nWreQ-bqU-1grWLmCHFsAlo30",
+      "sheetId": 0,
+      "lastRevision": 71,
+      "lastRevisionLink": "https://docs.google.com/spreadsheets/export?id=1C3ne5XoVsaFefZvsI2nWreQ-bqU-1grWLmCHFsAlo30&revision=71&exportFormat=xlsx"
+    },
+    "node:ListenChanges": {
+      "documentId": "1C3ne5XoVsaFefZvsI2nWreQ-bqU-1grWLmCHFsAlo30",
+      "sheetId": 0,
+      "lastRevision": 207,
+      "lastRevisionLink": "https://docs.google.com/spreadsheets/export?id=1C3ne5XoVsaFefZvsI2nWreQ-bqU-1grWLmCHFsAlo30&revision=207&exportFormat=xlsx"
+    }
+  },
+  "tags": [
+    {
+      "updatedAt": "2026-01-16T22:51:45.039Z",
+      "createdAt": "2026-01-16T22:51:45.039Z",
+      "id": "17d9zKrDLCuYCUQA",
+      "name": "insurance"
+    },
+    {
+      "updatedAt": "2026-01-16T22:51:47.521Z",
+      "createdAt": "2026-01-16T22:51:47.521Z",
+      "id": "2Yso2axgFawSJG9i",
+      "name": "billing"
+    },
+    {
+      "updatedAt": "2026-01-16T22:51:41.453Z",
+      "createdAt": "2026-01-16T22:51:41.453Z",
+      "id": "3n9C0kBs5J5Y9L9H",
+      "name": "configuration"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2026-02-12T00:39:31.301Z",
+  "versionId": "7496b53e-4a71-442b-93a3-e36626e3de3b"
+}
