@@ -1,0 +1,43 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {},
+  "createdAt": "2026-02-04T19:49:08.855Z",
+  "id": "pAGhqbznKLUAhsEwGNHup",
+  "isArchived": false,
+  "meta": null,
+  "name": "DumpReportChecking",
+  "nodes": [],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-04T19:49:08.858Z",
+      "createdAt": "2026-02-04T19:49:08.858Z",
+      "role": "workflow:owner",
+      "workflowId": "pAGhqbznKLUAhsEwGNHup",
+      "projectId": "eMUywwHEm5lrOsOi"
+    }
+  ],
+  "staticData": null,
+  "tags": [
+    {
+      "updatedAt": "2026-01-16T22:51:47.521Z",
+      "createdAt": "2026-01-16T22:51:47.521Z",
+      "id": "2Yso2axgFawSJG9i",
+      "name": "billing"
+    }
+  ],
+  "triggerCount": 0,
+  "updatedAt": "2026-02-04T19:49:20.198Z",
+  "versionId": "48dbe4ba-a69f-4b3f-9943-1a2c02cf3ffc"
+}
