@@ -1,0 +1,62 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "createdAt": "2026-02-06T21:44:15.386Z",
+  "id": "702wA9hXdDSx1h8h",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "screening data copy",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "1265117b-1154-4a89-9e1b-6b07f951a965",
+      "name": "Schedule Trigger"
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-06T21:44:15.389Z",
+      "createdAt": "2026-02-06T21:44:15.389Z",
+      "role": "workflow:owner",
+      "workflowId": "702wA9hXdDSx1h8h",
+      "projectId": "kugITzN49x98FAtM"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-02-06T21:44:22.594Z",
+  "versionId": "2af6e033-e0c8-4589-a814-4c93fc000a67"
+}
