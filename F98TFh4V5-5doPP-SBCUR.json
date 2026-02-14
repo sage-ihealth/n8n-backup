@@ -1,0 +1,731 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-01-30T22:11:58.000Z",
+    "createdAt": "2026-01-30T22:10:21.084Z",
+    "versionId": "b810f0f0-67ab-40bc-aea0-711d4c8643df",
+    "workflowId": "F98TFh4V5-5doPP-SBCUR",
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "weeks",
+                "triggerAtDay": [
+                  5
+                ],
+                "triggerAtHour": 15
+              },
+              {
+                "field": "weeks",
+                "triggerAtDay": [
+                  5
+                ],
+                "triggerAtHour": 18
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          0,
+          560
+        ],
+        "id": "cac7ece0-315a-49cc-b4c1-18f92de162b4",
+        "name": "Schedule Trigger1"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "06e9d547-1cf0-4402-8743-d1ef0de2b94a",
+                "leftValue": "={{ $json[\"This Week's Focus\"] }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "string",
+                  "operation": "empty",
+                  "singleValue": true
+                }
+              },
+              {
+                "id": "1831201d-557c-4740-9828-912c40d1645e",
+                "leftValue": "={{ $json[\"Date (Friday of that week)\"] }}",
+                "rightValue": "={{ $now.setZone('America/Los_Angeles').toFormat('M/d/yyyy') }}",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals",
+                  "name": "filter",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.filter",
+        "typeVersion": 2.3,
+        "position": [
+          448,
+          560
+        ],
+        "id": "1df64c43-e7d5-4038-94f6-563321605a9e",
+        "name": "Filter for Today + Empty1"
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1vRhvx9dHvmu_BGtc6p8BrW9ywphUc5Y-uAddHooZoJg",
+            "mode": "list",
+            "cachedResultName": "UC Weekly Alignment Update (Leaders Input)",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1vRhvx9dHvmu_BGtc6p8BrW9ywphUc5Y-uAddHooZoJg/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 763657570,
+            "mode": "list",
+            "cachedResultName": "Fill Out Here Pls",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1vRhvx9dHvmu_BGtc6p8BrW9ywphUc5Y-uAddHooZoJg/edit#gid=763657570"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          224,
+          560
+        ],
+        "id": "137fa82f-11a4-4b52-8016-f9ff49c75494",
+        "name": "Get row(s) in sheet1",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "mPiYRUHsh5Fajaec",
+            "name": "Google Sheets account 5"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "weeks",
+                "triggerAtDay": [],
+                "triggerAtHour": 10
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          0,
+          784
+        ],
+        "id": "29eebae0-3730-4fdd-8352-b86ffb6d797a",
+        "name": "Schedule (Friday 6PM)"
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1vRhvx9dHvmu_BGtc6p8BrW9ywphUc5Y-uAddHooZoJg",
+            "mode": "list",
+            "cachedResultName": "Unified Care Team Weekly Update 2026",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1vRhvx9dHvmu_BGtc6p8BrW9ywphUc5Y-uAddHooZoJg/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 763657570,
+            "mode": "list",
+            "cachedResultName": "Fill Out Here Pls",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1vRhvx9dHvmu_BGtc6p8BrW9ywphUc5Y-uAddHooZoJg/edit#gid=763657570"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          224,
+          784
+        ],
+        "id": "8e20a7dc-c09a-42b9-8cb4-417bc9b1ce5a",
+        "name": "Get Sheet Data",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "mPiYRUHsh5Fajaec",
+            "name": "Google Sheets account 5"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "date-check",
+                "leftValue": "={{ $json[\"Date (Friday of that week)\"] }}",
+                "rightValue": "={{ $now.setZone('America/Los_Angeles').toFormat('M/d/yyyy') }}",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals",
+                  "name": "filter",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.filter",
+        "typeVersion": 2.3,
+        "position": [
+          448,
+          784
+        ],
+        "id": "12d71364-75a0-4638-94b2-04f6f03441dd",
+        "name": "Filter for Today's Date"
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "documentURL": "https://docs.google.com/document/d/15vB3pVd0jdQe7KVaYO8_vV80craD3GzdQVekrXLjhO8/edit?tab=t.2ltjpdsxjb4u",
+          "actionsUi": {
+            "actionFields": [
+              {
+                "action": "insert",
+                "text": "={{ $json.text }}"
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.googleDocs",
+        "typeVersion": 2,
+        "position": [
+          896,
+          784
+        ],
+        "id": "457fe8da-ff76-4a32-b40b-d3a204cd4654",
+        "name": "Append to Doc",
+        "credentials": {
+          "googleDocsOAuth2Api": {
+            "id": "Hn7SZSdLBTvkeEyv",
+            "name": "Google Docs account 3"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// 1. Start the report with the Date Header\n// We use the date from the first item found\nlet reportText = \"\\n\\n\" + items[0].json['Date (Friday of that week)'] + \"\\n\";\nreportText += \"==================================================\\n\\n\";\n\n// 2. Loop through EVERY row found in the sheet\nfor (const item of items) {\n  const dept = item.json['Team'];\n  const rawStatus = item.json['Status'] || \"\";\n  const focus = item.json[\"This Week's Focus\"] || \"(No update provided)\";\n  const risk = item.json['Key Change or Upcoming Risk'] || \"None\";\n\n  // 3. Convert text Status to Emojis\n  let statusEmoji = \"⚪\"; // Default grey\n  if (rawStatus.includes(\"On Track\")) {\n    statusEmoji = \"🟢\";\n  } else if (rawStatus.includes(\"At Risk\")) {\n    statusEmoji = \"🟡\";\n  } else if (rawStatus.includes(\"Blocked\")) {\n    statusEmoji = \"🔴\";\n  }\n\n  // 4. Build the text block using \"Mathematical Bold\" characters\n  // These special characters look bold but are treated as plain text\n  \n  reportText += `𝐓𝐞𝐚𝐦/𝐃𝐞𝐩𝐚𝐫𝐭𝐦𝐞𝐧𝐭: ${dept}\\n`;\n  reportText += `𝐒𝐭𝐚𝐭𝐮𝐬: ${statusEmoji}\\n\\n`;\n  \n  reportText += `𝐓𝐡𝐢𝐬 𝐰𝐞𝐞𝐤'𝐬 𝐟𝐨𝐜𝐮𝐬:\\n`;\n  reportText += `${focus}\\n\\n`;\n  \n  reportText += `𝐊𝐞𝐲 𝐜𝐡𝐚𝐧𝐠𝐞 𝐨𝐫 𝐮𝐩𝐜𝐨𝐦𝐢𝐧𝐠 𝐫𝐢𝐬𝐤, 𝐜𝐡𝐚𝐥𝐥𝐞𝐧𝐠𝐞𝐬:\\n`;\n  reportText += `${risk}\\n`;\n  \n  // Add the separator line\n  reportText += \"____________________________________________________________________________\\n\\n\";\n}\n\n// 5. Output the single combined text block\nreturn [{json: {text: reportText}}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          672,
+          784
+        ],
+        "id": "6245a99b-6843-4994-b30b-f5e41284768b",
+        "name": "Code in JavaScript"
+      },
+      {
+        "parameters": {
+          "spaceId": "spaces/AAQAknpNPFc",
+          "messageUi": {
+            "text": "=Hello {{ $json['Google Chat Handle'] }}, this is a friendly reminder to fill out your Weekly Update for the {{ $json['Team/Department'] }} team. Thank you!"
+          },
+          "additionalFields": {}
+        },
+        "type": "n8n-nodes-base.googleChat",
+        "typeVersion": 1,
+        "position": [
+          688,
+          560
+        ],
+        "id": "ecdcd0d0-4d6f-4c27-be04-eac310dce5c7",
+        "name": "Create a message",
+        "webhookId": "59597348-3ea1-45cb-b956-9339bac498e7",
+        "credentials": {
+          "googleApi": {
+            "id": "idRfoQl8gYSpgXqj",
+            "name": "Chat account 7"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Schedule Trigger1": {
+        "main": [
+          [
+            {
+              "node": "Get row(s) in sheet1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Filter for Today + Empty1": {
+        "main": [
+          [
+            {
+              "node": "Create a message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get row(s) in sheet1": {
+        "main": [
+          [
+            {
+              "node": "Filter for Today + Empty1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Schedule (Friday 6PM)": {
+        "main": [
+          [
+            {
+              "node": "Get Sheet Data",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Sheet Data": {
+        "main": [
+          [
+            {
+              "node": "Filter for Today's Date",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Filter for Today's Date": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript": {
+        "main": [
+          [
+            {
+              "node": "Append to Doc",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Tina Zou",
+    "name": "Version b810f0f0",
+    "description": "",
+    "autosaved": true
+  },
+  "activeVersionId": "b810f0f0-67ab-40bc-aea0-711d4c8643df",
+  "connections": {
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter for Today + Empty1": {
+      "main": [
+        [
+          {
+            "node": "Create a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Filter for Today + Empty1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule (Friday 6PM)": {
+      "main": [
+        [
+          {
+            "node": "Get Sheet Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Sheet Data": {
+      "main": [
+        [
+          {
+            "node": "Filter for Today's Date",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter for Today's Date": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Append to Doc",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-26T19:37:34.183Z",
+  "id": "F98TFh4V5-5doPP-SBCUR",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "UC Weekly Alignment Update",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                5
+              ],
+              "triggerAtHour": 15
+            },
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                5
+              ],
+              "triggerAtHour": 18
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        560
+      ],
+      "id": "cac7ece0-315a-49cc-b4c1-18f92de162b4",
+      "name": "Schedule Trigger1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "06e9d547-1cf0-4402-8743-d1ef0de2b94a",
+              "leftValue": "={{ $json[\"This Week's Focus\"] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "1831201d-557c-4740-9828-912c40d1645e",
+              "leftValue": "={{ $json[\"Date (Friday of that week)\"] }}",
+              "rightValue": "={{ $now.setZone('America/Los_Angeles').toFormat('M/d/yyyy') }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        448,
+        560
+      ],
+      "id": "1df64c43-e7d5-4038-94f6-563321605a9e",
+      "name": "Filter for Today + Empty1"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1vRhvx9dHvmu_BGtc6p8BrW9ywphUc5Y-uAddHooZoJg",
+          "mode": "list",
+          "cachedResultName": "UC Weekly Alignment Update (Leaders Input)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1vRhvx9dHvmu_BGtc6p8BrW9ywphUc5Y-uAddHooZoJg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 763657570,
+          "mode": "list",
+          "cachedResultName": "Fill Out Here Pls",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1vRhvx9dHvmu_BGtc6p8BrW9ywphUc5Y-uAddHooZoJg/edit#gid=763657570"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        560
+      ],
+      "id": "137fa82f-11a4-4b52-8016-f9ff49c75494",
+      "name": "Get row(s) in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "mPiYRUHsh5Fajaec",
+          "name": "Google Sheets account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [],
+              "triggerAtHour": 10
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        784
+      ],
+      "id": "29eebae0-3730-4fdd-8352-b86ffb6d797a",
+      "name": "Schedule (Friday 6PM)"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1vRhvx9dHvmu_BGtc6p8BrW9ywphUc5Y-uAddHooZoJg",
+          "mode": "list",
+          "cachedResultName": "Unified Care Team Weekly Update 2026",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1vRhvx9dHvmu_BGtc6p8BrW9ywphUc5Y-uAddHooZoJg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 763657570,
+          "mode": "list",
+          "cachedResultName": "Fill Out Here Pls",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1vRhvx9dHvmu_BGtc6p8BrW9ywphUc5Y-uAddHooZoJg/edit#gid=763657570"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        784
+      ],
+      "id": "8e20a7dc-c09a-42b9-8cb4-417bc9b1ce5a",
+      "name": "Get Sheet Data",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "mPiYRUHsh5Fajaec",
+          "name": "Google Sheets account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "date-check",
+              "leftValue": "={{ $json[\"Date (Friday of that week)\"] }}",
+              "rightValue": "={{ $now.setZone('America/Los_Angeles').toFormat('M/d/yyyy') }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        448,
+        784
+      ],
+      "id": "12d71364-75a0-4638-94b2-04f6f03441dd",
+      "name": "Filter for Today's Date"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "https://docs.google.com/document/d/15vB3pVd0jdQe7KVaYO8_vV80craD3GzdQVekrXLjhO8/edit?tab=t.2ltjpdsxjb4u",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "text": "={{ $json.text }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        896,
+        784
+      ],
+      "id": "457fe8da-ff76-4a32-b40b-d3a204cd4654",
+      "name": "Append to Doc",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "Hn7SZSdLBTvkeEyv",
+          "name": "Google Docs account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Start the report with the Date Header\n// We use the date from the first item found\nlet reportText = \"\\n\\n\" + items[0].json['Date (Friday of that week)'] + \"\\n\";\nreportText += \"==================================================\\n\\n\";\n\n// 2. Loop through EVERY row found in the sheet\nfor (const item of items) {\n  const dept = item.json['Team'];\n  const rawStatus = item.json['Status'] || \"\";\n  const focus = item.json[\"This Week's Focus\"] || \"(No update provided)\";\n  const risk = item.json['Key Change or Upcoming Risk'] || \"None\";\n\n  // 3. Convert text Status to Emojis\n  let statusEmoji = \"⚪\"; // Default grey\n  if (rawStatus.includes(\"On Track\")) {\n    statusEmoji = \"🟢\";\n  } else if (rawStatus.includes(\"At Risk\")) {\n    statusEmoji = \"🟡\";\n  } else if (rawStatus.includes(\"Blocked\")) {\n    statusEmoji = \"🔴\";\n  }\n\n  // 4. Build the text block using \"Mathematical Bold\" characters\n  // These special characters look bold but are treated as plain text\n  \n  reportText += `𝐓𝐞𝐚𝐦/𝐃𝐞𝐩𝐚𝐫𝐭𝐦𝐞𝐧𝐭: ${dept}\\n`;\n  reportText += `𝐒𝐭𝐚𝐭𝐮𝐬: ${statusEmoji}\\n\\n`;\n  \n  reportText += `𝐓𝐡𝐢𝐬 𝐰𝐞𝐞𝐤'𝐬 𝐟𝐨𝐜𝐮𝐬:\\n`;\n  reportText += `${focus}\\n\\n`;\n  \n  reportText += `𝐊𝐞𝐲 𝐜𝐡𝐚𝐧𝐠𝐞 𝐨𝐫 𝐮𝐩𝐜𝐨𝐦𝐢𝐧𝐠 𝐫𝐢𝐬𝐤, 𝐜𝐡𝐚𝐥𝐥𝐞𝐧𝐠𝐞𝐬:\\n`;\n  reportText += `${risk}\\n`;\n  \n  // Add the separator line\n  reportText += \"____________________________________________________________________________\\n\\n\";\n}\n\n// 5. Output the single combined text block\nreturn [{json: {text: reportText}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        784
+      ],
+      "id": "6245a99b-6843-4994-b30b-f5e41284768b",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAQADOX9tM4",
+        "messageUi": {
+          "text": "=Hello <users/{{ $json['Google Chat Handle'] }}>, this is a friendly reminder to fill out your Weekly Update for the {{ $json['Team/Department'] }} team. Thank you!"
+        },
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        688,
+        560
+      ],
+      "id": "ecdcd0d0-4d6f-4c27-be04-eac310dce5c7",
+      "name": "Create a message",
+      "webhookId": "59597348-3ea1-45cb-b956-9339bac498e7",
+      "credentials": {
+        "googleApi": {
+          "id": "idRfoQl8gYSpgXqj",
+          "name": "Chat account 7"
+        }
+      }
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-26T19:37:34.185Z",
+      "createdAt": "2026-01-26T19:37:34.185Z",
+      "role": "workflow:owner",
+      "workflowId": "F98TFh4V5-5doPP-SBCUR",
+      "projectId": "PvZitumGnZP1AedJ"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 2,
+  "updatedAt": "2026-02-06T22:16:00.243Z",
+  "versionId": "5ebd8116-7487-4d6e-a641-732e8b5232ad"
+}
