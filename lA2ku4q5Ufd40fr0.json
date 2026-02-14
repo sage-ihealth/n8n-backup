@@ -1,0 +1,379 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-01-30T01:53:41.000Z",
+    "createdAt": "2026-01-30T01:45:48.580Z",
+    "versionId": "4fc85ecd-333b-4c8b-b6d0-b04b60e96fc0",
+    "workflowId": "lA2ku4q5Ufd40fr0",
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "jira-dr-review",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2,
+        "position": [
+          -480,
+          448
+        ],
+        "id": "10109eaa-cdd4-481f-8a4b-3d1f9e82bb9b",
+        "name": "Webhook",
+        "webhookId": "df154bf6-2850-4ac5-9048-4828106a95cd"
+      },
+      {
+        "parameters": {
+          "jsCode": "const item = $input.item.json;\n\n// Extract the comments array\nconst comments = $input.first().json.body.issue.fields.comment.comments;\n\n// Safely get the last comment body in the list\nlet body = (comments && comments.length > 0) \n  ? comments[comments.length - 1].body \n  : \"\";\n\n// Robust Regex to handle 'sql:' followed by a newline or space\nconst sqlRegex = /^sql:\\s*([\\s\\S]*)$/i;\nconst match = body.trim().match(sqlRegex);\n\nconst isSql = !!match;\nconst sqlQuery = isSql ? match[1].trim() : null;\n\n// Get the issue key dynamically from the nested fields\nconst issueKey = $input.first().json.body.issue.key || \"DR-UNKNOWN\"; \n\nreturn {\n  is_sql: isSql,\n  sql_query: sqlQuery,\n  issue_key: issueKey\n};"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -256,
+          448
+        ],
+        "id": "32b47842-005c-4eac-b540-a84a29243e04",
+        "name": "Check sql: prefix (JS)"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 1
+            },
+            "conditions": [
+              {
+                "id": "sql_check",
+                "leftValue": "={{ $json.is_sql }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2,
+        "position": [
+          -32,
+          448
+        ],
+        "id": "7e6f70f2-d4bf-4a20-ad20-4bfe92795752",
+        "name": "Is SQL?"
+      },
+      {
+        "parameters": {
+          "modelId": {
+            "__rl": true,
+            "value": "chatgpt-4o-latest",
+            "mode": "list",
+            "cachedResultName": "CHATGPT-4O-LATEST"
+          },
+          "messages": {
+            "values": [
+              {
+                "content": "=You are an expert SQL engineer and data reviewer for Snowflake.\n\nPlease review the following Snowflake SQL code and provide feedback on:\n\n1. Correctness (logic, joins, filters)\n2. Performance (Snowflake specific: micro-partitioning, pruning)\n3. Readability\n\nSQL Code:\n {{ $json.sql_query }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.openAi",
+        "typeVersion": 1.5,
+        "position": [
+          240,
+          432
+        ],
+        "id": "b2ce5cd5-49bf-480b-bd14-3bd777abdf67",
+        "name": "Message a model",
+        "credentials": {
+          "openAiApi": {
+            "id": "pTwehq7p5zxhlHdV",
+            "name": "OpenAi account 5"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "resource": "issueComment",
+          "issueKey": "={{ $node[\"Check sql: prefix (JS)\"].json.issue_key }}",
+          "comment": "={{ $json.message.content }}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.jira",
+        "typeVersion": 1,
+        "position": [
+          576,
+          432
+        ],
+        "id": "f6469a1e-2111-4e2d-ac61-42d82e6e295f",
+        "name": "Add a comment",
+        "credentials": {
+          "jiraSoftwareCloudApi": {
+            "id": "QnhAkiMNRLvSnuZp",
+            "name": "Jira SW Cloud account - yichen.sun"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Check sql: prefix (JS)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Check sql: prefix (JS)": {
+        "main": [
+          [
+            {
+              "node": "Is SQL?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Is SQL?": {
+        "main": [
+          [
+            {
+              "node": "Message a model",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Message a model": {
+        "main": [
+          [
+            {
+              "node": "Add a comment",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Yichen Sun",
+    "name": "sql_qa_v1_0",
+    "description": "",
+    "autosaved": true
+  },
+  "activeVersionId": "4fc85ecd-333b-4c8b-b6d0-b04b60e96fc0",
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Check sql: prefix (JS)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check sql: prefix (JS)": {
+      "main": [
+        [
+          {
+            "node": "Is SQL?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is SQL?": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Add a comment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add a comment": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "createdAt": "2026-01-17T03:29:03.337Z",
+  "id": "lA2ku4q5Ufd40fr0",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "Data Request Auto QA",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "jira-dr-review",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -480,
+        448
+      ],
+      "id": "10109eaa-cdd4-481f-8a4b-3d1f9e82bb9b",
+      "name": "Webhook",
+      "webhookId": "df154bf6-2850-4ac5-9048-4828106a95cd"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.item.json;\n\n// Extract the comments array\nconst comments = $input.first().json.body.issue.fields.comment.comments;\n\n// Safely get the last comment body in the list\nlet body = (comments && comments.length > 0) \n  ? comments[comments.length - 1].body \n  : \"\";\n\n// Robust Regex to handle 'sql:' followed by a newline or space\nconst sqlRegex = /^sql:\\s*([\\s\\S]*)$/i;\nconst match = body.trim().match(sqlRegex);\n\nconst isSql = !!match;\nconst sqlQuery = isSql ? match[1].trim() : null;\n\n// Get the issue key dynamically from the nested fields\nconst issueKey = $input.first().json.body.issue.key || \"DR-UNKNOWN\"; \n\nreturn {\n  is_sql: isSql,\n  sql_query: sqlQuery,\n  issue_key: issueKey\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -256,
+        448
+      ],
+      "id": "32b47842-005c-4eac-b540-a84a29243e04",
+      "name": "Check sql: prefix (JS)"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "sql_check",
+              "leftValue": "={{ $json.is_sql }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -32,
+        448
+      ],
+      "id": "7e6f70f2-d4bf-4a20-ad20-4bfe92795752",
+      "name": "Is SQL?"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "chatgpt-4o-latest",
+          "mode": "list",
+          "cachedResultName": "CHATGPT-4O-LATEST"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are an expert SQL engineer and data reviewer for Snowflake.\n\nPlease review the following Snowflake SQL code and provide feedback on:\n\n1. Correctness (logic, joins, filters)\n2. Performance (Snowflake specific: micro-partitioning, pruning)\n3. Readability\n\nSQL Code:\n {{ $json.sql_query }}",
+              "role": "assistant"
+            },
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.5,
+      "position": [
+        240,
+        432
+      ],
+      "id": "b2ce5cd5-49bf-480b-bd14-3bd777abdf67",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "pTwehq7p5zxhlHdV",
+          "name": "OpenAi account 5"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "issueComment",
+        "issueKey": "={{ $node[\"Check sql: prefix (JS)\"].json.issue_key }}",
+        "comment": "={{ $json.message.content }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.jira",
+      "typeVersion": 1,
+      "position": [
+        576,
+        432
+      ],
+      "id": "f6469a1e-2111-4e2d-ac61-42d82e6e295f",
+      "name": "Add a comment",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "QnhAkiMNRLvSnuZp",
+          "name": "Jira SW Cloud account - yichen.sun"
+        }
+      }
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-17T03:29:03.341Z",
+      "createdAt": "2026-01-17T03:29:03.341Z",
+      "role": "workflow:owner",
+      "workflowId": "lA2ku4q5Ufd40fr0",
+      "projectId": "wPHCz8dAeyUSV9Av"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2026-01-30T15:45:25.513Z",
+  "versionId": "2e4f1f48-dcbc-41b8-84c6-0f16aca61e26"
+}
