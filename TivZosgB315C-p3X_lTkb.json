@@ -1,0 +1,596 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-02-06T23:51:06.000Z",
+    "createdAt": "2026-02-06T23:51:04.366Z",
+    "versionId": "354d01c0-9234-4d6b-8941-202e97cb7229",
+    "workflowId": "TivZosgB315C-p3X_lTkb",
+    "nodes": [
+      {
+        "parameters": {
+          "resource": "fileFolder",
+          "filter": {},
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleDrive",
+        "typeVersion": 3,
+        "position": [
+          -208,
+          -16
+        ],
+        "id": "9655c687-8d35-4a30-a5a6-af40a7fd3094",
+        "name": "Search files and folders",
+        "credentials": {
+          "googleDriveOAuth2Api": {
+            "id": "vyrFwfMuFp13UUhR",
+            "name": "Google Drive account 4"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {}
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          -432,
+          -16
+        ],
+        "id": "56909dcd-7fd6-4f9d-a6fb-5b2d2056f63e",
+        "name": "Schedule Trigger"
+      }
+    ],
+    "connections": {
+      "Schedule Trigger": {
+        "main": [
+          [
+            {
+              "node": "Search files and folders",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "tianyang liu",
+    "name": "Version 354d01c0",
+    "description": "",
+    "autosaved": true
+  },
+  "activeVersionId": "354d01c0-9234-4d6b-8941-202e97cb7229",
+  "connections": {
+    "Set Initial Folder2": {
+      "main": [
+        [
+          {
+            "node": "Init Queue3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Init Queue3": {
+      "main": [
+        [
+          {
+            "node": "Queue > 0?2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Queue > 0?2": {
+      "main": [
+        [
+          {
+            "node": "Pop Folder2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Final PDFs1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pop Folder2": {
+      "main": [
+        [
+          {
+            "node": "Get Subfolders4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Subfolders4": {
+      "main": [
+        [
+          {
+            "node": "Update State2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update State2": {
+      "main": [
+        [
+          {
+            "node": "Queue > 0?2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger2": {
+      "main": [
+        [
+          {
+            "node": "Set Initial Folder2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get Subfolders5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Subfolders5": {
+      "main": [
+        [
+          {
+            "node": "Merge All PDFs1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Root Files": {
+      "main": [
+        [
+          {
+            "node": "Split Folders & PDFs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Folders & PDFs": {
+      "main": [
+        [
+          {
+            "node": "Get Subfolder PDFs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Subfolder PDFs": {
+      "main": [
+        [
+          {
+            "node": "Merge All PDFs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-02-06T19:20:52.371Z",
+  "id": "TivZosgB315C-p3X_lTkb",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "My workflow 30",
+  "nodes": [
+    {
+      "parameters": {
+        "fieldToSplitOut": "allPdfs",
+        "options": {}
+      },
+      "id": "7d959088-499e-4eda-8edb-4dae12c24adf",
+      "name": "Final PDFs1",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 3.1,
+      "position": [
+        0,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": " {\n    \"folderId\": \"1MbKC1N9AtOeu7khh0AEPClvWeVKY1ZEg\"\n  }",
+        "options": {}
+      },
+      "id": "d3136b10-ccc2-4c0c-af07-d09e6161d13d",
+      "name": "Set Initial Folder2",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.2,
+      "position": [
+        -672,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4b6c5d01-3777-4001-b26a-f3936971fed3",
+              "name": "queue",
+              "value": "={{ [$json.folderId] }}",
+              "type": "array"
+            },
+            {
+              "id": "5b6c5d02-3778-4002-b26b-f3936971fee4",
+              "name": "allPdfs",
+              "value": "={{ [] }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "cc1794da-0097-4e6d-82a9-3b1090f9916d",
+      "name": "Init Queue3",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -448,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "6b6c5d03-3779-4003-b26c-f3936971fef5",
+              "leftValue": "={{ $json.queue.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "larger"
+              }
+            },
+            {
+              "id": "feb02490-d234-438c-bddb-14ca44be4360",
+              "leftValue": "={{ $json.queue.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {
+          "ignoreCase": false
+        }
+      },
+      "id": "fb62fffe-8cd2-4cba-aba9-82e598209634",
+      "name": "Queue > 0?2",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -224,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7b6c5d04-3780-4004-b26d-f3936971ff06",
+              "name": "currentFolderId",
+              "value": "={{ $json.queue.shift() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "78ec5c2b-ee02-4f73-bcf1-d32b6e12c0b2",
+      "name": "Pop Folder2",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/drive/v3/files",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "='{{ $json.currentFolderId }}' in parents and (mimeType = 'application/vnd.google-apps.folder' or mimeType = 'application/pdf') and trashed = false"
+            },
+            {
+              "name": "fields",
+              "value": "files(id, name, mimeType)"
+            },
+            {
+              "name": "pageSize",
+              "value": "1000"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "ad136e64-8f24-4616-a142-5697986023c6",
+      "name": "Get Subfolders4"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $node[\"Get Subfolders4\"].json.files || [];\nconst currentQueue = $node[\"Pop Folder2\"].json.queue || [];\nconst currentAllPdfs = $node[\"Pop Folder2\"].json.allPdfs || [];\n\nconst newFolders = items.filter(f => f.mimeType === 'application/vnd.google-apps.folder').map(f => f.id);\nconst newPdfs = items.filter(f => f.mimeType === 'application/pdf');\nreturn {\n  queue: [...currentQueue, ...newFolders],\n  allPdfs: [...currentAllPdfs, ...newPdfs]\n};"
+      },
+      "id": "d2502a79-b308-49ef-9df0-b7b769570243",
+      "name": "Update State2",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -896,
+        192
+      ],
+      "id": "925de9c9-cb67-4ceb-9c13-c0f7c9b91551",
+      "name": "Schedule Trigger2"
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/drive/v3/files",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "='1BhFJxH-D_PyJffDaj1esiMbL5lcRzcj9' in parents and (mimeType = 'application/vnd.google-apps.folder' or mimeType = 'application/pdf') and trashed = false"
+            },
+            {
+              "name": "fields",
+              "value": "files(id, name, mimeType)"
+            },
+            {
+              "name": "pageSize",
+              "value": "1000"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -608,
+        384
+      ],
+      "id": "62b1acc1-9833-4253-9eb3-fa32263f0791",
+      "name": "Get Subfolders5",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "vyrFwfMuFp13UUhR",
+          "name": "Google Drive account tian'yang"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -832,
+        384
+      ],
+      "id": "ca111eb4-0879-4dea-a546-b838ed89c58c",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/drive/v3/files",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "='1BhFJxH-D_PyJffDaj1esiMbL5lcRzcj9' in parents and (mimeType = 'application/vnd.google-apps.folder' or mimeType = 'application/pdf') and trashed = false"
+            },
+            {
+              "name": "fields",
+              "value": "files(id, name, mimeType)"
+            },
+            {
+              "name": "pageSize",
+              "value": "1000"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1488,
+        704
+      ],
+      "id": "ec366d35-de98-4d98-bdf8-79a53ae7027e",
+      "name": "Get Root Files",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "vyrFwfMuFp13UUhR",
+          "name": "Google Drive account tian'yang"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst allFiles = items[0].json.files || [];\n\nconst folders = allFiles.filter(f => f.mimeType === 'application/vnd.google-apps.folder');\nconst rootPdfs = allFiles.filter(f => f.mimeType === 'application/pdf');\n\n// 保存根目录的 PDF 到工作流数据\n$('Workflow').first().json.rootPdfs = rootPdfs;\n\nreturn folders.map(folder => ({\n  json: {\n    folderId: folder.id,\n    folderName: folder.name\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1696,
+        704
+      ],
+      "id": "ef86d925-c4ce-4e40-a98c-cb08b3fdf2cb",
+      "name": "Split Folders & PDFs"
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/drive/v3/files",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "='{{ $json.folderId }}' in parents and mimeType = 'application/pdf' and trashed = false"
+            },
+            {
+              "name": "fields",
+              "value": "files(id, name, mimeType)"
+            },
+            {
+              "name": "pageSize",
+              "value": "1000"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1920,
+        704
+      ],
+      "id": "b8b6c442-6fa0-4f3e-90b1-47de2264bc60",
+      "name": "Get Subfolder PDFs",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "vyrFwfMuFp13UUhR",
+          "name": "Google Drive account tian'yang"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconst allPdfs = items.flatMap(item => {\n  if (item.json.files) {\n    return item.json.files;\n  }\n  return [];\n});\n\n// 获取根目录的 PDFs\nconst rootPdfs = $('Workflow').first().json.rootPdfs || [];\n\n// 合并所有 PDF\nconst combined = [...rootPdfs, ...allPdfs];\n\n// 去重\nconst uniquePdfs = [...new Map(combined.map(pdf => [pdf.id, pdf])).values()];\n\nreturn [{\n  json: {\n    totalCount: uniquePdfs.length,\n    pdfs: uniquePdfs\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2144,
+        704
+      ],
+      "id": "2ff0b5be-7501-49b1-b30f-9b64ab4dfd67",
+      "name": "Merge All PDFs"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconst allPdfs = items.flatMap(item => {\n  if (item.json.files) {\n    return item.json.files;\n  }\n  return [];\n});\n\n// 获取根目录的 PDFs\nconst rootPdfs = $('Workflow').first().json.rootPdfs || [];\n\n// 合并所有 PDF\nconst combined = [...rootPdfs, ...allPdfs];\n\n// 去重\nconst uniquePdfs = [...new Map(combined.map(pdf => [pdf.id, pdf])).values()];\n\nreturn [{\n  json: {\n    totalCount: uniquePdfs.length,\n    pdfs: uniquePdfs\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -48,
+        560
+      ],
+      "id": "51861643-b5d7-48ea-80f1-13166fec0f9c",
+      "name": "Merge All PDFs1"
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-06T19:20:52.409Z",
+      "createdAt": "2026-02-06T19:20:52.409Z",
+      "role": "workflow:owner",
+      "workflowId": "TivZosgB315C-p3X_lTkb",
+      "projectId": "fxF7JWNdG8BOQBd4"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2026-02-09T22:04:03.712Z",
+  "versionId": "8284b5e3-22f5-4901-85fc-77ac7fe27f4d"
+}
