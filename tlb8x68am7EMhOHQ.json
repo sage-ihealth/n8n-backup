@@ -1,0 +1,97 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-14T01:26:03.229Z",
+  "id": "tlb8x68am7EMhOHQ",
+  "isArchived": true,
+  "meta": null,
+  "name": "My workflow 8",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "db710159-3beb-4952-878c-4383ab877de5",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://ihealthlabs.talentlms.com/v1/gettimeline",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        208,
+        0
+      ],
+      "id": "19158df6-fb9a-410b-9fca-ef1fde7afb31",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "EsyepIMWisrkDo1g",
+          "name": "TalentLMS"
+        }
+      }
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-14T01:26:03.234Z",
+      "createdAt": "2026-01-14T01:26:03.234Z",
+      "role": "workflow:owner",
+      "workflowId": "tlb8x68am7EMhOHQ",
+      "projectId": "SzgLfYyy3lWDJHJA"
+    }
+  ],
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2026-01-17T03:08:53.000Z",
+  "versionId": "1b7c9c39-a264-448c-bef1-064963b8b849"
+}
