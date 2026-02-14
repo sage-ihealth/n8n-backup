@@ -1,0 +1,2080 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-02-11T02:03:12.000Z",
+    "createdAt": "2026-02-11T02:00:03.815Z",
+    "versionId": "a7b292ea-fe8b-42e1-87e4-70923736f2b5",
+    "workflowId": "gv6tO7As6tmBd7OF",
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "cronExpression",
+                "expression": "0 9,13,17 * * 1-5"
+              }
+            ]
+          }
+        },
+        "id": "poll_trigger",
+        "name": "Poll for New Workflows",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          0,
+          32
+        ]
+      },
+      {
+        "parameters": {
+          "url": "https://n8n.ihealth-eng.com/api/v1/workflows?limit=250&active=true",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "X-N8N-API-KEY",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjNzA1NTYxOS1jNDBhLTQ2ZWQtYmIzZi0wNmM0ZjcwM2QwMDAiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzcwNzcwMDM5fQ.hj2MMrEMPIYprqsRc0_HN99JQGocPxCqW5E_XIazRmM"
+              }
+            ]
+          },
+          "options": {
+            "response": {
+              "response": {
+                "neverError": true
+              }
+            }
+          }
+        },
+        "id": "list_workflows",
+        "name": "List All Workflows",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          224,
+          32
+        ]
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1x_H36J6hnHdVcC3OUfF53pGwH-Lzd6IKs2QTKfexJhk",
+            "mode": "list",
+            "cachedResultName": "Phoebe You 2026",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1x_H36J6hnHdVcC3OUfF53pGwH-Lzd6IKs2QTKfexJhk/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "mode": "name",
+            "value": "Workflow Registry"
+          },
+          "options": {}
+        },
+        "id": "read_registry",
+        "name": "Read Registry Sheet",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.5,
+        "position": [
+          448,
+          32
+        ],
+        "alwaysOutputData": true,
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "vdcRQ7DzD7EJYCNd",
+            "name": "Google Sheets account 3"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Get all active workflows from n8n API\nconst apiResponse = $('List All Workflows').first().json;\nconst allWorkflows = apiResponse.data || [];\n\n// Get existing registry entries\nconst registryRows = $('Read Registry Sheet').all();\nconst existingIds = new Set();\nfor (const row of registryRows) {\n  const id = row.json['Workflow ID'];\n  if (id) existingIds.add(id);\n}\n\n// Exclude this workflow itself\nconst selfId = $workflow.id;\n\n// Find active workflows not yet in the registry\nconst newWorkflows = allWorkflows.filter(w =>\n  !existingIds.has(w.id) && w.id !== selfId\n);\n\nif (newWorkflows.length === 0) {\n  return [{ json: { hasNew: false, message: 'No new workflows detected' } }];\n}\n\nreturn newWorkflows.map(w => ({\n  json: {\n    hasNew: true,\n    workflowId: w.id,\n    workflowName: w.name,\n    active: w.active,\n    createdAt: w.createdAt || '',\n    updatedAt: w.updatedAt || '',\n    tags: (w.tags || []).map(t => t.name || t).join(', ')\n  }\n}));"
+        },
+        "id": "find_new",
+        "name": "Find New Workflows",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          672,
+          32
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "version": 2,
+              "leftValue": "",
+              "caseSensitive": true,
+              "typeValidation": "strict"
+            },
+            "combinator": "and",
+            "conditions": [
+              {
+                "id": "1",
+                "leftValue": "={{ $json.hasNew }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "equals"
+                }
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "if_has_new",
+        "name": "Has New Workflows?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          896,
+          32
+        ]
+      },
+      {
+        "parameters": {
+          "url": "=https://n8n.ihealth-eng.com/api/v1/workflows/{{ $json.workflowId }}",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "X-N8N-API-KEY",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjNzA1NTYxOS1jNDBhLTQ2ZWQtYmIzZi0wNmM0ZjcwM2QwMDAiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzcwNzcwMDM5fQ.hj2MMrEMPIYprqsRc0_HN99JQGocPxCqW5E_XIazRmM"
+              }
+            ]
+          },
+          "options": {
+            "response": {
+              "response": {
+                "neverError": true
+              }
+            }
+          }
+        },
+        "id": "get_details",
+        "name": "Get Workflow Details",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1120,
+          32
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "const items = $input.all();\nconst contextItems = $('Find New Workflows').all();\nconst output = [];\n\nfor (let i = 0; i < items.length; i++) {\n  const workflow = items[i].json;\n  const ctx = contextItems[i]?.json || {};\n\n  // Extract trigger nodes\n  const nodes = workflow.nodes || [];\n  const triggerNodes = nodes.filter(n =>\n    n.type.toLowerCase().includes('trigger')\n  );\n\n  // Simplify node types for readability\n  const nodeList = nodes\n    .filter(n => !n.type.includes('stickyNote'))\n    .map((n, idx) => {\n      const shortType = n.type.split('.').pop().replace(/([A-Z])/g, ' $1').trim();\n      return `${idx + 1}. ${n.name} (${shortType})`;\n    })\n    .join('\\n');\n\n  // Extract schedule if present\n  let triggerInfo = triggerNodes.map(t => {\n    const shortType = t.type.split('.').pop();\n    const cron = t.parameters?.rule?.interval?.[0]?.expression || '';\n    return cron ? `${shortType} — cron: ${cron}` : shortType;\n  }).join(', ') || 'Manual/Unknown';\n\n  const prompt = `Analyze this n8n automation workflow and provide:\n\n1. PURPOSE (1-2 sentences): What business problem does this workflow solve?\n2. HIGH-LEVEL LOGIC (3-5 bullet points): Key steps in plain English\n\nWorkflow Name: ${workflow.name}\nTrigger: ${triggerInfo}\nNodes (${nodes.length} total):\n${nodeList}\n\nKeep it concise and non-technical. Write for a business audience.`;\n\n  output.push({\n    json: {\n      workflowId: workflow.id || ctx.workflowId,\n      workflowName: workflow.name || ctx.workflowName,\n      active: workflow.active,\n      createdAt: workflow.createdAt || ctx.createdAt || '',\n      updatedAt: workflow.updatedAt || ctx.updatedAt || '',\n      tags: ctx.tags || '',\n      timeSavedPerExecution: workflow.settings?.timeSavedPerExecution || 0,\n      prompt\n    }\n  });\n}\n\nreturn output;"
+        },
+        "id": "build_prompt",
+        "name": "Build LLM Prompt",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1344,
+          32
+        ]
+      },
+      {
+        "parameters": {
+          "model": "google/gemini-2.0-flash-001",
+          "options": {}
+        },
+        "id": "gemini_model",
+        "name": "Gemini Chat Model",
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+        "typeVersion": 1,
+        "position": [
+          1648,
+          144
+        ],
+        "credentials": {
+          "openRouterApi": {
+            "id": "spXl04sv5Iw54Zwt",
+            "name": "OpenRouter account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "={{ $json.prompt }}",
+          "batching": {}
+        },
+        "id": "llm_chain",
+        "name": "Generate Description",
+        "type": "@n8n/n8n-nodes-langchain.chainLlm",
+        "typeVersion": 1.9,
+        "position": [
+          1568,
+          -80
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "const items = $input.all();\nconst promptItems = $('Build LLM Prompt').all();\nconst output = [];\n\nfor (let i = 0; i < items.length; i++) {\n  const llmOutput = items[i].json.output || items[i].json.text || '';\n  const ctx = promptItems[i]?.json || {};\n\n  // Extract PURPOSE section\n  let purpose = 'Auto-generated description unavailable';\n  const purposeMatch = llmOutput.match(/PURPOSE[:\\s]*\\n?([\\s\\S]*?)(?=\\n\\s*\\d+\\.|\\n\\s*HIGH|$)/i);\n  if (purposeMatch) {\n    purpose = purposeMatch[1].trim().replace(/^[:\\s]+/, '');\n  }\n\n  // Extract HIGH-LEVEL LOGIC section\n  let logic = 'See workflow nodes for details';\n  const logicMatch = llmOutput.match(/HIGH-LEVEL LOGIC[:\\s]*\\n?([\\s\\S]*?)$/i);\n  if (logicMatch) {\n    logic = logicMatch[1].trim().replace(/^[:\\s]+/, '');\n  }\n\n  output.push({\n    json: {\n      ...ctx,\n      purpose,\n      logic\n    }\n  });\n}\n\nreturn output;"
+        },
+        "id": "parse_response",
+        "name": "Parse LLM Response",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1920,
+          32
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "const items = $input.all();\nconst now = new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles' });\nconst output = [];\n\nfor (const item of items) {\n  const d = item.json;\n  output.push({\n    json: {\n      'Workflow ID': d.workflowId,\n      'Workflow Name': d.workflowName,\n      'Purpose': d.purpose,\n      'High-Level Logic': d.logic,\n      'Created Date': d.createdAt ? new Date(d.createdAt).toLocaleDateString('en-US', { timeZone: 'America/Los_Angeles' }) : '',\n      'Last Updated': d.updatedAt ? new Date(d.updatedAt).toLocaleDateString('en-US', { timeZone: 'America/Los_Angeles' }) : '',\n      'Tags': d.tags || '',\n      'Time Saved Per Run (min)': d.timeSavedPerExecution || 0,\n      'Jan': '', 'Feb': '', 'Mar': '', 'Apr': '', 'May': '', 'Jun': '',\n      'Jul': '', 'Aug': '', 'Sep': '', 'Oct': '', 'Nov': '', 'Dec': '',\n      'Total Runs': '', 'Total Time Saved (hrs)': '',\n      'Last Synced': now\n    }\n  });\n}\n\nreturn output;"
+        },
+        "id": "prepare_row",
+        "name": "Prepare Registry Row",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2144,
+          32
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "1x_H36J6hnHdVcC3OUfF53pGwH-Lzd6IKs2QTKfexJhk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "mode": "name",
+            "value": "Workflow Registry"
+          },
+          "columns": {
+            "mappingMode": "autoMapInputData",
+            "value": {}
+          },
+          "options": {
+            "cellFormat": "USER_ENTERED"
+          }
+        },
+        "id": "append_registry",
+        "name": "Append to Registry",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.5,
+        "position": [
+          2368,
+          32
+        ],
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "vdcRQ7DzD7EJYCNd",
+            "name": "Google Sheets account 3"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "cronExpression",
+                "expression": "0 8 1 * *"
+              }
+            ]
+          }
+        },
+        "id": "monthly_trigger",
+        "name": "Monthly Stats Trigger",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          0,
+          448
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "// Calculate previous month's date range in PST\nconst now = new Date();\nconst pstStr = now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' });\nconst pstNow = new Date(pstStr);\n\n// Previous month\nconst year = pstNow.getMonth() === 0 ? pstNow.getFullYear() - 1 : pstNow.getFullYear();\nconst month = pstNow.getMonth() === 0 ? 11 : pstNow.getMonth() - 1;\n\nconst monthStart = new Date(Date.UTC(year, month, 1, 8, 0, 0));\nconst monthEnd = new Date(Date.UTC(year, month + 1, 1, 7, 59, 59));\n\nconst monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];\nconst monthColumn = monthNames[month];\nconst monthLabel = `${year}-${String(month + 1).padStart(2, '0')}`;\nconst monthName = new Date(year, month, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });\n\nreturn [{\n  json: {\n    monthColumn,\n    monthLabel,\n    monthName,\n    startDate: monthStart.toISOString(),\n    endDate: monthEnd.toISOString()\n  }\n}];"
+        },
+        "id": "calc_dates",
+        "name": "Calculate Date Range",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          224,
+          448
+        ]
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "1x_H36J6hnHdVcC3OUfF53pGwH-Lzd6IKs2QTKfexJhk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "mode": "name",
+            "value": "Workflow Registry"
+          },
+          "options": {}
+        },
+        "id": "read_registry_m",
+        "name": "Read Registry for Stats",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.5,
+        "position": [
+          448,
+          448
+        ],
+        "alwaysOutputData": true,
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "vdcRQ7DzD7EJYCNd",
+            "name": "Google Sheets account 3"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const registryRows = $('Read Registry for Stats').all();\nconst dateRange = $('Calculate Date Range').first().json;\nconst selfId = $workflow.id;\n\nconst workflows = [];\nfor (const row of registryRows) {\n  const wfId = row.json['Workflow ID'];\n  if (!wfId || wfId === selfId) continue;\n\n  workflows.push({\n    json: {\n      workflowId: wfId,\n      workflowName: row.json['Workflow Name'] || '',\n      timeSavedPerRun: parseInt(row.json['Time Saved Per Run (min)']) || 0,\n      createdAt: row.json['Created Date'] || '',\n      startDate: dateRange.startDate,\n      endDate: dateRange.endDate,\n      monthLabel: dateRange.monthLabel,\n      monthName: dateRange.monthName\n    }\n  });\n}\n\nif (workflows.length === 0) {\n  return [{ json: { noWorkflows: true, monthLabel: dateRange.monthLabel, monthName: dateRange.monthName } }];\n}\n\nreturn workflows;"
+        },
+        "id": "prep_workflows",
+        "name": "Prepare Workflow List",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          672,
+          448
+        ]
+      },
+      {
+        "parameters": {
+          "url": "=https://n8n.ihealth-eng.com/api/v1/executions?workflowId={{ $json.workflowId }}&status=success&limit=250",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "X-N8N-API-KEY",
+                "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjNzA1NTYxOS1jNDBhLTQ2ZWQtYmIzZi0wNmM0ZjcwM2QwMDAiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzcwNzcwMDM5fQ.hj2MMrEMPIYprqsRc0_HN99JQGocPxCqW5E_XIazRmM"
+              }
+            ]
+          },
+          "options": {
+            "response": {
+              "response": {
+                "fullResponse": false,
+                "neverError": true,
+                "responseFormat": "autodetect"
+              }
+            },
+            "pagination": {}
+          }
+        },
+        "id": "get_executions",
+        "name": "Get Monthly Executions",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          896,
+          448
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "const items = $input.all();\nconst prepItems = $('Prepare Workflow List').all();\nconst dateInfo = $('Calculate Date Range').first().json;\nconst output = [];\n\nconst startDate = new Date(dateInfo.startDate);\nconst endDate = new Date(dateInfo.endDate);\n\n// Handle empty registry\nif (prepItems.length === 1 && prepItems[0].json.noWorkflows) {\n  return [{ json: { noWorkflows: true } }];\n}\n\n// Flatten all executions from all paginated response items\nconst allExecs = [];\nfor (const item of items) {\n  const data = item.json.data;\n  if (Array.isArray(data)) {\n    allExecs.push(...data);\n  }\n}\n\n// Group executions by workflowId and filter by date\nconst countsByWorkflow = {};\nfor (const exec of allExecs) {\n  const d = new Date(exec.startedAt);\n  if (d >= startDate && d <= endDate) {\n    countsByWorkflow[exec.workflowId] = (countsByWorkflow[exec.workflowId] || 0) + 1;\n  }\n}\n\n// Output one row per registered workflow\nfor (const prep of prepItems) {\n  const wfId = prep.json.workflowId;\n  const row = { 'Workflow ID': wfId };\n  row[dateInfo.monthColumn] = countsByWorkflow[wfId] || 0;\n  output.push({ json: row });\n}\n\nreturn output;"
+        },
+        "id": "calc_stats",
+        "name": "Calculate Monthly Stats",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1120,
+          448
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "update",
+          "documentId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "1x_H36J6hnHdVcC3OUfF53pGwH-Lzd6IKs2QTKfexJhk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "mode": "name",
+            "value": "Workflow Registry"
+          },
+          "columns": {
+            "mappingMode": "autoMapInputData",
+            "value": {},
+            "matchingColumns": [
+              "Workflow ID"
+            ],
+            "schema": [
+              {
+                "id": "Workflow ID",
+                "displayName": "Workflow ID",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Workflow Name",
+                "displayName": "Workflow Name",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Purpose",
+                "displayName": "Purpose",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "High-Level Logic",
+                "displayName": "High-Level Logic",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Created Date",
+                "displayName": "Created Date",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Last Updated",
+                "displayName": "Last Updated",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Tags",
+                "displayName": "Tags",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Time Saved Per Run (min)",
+                "displayName": "Time Saved Per Run (min)",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Jan",
+                "displayName": "Jan",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Feb",
+                "displayName": "Feb",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Mar",
+                "displayName": "Mar",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Apr",
+                "displayName": "Apr",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "May",
+                "displayName": "May",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Jun",
+                "displayName": "Jun",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Jul",
+                "displayName": "Jul",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Aug",
+                "displayName": "Aug",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Sep",
+                "displayName": "Sep",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Oct",
+                "displayName": "Oct",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Nov",
+                "displayName": "Nov",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Dec",
+                "displayName": "Dec",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Total Runs",
+                "displayName": "Total Runs",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Total Time Saved (hrs)",
+                "displayName": "Total Time Saved (hrs)",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "Last Synced",
+                "displayName": "Last Synced",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "string",
+                "canBeUsedToMatch": true,
+                "removed": false
+              },
+              {
+                "id": "row_number",
+                "displayName": "row_number",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "type": "number",
+                "canBeUsedToMatch": true,
+                "readOnly": true,
+                "removed": false
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          },
+          "options": {
+            "cellFormat": "USER_ENTERED"
+          }
+        },
+        "id": "append_monthly",
+        "name": "Update Monthly Stats",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.5,
+        "position": [
+          1344,
+          448
+        ],
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "vdcRQ7DzD7EJYCNd",
+            "name": "Google Sheets account 3"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Build chat summary from upstream data\nconst prepItems = $('Prepare Workflow List').all();\nconst statsItems = $('Calculate Monthly Stats').all();\nconst dateInfo = $('Calculate Date Range').first().json;\n\n// Handle empty registry\nif (prepItems.length === 1 && prepItems[0].json.noWorkflows) {\n  return [{ json: { text: 'No workflows registered yet. Run the poll trigger first to populate the registry.' } }];\n}\n\nconst monthName = dateInfo.monthName;\nconst monthCol = dateInfo.monthColumn;\n\n// Detect recently created workflows\nconst cutoff = new Date();\ncutoff.setDate(cutoff.getDate() - 35);\nconst newWorkflows = [];\n\nlet totalExecutions = 0;\nlet totalTimeSavedHrs = 0;\nconst workflowStats = [];\n\nfor (let i = 0; i < statsItems.length; i++) {\n  const statsRow = statsItems[i].json;\n  const wfId = statsRow['Workflow ID'];\n\n  // Find matching prep item for metadata\n  const wfInfo = prepItems.find(p => p.json.workflowId === wfId)?.json || {};\n\n  const executionCount = statsRow[monthCol] || 0;\n  const timeSavedHrs = parseFloat(((executionCount * (wfInfo.timeSavedPerRun || 0)) / 60).toFixed(2));\n\n  totalExecutions += executionCount;\n  totalTimeSavedHrs += timeSavedHrs;\n\n  if (executionCount > 0) {\n    workflowStats.push({\n      name: wfInfo.workflowName || wfId,\n      executions: executionCount,\n      timeSaved: timeSavedHrs\n    });\n  }\n\n  if (wfInfo.createdAt) {\n    const created = new Date(wfInfo.createdAt);\n    if (created >= cutoff) {\n      newWorkflows.push(wfInfo.workflowName || wfId);\n    }\n  }\n}\n\nworkflowStats.sort((a, b) => b.timeSaved - a.timeSaved);\nconst top5 = workflowStats.slice(0, 5);\n\nlet msg = `\\ud83d\\udcca *n8n Monthly Report \\u2014 ${monthName}*\\n\\n`;\n\nif (newWorkflows.length > 0) {\n  msg += `\\ud83c\\udd95 *New Workflows (${newWorkflows.length})*\\n`;\n  for (const name of newWorkflows) {\n    msg += `   \\u2022 ${name}\\n`;\n  }\n  msg += '\\n';\n}\n\nmsg += `\\ud83d\\udcc8 *Monthly Activity*\\n`;\nmsg += `   Total Executions: ${totalExecutions.toLocaleString()}\\n`;\nmsg += `   Time Saved: ${totalTimeSavedHrs.toFixed(1)} hours\\n\\n`;\n\nif (top5.length > 0) {\n  msg += `\\ud83c\\udfc6 *Top ${Math.min(5, top5.length)} by Time Saved*\\n`;\n  for (let i = 0; i < top5.length; i++) {\n    const wf = top5[i];\n    msg += `   ${i + 1}. ${wf.name} \\u2014 ${wf.executions} runs, ${wf.timeSaved.toFixed(1)} hrs\\n`;\n  }\n  msg += '\\n';\n}\n\nmsg += `\\ud83d\\udccb Full registry \\u2192 https://docs.google.com/spreadsheets/d/1x_H36J6hnHdVcC3OUfF53pGwH-Lzd6IKs2QTKfexJhk`;\n\nreturn [{ json: { text: msg } }];"
+        },
+        "id": "aggregate",
+        "name": "Build Chat Summary",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1568,
+          448
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://chat.googleapis.com/v1/spaces/AAQArkdpCu4/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=73gOUomiJ0I3JIfi746DoVGZfN98WtxzqIT0IeI-0Mg",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ text: $json.text }) }}",
+          "options": {}
+        },
+        "id": "send_test",
+        "name": "Send to Test Space",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1792,
+          352
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://chat.googleapis.com/v1/spaces/AAQAamP-Wx0/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=HCqXlM6LdHArEhQX9Oo2KNOvmlf9_vIicaJ3adNVxA0",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ text: $json.text }) }}",
+          "options": {}
+        },
+        "id": "send_prod",
+        "name": "Send to Production Space",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1792,
+          544
+        ],
+        "disabled": true
+      },
+      {
+        "parameters": {},
+        "id": "error_trigger",
+        "name": "Error Trigger",
+        "type": "n8n-nodes-base.errorTrigger",
+        "typeVersion": 1,
+        "position": [
+          0,
+          768
+        ]
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://chat.googleapis.com/v1/spaces/AAQArkdpCu4/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=73gOUomiJ0I3JIfi746DoVGZfN98WtxzqIT0IeI-0Mg",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={{ JSON.stringify({ text: '⚠️ *Workflow Registry & Monthly Report Failed*\\nError: ' + (($json.execution && $json.execution.error && $json.execution.error.message) || 'Unknown error') + '\\nTime: ' + new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }) }) }}",
+          "options": {}
+        },
+        "id": "send_error",
+        "name": "Send Error to Chat",
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          224,
+          768
+        ]
+      },
+      {
+        "parameters": {
+          "content": "**Workflow Registry & Monthly Report**\nAuto-documents all n8n workflows and tracks monthly usage.\n\n**Flow 1** (3x daily Mon-Fri): Detects new workflows, uses Gemini to generate purpose/logic descriptions, appends to registry sheet.\n\n**Flow 2** (1st of month): Calculates previous month's execution counts and time saved per workflow, appends monthly stats, sends summary to Google Chat.\n\n**Credentials:**\n- n8n API Key (Header Auth)\n- Google Sheets OAuth (vdcRQ7DzD7EJYCNd)\n- OpenRouter API (spXl04sv5Iw54Zwt) — Gemini 2.0 Flash",
+          "height": 220,
+          "width": 480
+        },
+        "id": "sticky_overview",
+        "name": "Sticky Note - Overview",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          0,
+          -288
+        ]
+      },
+      {
+        "parameters": {
+          "content": "**Sheet Layout:** Single tab with Jan-Dec columns for monthly execution counts.\nTotal Runs and Total Time Saved columns use formulas:\n- Total Runs: =SUM(I2:T2)\n- Total Time Saved (hrs): =U2*H2/60\n\nFlow 2 uses Google Sheets UPDATE (not append) to write execution counts into the correct month column.",
+          "height": 120,
+          "width": 400
+        },
+        "id": "sticky_tips",
+        "name": "Sticky Note - Sheet Tips",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          0,
+          288
+        ]
+      }
+    ],
+    "connections": {
+      "Poll for New Workflows": {
+        "main": [
+          [
+            {
+              "node": "List All Workflows",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "List All Workflows": {
+        "main": [
+          [
+            {
+              "node": "Read Registry Sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Read Registry Sheet": {
+        "main": [
+          [
+            {
+              "node": "Find New Workflows",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Find New Workflows": {
+        "main": [
+          [
+            {
+              "node": "Has New Workflows?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Has New Workflows?": {
+        "main": [
+          [
+            {
+              "node": "Get Workflow Details",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Workflow Details": {
+        "main": [
+          [
+            {
+              "node": "Build LLM Prompt",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build LLM Prompt": {
+        "main": [
+          [
+            {
+              "node": "Generate Description",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Gemini Chat Model": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Generate Description",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Generate Description": {
+        "main": [
+          [
+            {
+              "node": "Parse LLM Response",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Parse LLM Response": {
+        "main": [
+          [
+            {
+              "node": "Prepare Registry Row",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Prepare Registry Row": {
+        "main": [
+          [
+            {
+              "node": "Append to Registry",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Monthly Stats Trigger": {
+        "main": [
+          [
+            {
+              "node": "Calculate Date Range",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Calculate Date Range": {
+        "main": [
+          [
+            {
+              "node": "Read Registry for Stats",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Read Registry for Stats": {
+        "main": [
+          [
+            {
+              "node": "Prepare Workflow List",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Prepare Workflow List": {
+        "main": [
+          [
+            {
+              "node": "Get Monthly Executions",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get Monthly Executions": {
+        "main": [
+          [
+            {
+              "node": "Calculate Monthly Stats",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Calculate Monthly Stats": {
+        "main": [
+          [
+            {
+              "node": "Update Monthly Stats",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Update Monthly Stats": {
+        "main": [
+          [
+            {
+              "node": "Build Chat Summary",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Build Chat Summary": {
+        "main": [
+          [
+            {
+              "node": "Send to Test Space",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Send to Production Space",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Error Trigger": {
+        "main": [
+          [
+            {
+              "node": "Send Error to Chat",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Phoebe You",
+    "name": "Version a7b292ea",
+    "description": "",
+    "autosaved": false
+  },
+  "activeVersionId": "a7b292ea-fe8b-42e1-87e4-70923736f2b5",
+  "connections": {
+    "Poll for New Workflows": {
+      "main": [
+        [
+          {
+            "node": "List All Workflows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "List All Workflows": {
+      "main": [
+        [
+          {
+            "node": "Read Registry Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Registry Sheet": {
+      "main": [
+        [
+          {
+            "node": "Find New Workflows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find New Workflows": {
+      "main": [
+        [
+          {
+            "node": "Has New Workflows?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has New Workflows?": {
+      "main": [
+        [
+          {
+            "node": "Get Workflow Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Workflow Details": {
+      "main": [
+        [
+          {
+            "node": "Build LLM Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build LLM Prompt": {
+      "main": [
+        [
+          {
+            "node": "Generate Description",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Generate Description",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Description": {
+      "main": [
+        [
+          {
+            "node": "Parse LLM Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse LLM Response": {
+      "main": [
+        [
+          {
+            "node": "Prepare Registry Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Registry Row": {
+      "main": [
+        [
+          {
+            "node": "Append to Registry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Monthly Stats Trigger": {
+      "main": [
+        [
+          {
+            "node": "Calculate Date Range",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Date Range": {
+      "main": [
+        [
+          {
+            "node": "Read Registry for Stats",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Registry for Stats": {
+      "main": [
+        [
+          {
+            "node": "Prepare Workflow List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Workflow List": {
+      "main": [
+        [
+          {
+            "node": "Get Monthly Executions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Monthly Executions": {
+      "main": [
+        [
+          {
+            "node": "Calculate Monthly Stats",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Monthly Stats": {
+      "main": [
+        [
+          {
+            "node": "Update Monthly Stats",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Monthly Stats": {
+      "main": [
+        [
+          {
+            "node": "Build Chat Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Chat Summary": {
+      "main": [
+        [
+          {
+            "node": "Send to Test Space",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send to Production Space",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Send Error to Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-02-11T00:44:04.826Z",
+  "id": "gv6tO7As6tmBd7OF",
+  "isArchived": false,
+  "meta": null,
+  "name": "Workflow Registry & Monthly Report",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9,13,17 * * 1-5"
+            }
+          ]
+        }
+      },
+      "id": "poll_trigger",
+      "name": "Poll for New Workflows",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        32
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://n8n.ihealth-eng.com/api/v1/workflows?limit=250&active=true",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-N8N-API-KEY",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjNzA1NTYxOS1jNDBhLTQ2ZWQtYmIzZi0wNmM0ZjcwM2QwMDAiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzcwNzcwMDM5fQ.hj2MMrEMPIYprqsRc0_HN99JQGocPxCqW5E_XIazRmM"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "list_workflows",
+      "name": "List All Workflows",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        224,
+        32
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1x_H36J6hnHdVcC3OUfF53pGwH-Lzd6IKs2QTKfexJhk",
+          "mode": "list",
+          "cachedResultName": "Phoebe You 2026",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1x_H36J6hnHdVcC3OUfF53pGwH-Lzd6IKs2QTKfexJhk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Workflow Registry"
+        },
+        "options": {}
+      },
+      "id": "read_registry",
+      "name": "Read Registry Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        448,
+        32
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "vdcRQ7DzD7EJYCNd",
+          "name": "Google Sheets account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get all active workflows from n8n API\nconst apiResponse = $('List All Workflows').first().json;\nconst allWorkflows = apiResponse.data || [];\n\n// Get existing registry entries\nconst registryRows = $('Read Registry Sheet').all();\nconst existingIds = new Set();\nfor (const row of registryRows) {\n  const id = row.json['Workflow ID'];\n  if (id) existingIds.add(id);\n}\n\n// Exclude this workflow itself\nconst selfId = $workflow.id;\n\n// Find active workflows not yet in the registry\nconst newWorkflows = allWorkflows.filter(w =>\n  !existingIds.has(w.id) && w.id !== selfId\n);\n\nif (newWorkflows.length === 0) {\n  return [{ json: { hasNew: false, message: 'No new workflows detected' } }];\n}\n\nreturn newWorkflows.map(w => ({\n  json: {\n    hasNew: true,\n    workflowId: w.id,\n    workflowName: w.name,\n    active: w.active,\n    createdAt: w.createdAt || '',\n    updatedAt: w.updatedAt || '',\n    tags: (w.tags || []).map(t => t.name || t).join(', ')\n  }\n}));"
+      },
+      "id": "find_new",
+      "name": "Find New Workflows",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        32
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "version": 2,
+            "leftValue": "",
+            "caseSensitive": true,
+            "typeValidation": "strict"
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "1",
+              "leftValue": "={{ $json.hasNew }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "if_has_new",
+      "name": "Has New Workflows?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        896,
+        32
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://n8n.ihealth-eng.com/api/v1/workflows/{{ $json.workflowId }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-N8N-API-KEY",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjNzA1NTYxOS1jNDBhLTQ2ZWQtYmIzZi0wNmM0ZjcwM2QwMDAiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzcwNzcwMDM5fQ.hj2MMrEMPIYprqsRc0_HN99JQGocPxCqW5E_XIazRmM"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "get_details",
+      "name": "Get Workflow Details",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1120,
+        32
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst contextItems = $('Find New Workflows').all();\nconst output = [];\n\nfor (let i = 0; i < items.length; i++) {\n  const workflow = items[i].json;\n  const ctx = contextItems[i]?.json || {};\n\n  // Extract trigger nodes\n  const nodes = workflow.nodes || [];\n  const triggerNodes = nodes.filter(n =>\n    n.type.toLowerCase().includes('trigger')\n  );\n\n  // Simplify node types for readability\n  const nodeList = nodes\n    .filter(n => !n.type.includes('stickyNote'))\n    .map((n, idx) => {\n      const shortType = n.type.split('.').pop().replace(/([A-Z])/g, ' $1').trim();\n      return `${idx + 1}. ${n.name} (${shortType})`;\n    })\n    .join('\\n');\n\n  // Extract schedule if present\n  let triggerInfo = triggerNodes.map(t => {\n    const shortType = t.type.split('.').pop();\n    const cron = t.parameters?.rule?.interval?.[0]?.expression || '';\n    return cron ? `${shortType} — cron: ${cron}` : shortType;\n  }).join(', ') || 'Manual/Unknown';\n\n  const prompt = `Analyze this n8n automation workflow and provide:\n\n1. PURPOSE (1-2 sentences): What business problem does this workflow solve?\n2. HIGH-LEVEL LOGIC (3-5 bullet points): Key steps in plain English\n\nWorkflow Name: ${workflow.name}\nTrigger: ${triggerInfo}\nNodes (${nodes.length} total):\n${nodeList}\n\nKeep it concise and non-technical. Write for a business audience.`;\n\n  output.push({\n    json: {\n      workflowId: workflow.id || ctx.workflowId,\n      workflowName: workflow.name || ctx.workflowName,\n      active: workflow.active,\n      createdAt: workflow.createdAt || ctx.createdAt || '',\n      updatedAt: workflow.updatedAt || ctx.updatedAt || '',\n      tags: ctx.tags || '',\n      timeSavedPerExecution: workflow.settings?.timeSavedPerExecution || 0,\n      prompt\n    }\n  });\n}\n\nreturn output;"
+      },
+      "id": "build_prompt",
+      "name": "Build LLM Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1344,
+        32
+      ]
+    },
+    {
+      "parameters": {
+        "model": "google/gemini-2.0-flash-001",
+        "options": {}
+      },
+      "id": "gemini_model",
+      "name": "Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1648,
+        144
+      ],
+      "credentials": {
+        "openRouterApi": {
+          "id": "spXl04sv5Iw54Zwt",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.prompt }}",
+        "batching": {}
+      },
+      "id": "llm_chain",
+      "name": "Generate Description",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        1568,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst promptItems = $('Build LLM Prompt').all();\nconst output = [];\n\nfor (let i = 0; i < items.length; i++) {\n  const llmOutput = items[i].json.output || items[i].json.text || '';\n  const ctx = promptItems[i]?.json || {};\n\n  // Extract PURPOSE section\n  let purpose = 'Auto-generated description unavailable';\n  const purposeMatch = llmOutput.match(/PURPOSE[:\\s]*\\n?([\\s\\S]*?)(?=\\n\\s*\\d+\\.|\\n\\s*HIGH|$)/i);\n  if (purposeMatch) {\n    purpose = purposeMatch[1].trim().replace(/^[:\\s]+/, '');\n  }\n\n  // Extract HIGH-LEVEL LOGIC section\n  let logic = 'See workflow nodes for details';\n  const logicMatch = llmOutput.match(/HIGH-LEVEL LOGIC[:\\s]*\\n?([\\s\\S]*?)$/i);\n  if (logicMatch) {\n    logic = logicMatch[1].trim().replace(/^[:\\s]+/, '');\n  }\n\n  output.push({\n    json: {\n      ...ctx,\n      purpose,\n      logic\n    }\n  });\n}\n\nreturn output;"
+      },
+      "id": "parse_response",
+      "name": "Parse LLM Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1920,
+        32
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst now = new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles' });\nconst output = [];\n\nfor (const item of items) {\n  const d = item.json;\n  output.push({\n    json: {\n      'Workflow ID': d.workflowId,\n      'Workflow Name': d.workflowName,\n      'Purpose': d.purpose,\n      'High-Level Logic': d.logic,\n      'Created Date': d.createdAt ? new Date(d.createdAt).toLocaleDateString('en-US', { timeZone: 'America/Los_Angeles' }) : '',\n      'Last Updated': d.updatedAt ? new Date(d.updatedAt).toLocaleDateString('en-US', { timeZone: 'America/Los_Angeles' }) : '',\n      'Tags': d.tags || '',\n      'Time Saved Per Run (min)': d.timeSavedPerExecution || 0,\n      'Jan': '', 'Feb': '', 'Mar': '', 'Apr': '', 'May': '', 'Jun': '',\n      'Jul': '', 'Aug': '', 'Sep': '', 'Oct': '', 'Nov': '', 'Dec': '',\n      'Total Runs': '', 'Total Time Saved (hrs)': '',\n      'Last Synced': now\n    }\n  });\n}\n\nreturn output;"
+      },
+      "id": "prepare_row",
+      "name": "Prepare Registry Row",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2144,
+        32
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1x_H36J6hnHdVcC3OUfF53pGwH-Lzd6IKs2QTKfexJhk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Workflow Registry"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {}
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "append_registry",
+      "name": "Append to Registry",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        2368,
+        32
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "vdcRQ7DzD7EJYCNd",
+          "name": "Google Sheets account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 8 1 * *"
+            }
+          ]
+        }
+      },
+      "id": "monthly_trigger",
+      "name": "Monthly Stats Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        448
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Calculate previous month's date range in PST\nconst now = new Date();\nconst pstStr = now.toLocaleString('en-US', { timeZone: 'America/Los_Angeles' });\nconst pstNow = new Date(pstStr);\n\n// Previous month\nconst year = pstNow.getMonth() === 0 ? pstNow.getFullYear() - 1 : pstNow.getFullYear();\nconst month = pstNow.getMonth() === 0 ? 11 : pstNow.getMonth() - 1;\n\nconst monthStart = new Date(Date.UTC(year, month, 1, 8, 0, 0));\nconst monthEnd = new Date(Date.UTC(year, month + 1, 1, 7, 59, 59));\n\nconst monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];\nconst monthColumn = monthNames[month];\nconst monthLabel = `${year}-${String(month + 1).padStart(2, '0')}`;\nconst monthName = new Date(year, month, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });\n\nreturn [{\n  json: {\n    monthColumn,\n    monthLabel,\n    monthName,\n    startDate: monthStart.toISOString(),\n    endDate: monthEnd.toISOString()\n  }\n}];"
+      },
+      "id": "calc_dates",
+      "name": "Calculate Date Range",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        448
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1x_H36J6hnHdVcC3OUfF53pGwH-Lzd6IKs2QTKfexJhk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Workflow Registry"
+        },
+        "options": {}
+      },
+      "id": "read_registry_m",
+      "name": "Read Registry for Stats",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        448,
+        448
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "vdcRQ7DzD7EJYCNd",
+          "name": "Google Sheets account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const registryRows = $('Read Registry for Stats').all();\nconst dateRange = $('Calculate Date Range').first().json;\nconst selfId = $workflow.id;\n\nconst workflows = [];\nfor (const row of registryRows) {\n  const wfId = row.json['Workflow ID'];\n  if (!wfId || wfId === selfId) continue;\n\n  workflows.push({\n    json: {\n      workflowId: wfId,\n      workflowName: row.json['Workflow Name'] || '',\n      timeSavedPerRun: parseInt(row.json['Time Saved Per Run (min)']) || 0,\n      createdAt: row.json['Created Date'] || '',\n      startDate: dateRange.startDate,\n      endDate: dateRange.endDate,\n      monthLabel: dateRange.monthLabel,\n      monthName: dateRange.monthName\n    }\n  });\n}\n\nif (workflows.length === 0) {\n  return [{ json: { noWorkflows: true, monthLabel: dateRange.monthLabel, monthName: dateRange.monthName } }];\n}\n\nreturn workflows;"
+      },
+      "id": "prep_workflows",
+      "name": "Prepare Workflow List",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        448
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://n8n.ihealth-eng.com/api/v1/executions?workflowId={{ $json.workflowId }}&status=success&limit=250",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-N8N-API-KEY",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjNzA1NTYxOS1jNDBhLTQ2ZWQtYmIzZi0wNmM0ZjcwM2QwMDAiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzcwNzcwMDM5fQ.hj2MMrEMPIYprqsRc0_HN99JQGocPxCqW5E_XIazRmM"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": false,
+              "neverError": true,
+              "responseFormat": "autodetect"
+            }
+          },
+          "pagination": {}
+        }
+      },
+      "id": "get_executions",
+      "name": "Get Monthly Executions",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        896,
+        448
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst prepItems = $('Prepare Workflow List').all();\nconst dateInfo = $('Calculate Date Range').first().json;\nconst output = [];\n\nconst startDate = new Date(dateInfo.startDate);\nconst endDate = new Date(dateInfo.endDate);\n\n// Handle empty registry\nif (prepItems.length === 1 && prepItems[0].json.noWorkflows) {\n  return [{ json: { noWorkflows: true } }];\n}\n\n// Flatten all executions from all paginated response items\nconst allExecs = [];\nfor (const item of items) {\n  const data = item.json.data;\n  if (Array.isArray(data)) {\n    allExecs.push(...data);\n  }\n}\n\n// Group executions by workflowId and filter by date\nconst countsByWorkflow = {};\nfor (const exec of allExecs) {\n  const d = new Date(exec.startedAt);\n  if (d >= startDate && d <= endDate) {\n    countsByWorkflow[exec.workflowId] = (countsByWorkflow[exec.workflowId] || 0) + 1;\n  }\n}\n\n// Output one row per registered workflow\nfor (const prep of prepItems) {\n  const wfId = prep.json.workflowId;\n  const row = { 'Workflow ID': wfId };\n  row[dateInfo.monthColumn] = countsByWorkflow[wfId] || 0;\n  output.push({ json: row });\n}\n\nreturn output;"
+      },
+      "id": "calc_stats",
+      "name": "Calculate Monthly Stats",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        448
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1x_H36J6hnHdVcC3OUfF53pGwH-Lzd6IKs2QTKfexJhk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Workflow Registry"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "Workflow ID"
+          ],
+          "schema": [
+            {
+              "id": "Workflow ID",
+              "displayName": "Workflow ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Workflow Name",
+              "displayName": "Workflow Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Purpose",
+              "displayName": "Purpose",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "High-Level Logic",
+              "displayName": "High-Level Logic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Created Date",
+              "displayName": "Created Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Last Updated",
+              "displayName": "Last Updated",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Tags",
+              "displayName": "Tags",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Time Saved Per Run (min)",
+              "displayName": "Time Saved Per Run (min)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Jan",
+              "displayName": "Jan",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Feb",
+              "displayName": "Feb",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Mar",
+              "displayName": "Mar",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Apr",
+              "displayName": "Apr",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "May",
+              "displayName": "May",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Jun",
+              "displayName": "Jun",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Jul",
+              "displayName": "Jul",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Aug",
+              "displayName": "Aug",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Sep",
+              "displayName": "Sep",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Oct",
+              "displayName": "Oct",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Nov",
+              "displayName": "Nov",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Dec",
+              "displayName": "Dec",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Total Runs",
+              "displayName": "Total Runs",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Total Time Saved (hrs)",
+              "displayName": "Total Time Saved (hrs)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Last Synced",
+              "displayName": "Last Synced",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED"
+        }
+      },
+      "id": "append_monthly",
+      "name": "Update Monthly Stats",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1344,
+        448
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "vdcRQ7DzD7EJYCNd",
+          "name": "Google Sheets account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build chat summary from upstream data\nconst prepItems = $('Prepare Workflow List').all();\nconst statsItems = $('Calculate Monthly Stats').all();\nconst dateInfo = $('Calculate Date Range').first().json;\n\n// Handle empty registry\nif (prepItems.length === 1 && prepItems[0].json.noWorkflows) {\n  return [{ json: { text: 'No workflows registered yet. Run the poll trigger first to populate the registry.' } }];\n}\n\nconst monthName = dateInfo.monthName;\nconst monthCol = dateInfo.monthColumn;\n\n// Detect recently created workflows\nconst cutoff = new Date();\ncutoff.setDate(cutoff.getDate() - 35);\nconst newWorkflows = [];\n\nlet totalExecutions = 0;\nlet totalTimeSavedHrs = 0;\nconst workflowStats = [];\n\nfor (let i = 0; i < statsItems.length; i++) {\n  const statsRow = statsItems[i].json;\n  const wfId = statsRow['Workflow ID'];\n\n  // Find matching prep item for metadata\n  const wfInfo = prepItems.find(p => p.json.workflowId === wfId)?.json || {};\n\n  const executionCount = statsRow[monthCol] || 0;\n  const timeSavedHrs = parseFloat(((executionCount * (wfInfo.timeSavedPerRun || 0)) / 60).toFixed(2));\n\n  totalExecutions += executionCount;\n  totalTimeSavedHrs += timeSavedHrs;\n\n  if (executionCount > 0) {\n    workflowStats.push({\n      name: wfInfo.workflowName || wfId,\n      executions: executionCount,\n      timeSaved: timeSavedHrs\n    });\n  }\n\n  if (wfInfo.createdAt) {\n    const created = new Date(wfInfo.createdAt);\n    if (created >= cutoff) {\n      newWorkflows.push(wfInfo.workflowName || wfId);\n    }\n  }\n}\n\nworkflowStats.sort((a, b) => b.timeSaved - a.timeSaved);\nconst top5 = workflowStats.slice(0, 5);\n\nlet msg = `\\ud83d\\udcca *n8n Monthly Report \\u2014 ${monthName}*\\n\\n`;\n\nif (newWorkflows.length > 0) {\n  msg += `\\ud83c\\udd95 *New Workflows (${newWorkflows.length})*\\n`;\n  for (const name of newWorkflows) {\n    msg += `   \\u2022 ${name}\\n`;\n  }\n  msg += '\\n';\n}\n\nmsg += `\\ud83d\\udcc8 *Monthly Activity*\\n`;\nmsg += `   Total Executions: ${totalExecutions.toLocaleString()}\\n`;\nmsg += `   Time Saved: ${totalTimeSavedHrs.toFixed(1)} hours\\n\\n`;\n\nif (top5.length > 0) {\n  msg += `\\ud83c\\udfc6 *Top ${Math.min(5, top5.length)} by Time Saved*\\n`;\n  for (let i = 0; i < top5.length; i++) {\n    const wf = top5[i];\n    msg += `   ${i + 1}. ${wf.name} \\u2014 ${wf.executions} runs, ${wf.timeSaved.toFixed(1)} hrs\\n`;\n  }\n  msg += '\\n';\n}\n\nmsg += `\\ud83d\\udccb Full registry \\u2192 https://docs.google.com/spreadsheets/d/1x_H36J6hnHdVcC3OUfF53pGwH-Lzd6IKs2QTKfexJhk`;\n\nreturn [{ json: { text: msg } }];"
+      },
+      "id": "aggregate",
+      "name": "Build Chat Summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1568,
+        448
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://chat.googleapis.com/v1/spaces/AAQArkdpCu4/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=73gOUomiJ0I3JIfi746DoVGZfN98WtxzqIT0IeI-0Mg",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ text: $json.text }) }}",
+        "options": {}
+      },
+      "id": "send_test",
+      "name": "Send to Test Space",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1792,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://chat.googleapis.com/v1/spaces/AAQAamP-Wx0/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=HCqXlM6LdHArEhQX9Oo2KNOvmlf9_vIicaJ3adNVxA0",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ text: $json.text }) }}",
+        "options": {}
+      },
+      "id": "send_prod",
+      "name": "Send to Production Space",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1792,
+        544
+      ],
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "id": "error_trigger",
+      "name": "Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        768
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://chat.googleapis.com/v1/spaces/AAQArkdpCu4/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=73gOUomiJ0I3JIfi746DoVGZfN98WtxzqIT0IeI-0Mg",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ text: '⚠️ *Workflow Registry & Monthly Report Failed*\\nError: ' + (($json.execution && $json.execution.error && $json.execution.error.message) || 'Unknown error') + '\\nTime: ' + new Date().toLocaleString('en-US', { timeZone: 'America/Los_Angeles' }) }) }}",
+        "options": {}
+      },
+      "id": "send_error",
+      "name": "Send Error to Chat",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        224,
+        768
+      ]
+    },
+    {
+      "parameters": {
+        "content": "**Workflow Registry & Monthly Report**\nAuto-documents all n8n workflows and tracks monthly usage.\n\n**Flow 1** (3x daily Mon-Fri): Detects new workflows, uses Gemini to generate purpose/logic descriptions, appends to registry sheet.\n\n**Flow 2** (1st of month): Calculates previous month's execution counts and time saved per workflow, appends monthly stats, sends summary to Google Chat.\n\n**Credentials:**\n- n8n API Key (Header Auth)\n- Google Sheets OAuth (vdcRQ7DzD7EJYCNd)\n- OpenRouter API (spXl04sv5Iw54Zwt) — Gemini 2.0 Flash",
+        "height": 220,
+        "width": 480
+      },
+      "id": "sticky_overview",
+      "name": "Sticky Note - Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -288
+      ]
+    },
+    {
+      "parameters": {
+        "content": "**Sheet Layout:** Single tab with Jan-Dec columns for monthly execution counts.\nTotal Runs and Total Time Saved columns use formulas:\n- Total Runs: =SUM(I2:T2)\n- Total Time Saved (hrs): =U2*H2/60\n\nFlow 2 uses Google Sheets UPDATE (not append) to write execution counts into the correct month column.",
+        "height": 120,
+        "width": 400
+      },
+      "id": "sticky_tips",
+      "name": "Sticky Note - Sheet Tips",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        288
+      ]
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Los_Angeles",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "timeSavedPerExecution": 30
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-11T00:44:04.829Z",
+      "createdAt": "2026-02-11T00:44:04.829Z",
+      "role": "workflow:owner",
+      "workflowId": "gv6tO7As6tmBd7OF",
+      "projectId": "SzgLfYyy3lWDJHJA"
+    }
+  ],
+  "staticData": {
+    "node:Poll for New Workflows": {
+      "recurrenceRules": []
+    },
+    "node:Monthly Stats Trigger": {
+      "recurrenceRules": []
+    }
+  },
+  "tags": [
+    {
+      "updatedAt": "2026-02-11T01:59:32.211Z",
+      "createdAt": "2026-02-11T01:57:12.706Z",
+      "id": "Wd8NzbnnACnDjoXi",
+      "name": "Productivity"
+    }
+  ],
+  "triggerCount": 2,
+  "updatedAt": "2026-02-11T02:03:27.572Z",
+  "versionId": "a7b292ea-fe8b-42e1-87e4-70923736f2b5"
+}
