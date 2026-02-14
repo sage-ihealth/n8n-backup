@@ -1,0 +1,183 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Daily 6PM": {
+      "main": [
+        [
+          {
+            "node": "Fetch All ADP Workers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch All ADP Workers": {
+      "main": [
+        [
+          {
+            "node": "Transform Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform Data": {
+      "main": [
+        [
+          {
+            "node": "Clear Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clear Sheet": {
+      "main": [
+        [
+          {
+            "node": "Batch Write to Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-21T00:00:47.151Z",
+  "id": "XwGtFefgAf9FFw5O",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "ADP Org Chart Auto-Sync",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 18 * * *"
+            }
+          ]
+        }
+      },
+      "id": "schedule",
+      "name": "Daily 6PM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        250,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://coraciiform-conchita-webbiest.ngrok-free.dev/workers",
+        "options": {
+          "timeout": 180000
+        }
+      },
+      "id": "fetch_workers",
+      "name": "Fetch All ADP Workers",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Transform ADP data into a single 2D array for batch write\nconst workers = $input.first().json.workers || [];\n// Department codes to include (removed CARENG)\nconst targetDepts = ['care & growth', 'clcout', 'billin', 'cagvbc', 'clcops', 'cngsac'];\n\n// Titles that indicate department head level\nconst deptHeadTitles = ['director', 'associate director', 'sr. manager', 'senior manager'];\n\nconst employees = [];\nconst nameToTitle = {};\n\nfor (const worker of workers) {\n  const wa = worker.workAssignments?.[0] || {};\n  const status = wa.assignmentStatus?.statusCode?.codeValue || '';\n  if (status !== 'A') continue;\n  \n  const deptInfo = wa.homeOrganizationalUnits?.[0]?.nameCode || {};\n  const deptCode = (deptInfo.codeValue || '').toLowerCase();\n  const deptLongName = (deptInfo.longName || '').toLowerCase();\n  if (!targetDepts.some(t => deptCode.includes(t) || deptLongName.includes(t))) continue;\n  \n  const person = worker.person || {};\n  const legalName = person.legalName || {};\n  let fullName = legalName.formattedName || '';\n  if (fullName.includes(',')) {\n    const parts = fullName.split(',');\n    fullName = `${parts[1].trim()} ${parts[0].trim()}`;\n  }\n  \n  const jobTitle = wa.jobTitle || '';\n  const managerInfo = wa.reportsTo?.[0]?.reportsToWorkerName || {};\n  let managerName = managerInfo.formattedName || '';\n  if (managerName.includes(',')) {\n    const parts = managerName.split(',');\n    managerName = `${parts[1].trim()} ${parts[0].trim()}`;\n  }\n  \n  nameToTitle[fullName] = jobTitle;\n  \n  // Map to friendly department names\n  let friendlyDept = 'Care & Growth';\n  if (deptCode === 'clcout') friendlyDept = 'Clinical Outcome';\n  else if (deptCode === 'billin') friendlyDept = 'Billing';\n  \n  employees.push({ name: fullName, title: jobTitle, manager: managerName, dept: friendlyDept });\n}\n\n// Build set of all employee names in our filtered list\nconst employeeNames = new Set(employees.map(e => e.name));\n\n// Build 2D array for batch update\nconst rows = [];\n\n// Top-level structure\nrows.push(['Care & Growth', 'Unified Care']);\nrows.push(['Clinical Outcome', 'Unified Care']);\nrows.push(['Billing', 'Unified Care']);\n\n// Employees sorted by department then name\nemployees.sort((a, b) => a.dept.localeCompare(b.dept) || a.name.localeCompare(b.name));\n\nfor (const emp of employees) {\n  const employeeCell = `${emp.name}\\n${emp.title}`;\n  let managerCell = '';\n  \n  const titleLower = emp.title.toLowerCase();\n  const isDeptHead = deptHeadTitles.some(t => titleLower.includes(t));\n  \n  if (!emp.manager) {\n    // No manager - report to department\n    managerCell = emp.dept;\n  } else if (employeeNames.has(emp.manager)) {\n    // Manager is in our list - show manager with title\n    const managerTitle = nameToTitle[emp.manager] || '';\n    managerCell = managerTitle ? `${emp.manager}\\n${managerTitle}` : emp.manager;\n  } else if (isDeptHead) {\n    // Department head with manager outside our list - report to department\n    managerCell = emp.dept;\n  } else {\n    // Regular employee with manager outside our list - keep actual manager\n    managerCell = emp.manager;\n  }\n  rows.push([employeeCell, managerCell]);\n}\n\n// Return SINGLE item with all data for batch write\nreturn [{\n  json: {\n    values: rows,\n    rowCount: rows.length,\n    range: `'2026'!A1:B${rows.length}`\n  }\n}];"
+      },
+      "id": "transform",
+      "name": "Transform Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        700,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "clear",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1qja_FMk355xZRx-RI-44k1OM4uHCvrQy1td0W_TUqPk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "2026"
+        },
+        "options": {}
+      },
+      "id": "clear_sheet",
+      "name": "Clear Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        920,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://sheets.googleapis.com/v4/spreadsheets/1qja_FMk355xZRx-RI-44k1OM4uHCvrQy1td0W_TUqPk/values/{{ encodeURIComponent($json.range) }}?valueInputOption=USER_ENTERED",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleSheetsOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ values: $json.values }) }}",
+        "options": {}
+      },
+      "id": "batch_write",
+      "name": "Batch Write to Sheet",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1140,
+        380
+      ]
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-21T00:00:47.154Z",
+      "createdAt": "2026-01-21T00:00:47.154Z",
+      "role": "workflow:owner",
+      "workflowId": "XwGtFefgAf9FFw5O",
+      "projectId": "SzgLfYyy3lWDJHJA"
+    }
+  ],
+  "staticData": {
+    "node:Run Every 6 Hours": {
+      "recurrenceRules": []
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2026-02-05T01:29:09.327Z",
+  "versionId": "40eec9c5-85db-4ecb-b08b-5da17416e73d"
+}
