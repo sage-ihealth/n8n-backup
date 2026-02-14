@@ -1,0 +1,212 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Article Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Article Content": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Tags": {
+      "main": [
+        [
+          {
+            "node": "Final Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Process Tags",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-27T22:31:56.214Z",
+  "id": "TGEwZPJtcLwheGoBJzkNi",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "tag",
+  "nodes": [
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "content",
+              "value": "When you eat a carbohydrate (these are starchy foods, whole grains, fruit, milk, yogurt, or food or drinks with added sugar, your blood sugars rise at different rates, and fall at different rates. How do different carbohydrates affect your body? Watch the video below, or continue reading to find out! The best way to distinguish between these different reaction speeds of carbohydrates is to lump them into three main subcategories: the sweet or simple ones, refined or starchy ones low in fiber, and the higher fiber complex ones.‍Simple: Sweets, fruits, foods with added sugar, honey, lactose. Peak: 15–30 minutes. Lasts: 45–60 min.‍Starchy: White rice, white bread, pasta, some cereals. Peak: 45–60 minutes. Lasts: 1.5–2 hours.‍Complex: Legumes, whole grains, potato with skin. Peak: 1.5–2.5 hours. Lasts: 4–5 hours.Both Carbohydrate Quality and Quantity are ImportantMore processed things often have less fiber, more fat, more sodium, and more preservatives.Processed foods usually don't have the components that feed or grow your intestinal bacteria and keep your metabolism fast, young and thriving.The more natural the food, the more vitamins typically exist within the food, and the more natural the vitamin or mineral, the better the vitamin is absorbed.Even though a carbohydrate may be healthy and high in fiber, it will still raise blood glucose. Remember if you eat too much carbs, or a meal that only contains carb, your blood sugars will still be higher than the ideal curve.Wouldn't you want more vitamins, minerals and the digestion of a healthy 20 -year old? Eating natural, high fiber, whole grains and vegetables helps to speed up the digestive system, metabolism, and may help with weight management and gut health. Another way of visualizing how foods affect glucose is through graphing it out. In the Unified Care app you can tap on the \"Health\" icon on the left of the \"+\" button at the bottom. From there, tap on your glucose results grid and you can see a graph of your blood sugars. If you were to check your blood sugars continuously, you could get an idea of how different foods affect your body. But since that information already exists, skip the experiments - this graph below can give you a better idea:Imagine comparing eating 15 grams of carbohydrate from an orange (the red line) to 15 grams carbohydrate from mashed potatoes (the yellow line) and also 15 grams carbohydrate from beans (blue line).The orange (red line) spikes your blood sugars and typically drops them in around 30-45 minutes, giving you a short burst of a lot of energy. After 45 minutes that energy is basically gone. This is not bad, but it is a better source of energy to be had before an activity: ie. eat the fruit before you go out for a walk or jog so your glucose doesn't dip too low while you are out, and your body uses that energy burst instead of having a blood sugar spike.Eating some mashed potato (yellow line), however, is starchy, not sugary. The starch turns into sugar eventually, so it'll raise your glucose but typically takes around 1 hour to reach its peak. About 2 hours after eating the potato (or other starchy foods) your blood sugar drops back to baseline and your energy is gone. This is a great snack if you are planning to do an activity afterward that lasts 1-2 hours.In contrast, high fiber whole grains or beans (the blue line) are so complex that your stomach works for around 2 hours to break down the carbohydrate fibers into their more easily absorbable form (glucose), so as a result, those 15 grams of carbohydrate are absorbed more slowly and steadily into the bloodstream, raising the glucose without seeing it spike, and giving the body a more consistent energy source. This is the ideal carbohydrate for a meal, because it will provide you energy for around 4-5 total hours, or basically until the next meal if you are sedentary during that time.The Best Carbohydrates To Add‍The smartest way to eat carbs is to pair them with protein and fiber. Carbs on their own can raise blood sugar quickly. Adding protein and fiber acts like natural brakes, slowing digestion so energy lasts longer and blood sugar stays steadier.Think in teams: Carb + Protein + FiberExamples:Apple or pear + peanut butter or cheesegranola + plain Greek yogurt + nuts or seedsWhole-grain toast + eggsBerries + fat-free plain yogurt + nutsCrackers + tuna This simple pairing turns a fast spike into steady fuel and helps you stay full longer.TakeawaysTry these tricks out - eat whole grains, beans, or lentils with your meals every 4-5 hours. If you are active between the meal, have a snack of one fruit serving to give your body a little energy burst. The goal is not to avoid carbohydrates—it’s to build them into a balanced team and use them wisely. Pair carbs with protein and fiber so your energy lasts longer and your blood sugar stays more stable. Message us on Unified Care App for more meal and snack ideas!"
+            },
+            {
+              "name": "title",
+              "value": "Different Carbohydrates And Their Effects on Blood Glucose"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Article Content",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        224,
+        0
+      ],
+      "data": {
+        "values": [
+          {
+            "value": "How Different Carbohydrates Affect Your Body",
+            "name": "title"
+          },
+          {
+            "value": "When you eat a carbohydrate (these are starchy foods, whole grains, fruit, milk, yogurt, or food or drinks with added sugar, your blood sugars rise at different rates, and fall at different rates. How do different carbohydrates affect your body? Watch the video below, or continue reading to find out! The best way to distinguish between these different reaction speeds of carbohydrates is to lump them into three main subcategories: the sweet or simple ones, refined or starchy ones low in fiber, and the higher fiber complex ones.‍Simple: Sweets, fruits, foods with added sugar, honey, lactose. Peak: 15–30 minutes. Lasts: 45–60 min.‍Starchy: White rice, white bread, pasta, some cereals. Peak: 45–60 minutes. Lasts: 1.5–2 hours.‍Complex: Legumes, whole grains, potato with skin. Peak: 1.5–2.5 hours. Lasts: 4–5 hours.Both Carbohydrate Quality and Quantity are ImportantMore processed things often have less fiber, more fat, more sodium, and more preservatives.Processed foods usually don't have the components that feed or grow your intestinal bacteria and keep your metabolism fast, young and thriving.The more natural the food, the more vitamins typically exist within the food, and the more natural the vitamin or mineral, the better the vitamin is absorbed.Even though a carbohydrate may be healthy and high in fiber, it will still raise blood glucose. Remember if you eat too much carbs, or a meal that only contains carb, your blood sugars will still be higher than the ideal curve.Wouldn't you want more vitamins, minerals and the digestion of a healthy 20 -year old? Eating natural, high fiber, whole grains and vegetables helps to speed up the digestive system, metabolism, and may help with weight management and gut health. Another way of visualizing how foods affect glucose is through graphing it out. In the Unified Care app you can tap on the \"Health\" icon on the left of the \"+\" button at the bottom. From there, tap on your glucose results grid and you can see a graph of your blood sugars. If you were to check your blood sugars continuously,  you could get an idea of how different foods affect your body. But since that information already exists, skip the experiments - this graph below can give you a better idea:Imagine comparing eating 15 grams of carbohydrate from an orange (the red line) to 15 grams carbohydrate from mashed potatoes (the yellow line) and also 15 grams carbohydrate from beans (blue line).The orange (red line) spikes your blood sugars and typically drops them in around 30-45 minutes, giving you a short burst of a lot of energy. After 45 minutes that energy is basically gone. This is not bad, but it is a better source of energy to be had before an activity: ie. eat the fruit before you go out for a walk or jog so your glucose doesn't dip too low while you are out, and your body uses that energy burst instead of having a blood sugar spike.Eating some mashed potato (yellow line), however, is starchy, not sugary. The starch turns into sugar eventually, so it'll raise your glucose but typically takes around 1 hour to reach its peak. About 2 hours after eating the potato (or other starchy foods) your blood sugar drops back to baseline and your energy is gone. This is a great snack if you are planning to do an activity afterward that lasts 1-2 hours.In contrast, high fiber whole grains or beans (the blue line) are so complex that your stomach works for around 2 hours to break down the carbohydrate fibers into their more easily absorbable form (glucose), so as a result, those 15 grams of carbohydrate are absorbed more slowly and steadily into the bloodstream, raising the glucose without seeing it spike, and giving the body a more consistent energy source. This is the ideal carbohydrate for a meal, because it will provide you energy for around 4-5 total hours, or basically until the next meal if you are sedentary during that time.The Best Carbohydrates To Add‍The smartest way to eat carbs is to pair them with protein and fiber. Carbs on their own can raise blood sugar quickly. Adding protein and fiber acts like natural brakes, slowing digestion so energy lasts longer and blood sugar stays steadier.Think in teams: Carb + Protein + FiberExamples:Apple or pear + peanut butter or cheesegranola + plain Greek yogurt + nuts or seedsWhole-grain toast + eggsBerries + fat-free plain yogurt + nutsCrackers + tuna This simple pairing turns a fast spike into steady fuel and helps you stay full longer.TakeawaysTry these tricks out - eat whole grains, beans, or lentils with your meals every 4-5 hours. If you are active between the meal, have a snack of one fruit serving to give your body a little energy burst. The goal is not to avoid carbohydrates—it’s to build them into a balanced team and use them wisely. Pair carbs with protein and fiber so your energy lasts longer and your blood sugar stays more stable. Message us on Unified Care App for more meal and snack ideas!",
+            "name": "content"
+          }
+        ]
+      },
+      "id": "53e0ebf2-70ed-480d-b7dd-4a96edd95e09"
+    },
+    {
+      "parameters": {},
+      "name": "Process Tags",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        800,
+        0
+      ],
+      "id": "485788de-117d-42ba-a6b2-4da698d7da63"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "name": "Final Output",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        1024,
+        0
+      ],
+      "data": {
+        "values": [
+          {
+            "value": "={{ $node[\"Article Content\"].json[\"title\"] }}",
+            "name": "article_title"
+          },
+          {
+            "value": "={{ $node[\"Process Tags\"].json[\"deep_tags\"] }}",
+            "name": "generated_deep_tags"
+          }
+        ]
+      },
+      "id": "e97dfe6d-09ea-4ef0-ab65-8397d2f4264c"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "9586cba1-8e22-4ee8-a16b-0ad73ca1e2b2",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-3-flash-preview",
+          "mode": "list",
+          "cachedResultName": "models/gemini-3-flash-preview"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are an expert content tagger for health and nutrition articles. Your task is to extract 8-15 highly specific, granular, and relevant deep tags from the provided article. Focus on individual food types, specific physiological processes, health conditions, dietary components, or detailed nutritional concepts. Avoid broad categories like 'nutrition', 'food', or 'diet'.\n\nOutput ONLY the comma-separated list of tags, with no other text, introduction, or explanation.\n\nArticle Title:  {{ $json.title }}\nArticle Content:  {{ $json.content }} "
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        448,
+        0
+      ],
+      "id": "dff2f555-5930-4307-8b63-7ad861591a6b",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "hQyS1P4OTmoDyAc6",
+          "name": "Google Gemini(PaLM) Api account 4"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.webflow",
+      "typeVersion": 2,
+      "position": [
+        224,
+        -176
+      ],
+      "id": "4713d8f8-00f5-41ea-96d2-ecd9286046d4",
+      "name": "Get an item"
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-27T22:31:56.216Z",
+      "createdAt": "2026-01-27T22:31:56.216Z",
+      "role": "workflow:owner",
+      "workflowId": "TGEwZPJtcLwheGoBJzkNi",
+      "projectId": "OPnbUBhdRCIRGO4T"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-01-27T22:48:35.374Z",
+  "versionId": "16b3f047-a146-466a-83d6-9001dfc7741f"
+}
