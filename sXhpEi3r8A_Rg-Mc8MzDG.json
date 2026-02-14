@@ -1,0 +1,58 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {},
+  "createdAt": "2026-02-13T22:44:01.842Z",
+  "id": "sXhpEi3r8A_Rg-Mc8MzDG",
+  "isArchived": false,
+  "meta": null,
+  "name": "Billing/Data - APCM Weekly",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 0 * * FRI"
+            },
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "babcd590-763e-45fc-8103-3921022a31d3",
+      "name": "Schedule Trigger"
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-13T22:44:01.844Z",
+      "createdAt": "2026-02-13T22:44:01.844Z",
+      "role": "workflow:owner",
+      "workflowId": "sXhpEi3r8A_Rg-Mc8MzDG",
+      "projectId": "wPHCz8dAeyUSV9Av"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-02-13T22:44:34.678Z",
+  "versionId": "50d8e20b-29aa-401a-8633-408f84f45d5c"
+}
