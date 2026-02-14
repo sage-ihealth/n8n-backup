@@ -1,0 +1,277 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-01-26T18:10:31.000Z",
+    "createdAt": "2026-01-22T23:35:16.958Z",
+    "versionId": "3ac320f4-c1e2-43d6-9251-88c9e99186e1",
+    "workflowId": "aNz3W5buzterERUC",
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {}
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          0,
+          -176
+        ],
+        "id": "12a1fa40-2f69-44fc-bedf-62762703365d",
+        "name": "Schedule Trigger"
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "SELECT \n    user_sentiment_xgboost,\n    COUNT(*) AS sentiment_count,\n    ROUND(\n        COUNT(*) * 100.0 / SUM(COUNT(*)) OVER(), \n        2\n    ) AS percentage\nFROM minerva.phone_call_history\nWHERE timestamp >= CURDATE() - INTERVAL 1 DAY \n  AND timestamp <  CURDATE()\nGROUP BY user_sentiment_xgboost;",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.mySql",
+        "typeVersion": 2.5,
+        "position": [
+          224,
+          -176
+        ],
+        "id": "d3f9b65b-11a6-4a9b-aff5-a70ed753f770",
+        "name": "Execute a SQL query",
+        "credentials": {
+          "mySql": {
+            "id": "ZdT0F4flYxqCKSOD",
+            "name": "minerva MySQL account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// This node combines the multiple SQL rows into one single message string\n\nlet messageLines = [];\n\n// Loop through all items returned by the SQL node\nfor (const item of items) {\n  const data = item.json;\n  // Create a line like: \"negative: 2 (12.50%)\"\n  messageLines.push(`• *${data.user_sentiment_xgboost}*: ${data.sentiment_count} (${data.percentage}%)`);\n}\n\n// Join them with newlines\nconst finalMessage = \"📊 *Daily Sentiment Report*\\n\" + messageLines.join(\"\\n\");\n\n// Return a single item to be sent to Google Chat\nreturn [{ json: { text: finalMessage } }];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          448,
+          -176
+        ],
+        "id": "b80069dd-8d92-4091-a627-cba82e310c3e",
+        "name": "Format Message"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://chat.googleapis.com/v1/spaces/AAQAl1r1FEA/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=2N4tYMxOtHKWnX8PzlUk4m_H73Z4GicA8nZI2-XHlMg",
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "text",
+                "value": "={{ $json.text }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.1,
+        "position": [
+          672,
+          -176
+        ],
+        "id": "bd96a0e2-8e1c-4b13-8edf-3d837402f754",
+        "name": "Send to Google Chat"
+      }
+    ],
+    "connections": {
+      "Schedule Trigger": {
+        "main": [
+          [
+            {
+              "node": "Execute a SQL query",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Format Message": {
+        "main": [
+          [
+            {
+              "node": "Send to Google Chat",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Execute a SQL query": {
+        "main": [
+          [
+            {
+              "node": "Format Message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "sage gu",
+    "name": "Version 3ac320f4",
+    "description": "WHERE timestamp >= CURDATE() - INTERVAL 1 DAY \n  AND timestamp <  CURDATE()",
+    "autosaved": true
+  },
+  "activeVersionId": "3ac320f4-c1e2-43d6-9251-88c9e99186e1",
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Execute a SQL query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Message": {
+      "main": [
+        [
+          {
+            "node": "Send to Google Chat",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute a SQL query": {
+      "main": [
+        [
+          {
+            "node": "Format Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-22T19:56:31.290Z",
+  "id": "aNz3W5buzterERUC",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "Minerva Sentiment Daily Report",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        -176
+      ],
+      "id": "12a1fa40-2f69-44fc-bedf-62762703365d",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n    user_sentiment_xgboost,\n    COUNT(*) AS sentiment_count,\n    ROUND(\n        COUNT(*) * 100.0 / SUM(COUNT(*)) OVER(), \n        2\n    ) AS percentage\nFROM minerva.phone_call_history\nWHERE timestamp >= CURDATE() - INTERVAL 1 DAY \n  AND timestamp <  CURDATE()\nGROUP BY user_sentiment_xgboost;",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mySql",
+      "typeVersion": 2.5,
+      "position": [
+        224,
+        -176
+      ],
+      "id": "d3f9b65b-11a6-4a9b-aff5-a70ed753f770",
+      "name": "Execute a SQL query",
+      "credentials": {
+        "mySql": {
+          "id": "ZdT0F4flYxqCKSOD",
+          "name": "minerva MySQL account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// This node combines the multiple SQL rows into one single message string\n\nlet messageLines = [];\n\n// Loop through all items returned by the SQL node\nfor (const item of items) {\n  const data = item.json;\n  // Create a line like: \"negative: 2 (12.50%)\"\n  messageLines.push(`• *${data.user_sentiment_xgboost}*: ${data.sentiment_count} (${data.percentage}%)`);\n}\n\n// Join them with newlines\nconst finalMessage = \"📊 *Daily Sentiment Report*\\n\" + messageLines.join(\"\\n\");\n\n// Return a single item to be sent to Google Chat\nreturn [{ json: { text: finalMessage } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        -176
+      ],
+      "id": "b80069dd-8d92-4091-a627-cba82e310c3e",
+      "name": "Format Message"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://chat.googleapis.com/v1/spaces/AAQAl1r1FEA/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=2N4tYMxOtHKWnX8PzlUk4m_H73Z4GicA8nZI2-XHlMg",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "={{ $json.text }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        672,
+        -176
+      ],
+      "id": "bd96a0e2-8e1c-4b13-8edf-3d837402f754",
+      "name": "Send to Google Chat"
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timeSavedMode": "fixed",
+    "timezone": "America/Los_Angeles",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": null,
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-22T19:56:31.292Z",
+      "createdAt": "2026-01-22T19:56:31.292Z",
+      "role": "workflow:owner",
+      "workflowId": "aNz3W5buzterERUC",
+      "projectId": "IGL0EzJNN8XZ65mm"
+    }
+  ],
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2026-01-22T23:35:16.957Z",
+  "versionId": "3ac320f4-c1e2-43d6-9251-88c9e99186e1"
+}
