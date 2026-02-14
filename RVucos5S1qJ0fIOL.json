@@ -1,0 +1,346 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Daily 6AM PT": {
+      "main": [
+        [
+          {
+            "node": "Get All Courses",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get All Categories",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get All Groups",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get All Courses": {
+      "main": [
+        [
+          {
+            "node": "Build Group Detail URLs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get All Categories": {
+      "main": [
+        [
+          {
+            "node": "Build Group Detail URLs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get All Groups": {
+      "main": [
+        [
+          {
+            "node": "Build Group Detail URLs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Group Detail URLs": {
+      "main": [
+        [
+          {
+            "node": "Get Group Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Group Details": {
+      "main": [
+        [
+          {
+            "node": "Match & Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Match & Filter": {
+      "main": [
+        [
+          {
+            "node": "Has Assignments?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Assignments?": {
+      "main": [
+        [
+          {
+            "node": "Assign Course to Group",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Assignments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-02-14T01:43:02.806Z",
+  "id": "RVucos5S1qJ0fIOL",
+  "isArchived": false,
+  "meta": null,
+  "name": "TalentLMS Auto-Assign Courses to Groups",
+  "nodes": [
+    {
+      "id": "schedule_trigger",
+      "name": "Daily 6AM PT",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        300
+      ],
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 6 * * *"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "get_courses",
+      "name": "Get All Courses",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        300,
+        100
+      ],
+      "parameters": {
+        "url": "https://ihealthlabs.talentlms.com/api/v1/courses",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "options": {}
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "zjdo1NyXWx7o3LVy",
+          "name": "TalentLMS Header Auth"
+        }
+      }
+    },
+    {
+      "id": "get_categories",
+      "name": "Get All Categories",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        300,
+        300
+      ],
+      "parameters": {
+        "url": "https://ihealthlabs.talentlms.com/api/v1/categories",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "options": {}
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "zjdo1NyXWx7o3LVy",
+          "name": "TalentLMS Header Auth"
+        }
+      }
+    },
+    {
+      "id": "get_groups",
+      "name": "Get All Groups",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        300,
+        500
+      ],
+      "parameters": {
+        "url": "https://ihealthlabs.talentlms.com/api/v1/groups",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "options": {}
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "zjdo1NyXWx7o3LVy",
+          "name": "TalentLMS Header Auth"
+        }
+      }
+    },
+    {
+      "id": "build_group_urls",
+      "name": "Build Group Detail URLs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        600,
+        300
+      ],
+      "parameters": {
+        "jsCode": "// Category → Group mapping (edit this to change auto-assignments)\nconst CATEGORY_TO_GROUPS = {\n  \"All\": [\"Billing\", \"Care & Growth\", \"Clinical Outcome\", \"HR\", \"IT/Engineering\", \"Management\", \"Product/Solutions\"],\n  \"Care Team\": [\"Care & Growth\", \"Clinical Outcome\"],\n  \"C&G\": [\"Care & Growth\"],\n  \"CO\": [\"Clinical Outcome\"]\n};\n\n// Get all groups from the API\nconst groups = $('Get All Groups').all().map(i => i.json);\n\n// Find unique group names from the mapping\nconst targetGroupNames = new Set();\nfor (const groupList of Object.values(CATEGORY_TO_GROUPS)) {\n  groupList.forEach(name => targetGroupNames.add(name));\n}\n\n// Build URLs for group detail fetches\nconst output = [];\nfor (const groupName of targetGroupNames) {\n  const group = groups.find(g => g.name === groupName);\n  if (group) {\n    output.push({\n      json: {\n        groupId: String(group.id),\n        groupName: group.name,\n        url: `https://ihealthlabs.talentlms.com/api/v1/groups/id:${group.id}`\n      }\n    });\n  }\n}\n\nif (output.length === 0) {\n  throw new Error('No matching groups found in TalentLMS. Check group names in mapping.');\n}\n\nreturn output;"
+      }
+    },
+    {
+      "id": "get_group_details",
+      "name": "Get Group Details",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        900,
+        300
+      ],
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "options": {}
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "zjdo1NyXWx7o3LVy",
+          "name": "TalentLMS Header Auth"
+        }
+      }
+    },
+    {
+      "id": "match_filter",
+      "name": "Match & Filter",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1200,
+        300
+      ],
+      "parameters": {
+        "jsCode": "// Category → Group mapping (must match Build Group Detail URLs node)\nconst CATEGORY_TO_GROUPS = {\n  \"All\": [\"Billing\", \"Care & Growth\", \"Clinical Outcome\", \"HR\", \"IT/Engineering\", \"Management\", \"Product/Solutions\"],\n  \"Care Team\": [\"Care & Growth\", \"Clinical Outcome\"],\n  \"C&G\": [\"Care & Growth\"],\n  \"CO\": [\"Clinical Outcome\"]\n};\n\n// Get data from upstream nodes\nconst courses = $('Get All Courses').all().map(i => i.json);\nconst categories = $('Get All Categories').all().map(i => i.json);\nconst groups = $('Get All Groups').all().map(i => i.json);\nconst groupDetails = $input.all().map(i => i.json);\n\n// Build lookup maps\nconst categoryMap = {};\nfor (const cat of categories) {\n  categoryMap[String(cat.id)] = cat.name;\n}\n\nconst groupNameToId = {};\nfor (const g of groups) {\n  groupNameToId[g.name] = String(g.id);\n}\n\n// Build existing assignments set from group details\nconst existingAssignments = new Set();\nfor (const gd of groupDetails) {\n  const groupId = String(gd.id);\n  if (gd.courses && Array.isArray(gd.courses)) {\n    for (const course of gd.courses) {\n      existingAssignments.add(`${groupId}-${course.id}`);\n    }\n  }\n}\n\n// Find needed assignments\nconst assignments = [];\nconst unmapped = [];\nconst alreadyAssigned = [];\n\nfor (const course of courses) {\n  const categoryName = categoryMap[String(course.category_id)];\n  \n  if (!categoryName) {\n    unmapped.push({ courseId: course.id, courseName: course.name, reason: 'Unknown category' });\n    continue;\n  }\n  \n  const targetGroups = CATEGORY_TO_GROUPS[categoryName];\n  if (!targetGroups) {\n    // Category exists but not in our mapping\n    unmapped.push({ courseId: course.id, courseName: course.name, category: categoryName });\n    continue;\n  }\n  \n  for (const groupName of targetGroups) {\n    const groupId = groupNameToId[groupName];\n    if (!groupId) continue;\n    \n    const key = `${groupId}-${course.id}`;\n    if (existingAssignments.has(key)) {\n      alreadyAssigned.push({ courseName: course.name, groupName });\n    } else {\n      assignments.push({\n        course_id: String(course.id),\n        courseName: course.name,\n        group_id: groupId,\n        groupName\n      });\n    }\n  }\n}\n\n// Summary\nconst unmappedCategories = [...new Set(unmapped.filter(u => u.category).map(u => u.category))];\nconst summary = {\n  totalCourses: courses.length,\n  assignmentsNeeded: assignments.length,\n  alreadyAssigned: alreadyAssigned.length,\n  unmappedCategories,\n  unmappedDetails: unmapped\n};\n\nif (assignments.length === 0) {\n  return [{ json: { hasAssignments: false, summary } }];\n}\n\nreturn assignments.map((a, i) => ({\n  json: {\n    ...a,\n    hasAssignments: true,\n    ...(i === 0 ? { _summary: summary } : {})\n  }\n}));"
+      }
+    },
+    {
+      "id": "if_has_assignments",
+      "name": "Has Assignments?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1500,
+        300
+      ],
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "condition_1",
+              "leftValue": "={{ $json.hasAssignments }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      }
+    },
+    {
+      "id": "assign_course",
+      "name": "Assign Course to Group",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1800,
+        200
+      ],
+      "parameters": {
+        "url": "=https://ihealthlabs.talentlms.com/api/v1/addcoursetogroup/course_id:{{ $json.course_id }},group_id:{{ $json.group_id }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "options": {}
+      },
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "zjdo1NyXWx7o3LVy",
+          "name": "TalentLMS Header Auth"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "id": "no_assignments",
+      "name": "No Assignments",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        1800,
+        400
+      ],
+      "parameters": {}
+    }
+  ],
+  "origin": "n8n",
+  "pinData": null,
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Los_Angeles",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-14T01:43:02.809Z",
+      "createdAt": "2026-02-14T01:43:02.809Z",
+      "role": "workflow:owner",
+      "workflowId": "RVucos5S1qJ0fIOL",
+      "projectId": "SzgLfYyy3lWDJHJA"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-02-14T01:43:02.806Z",
+  "versionId": "db5d4eab-cb7f-4e8f-ae6b-945739c0ba57"
+}
