@@ -1,0 +1,355 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Set Initial Folder2": {
+      "main": [
+        [
+          {
+            "node": "Init Queue3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Init Queue3": {
+      "main": [
+        [
+          {
+            "node": "Queue > 0?2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Queue > 0?2": {
+      "main": [
+        [
+          {
+            "node": "Pop Folder2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Final PDFs1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pop Folder2": {
+      "main": [
+        [
+          {
+            "node": "Get Subfolders4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Subfolders4": {
+      "main": [
+        [
+          {
+            "node": "Update State2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update State2": {
+      "main": [
+        [
+          {
+            "node": "Queue > 0?2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger2": {
+      "main": [
+        [
+          {
+            "node": "Set Initial Folder2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-02-07T00:17:43.591Z",
+  "id": "JSZYWCQLCuVhhGje56mOV",
+  "isArchived": false,
+  "meta": null,
+  "name": "Tianyang",
+  "nodes": [
+    {
+      "parameters": {
+        "fieldToSplitOut": "allPdfs",
+        "options": {}
+      },
+      "id": "add542b3-7cb8-48bc-a7b0-b2a55a269052",
+      "name": "Final PDFs1",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 3.1,
+      "position": [
+        -1152,
+        1856
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": " {\n    \"folderId\": \"1MbKC1N9AtOeu7khh0AEPClvWeVKY1ZEg\"\n  }",
+        "options": {}
+      },
+      "id": "3f0bf315-5957-47fa-bd19-ddaed2b943cc",
+      "name": "Set Initial Folder2",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.2,
+      "position": [
+        -1824,
+        1856
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4b6c5d01-3777-4001-b26a-f3936971fed3",
+              "name": "queue",
+              "value": "={{ [$json.folderId] }}",
+              "type": "array"
+            },
+            {
+              "id": "5b6c5d02-3778-4002-b26b-f3936971fee4",
+              "name": "allPdfs",
+              "value": "={{ [] }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "da74e32f-6ac5-4092-99dc-09fa081f4d2e",
+      "name": "Init Queue3",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1600,
+        1856
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "id": "6b6c5d03-3779-4003-b26c-f3936971fef5",
+              "leftValue": "={{ $json.queue.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "larger"
+              }
+            },
+            {
+              "id": "feb02490-d234-438c-bddb-14ca44be4360",
+              "leftValue": "={{ $json.queue.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {
+          "ignoreCase": false
+        }
+      },
+      "id": "94e325f4-703b-456a-8eeb-cd689d60ccb1",
+      "name": "Queue > 0?2",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -1376,
+        1856
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7b6c5d04-3780-4004-b26d-f3936971ff06",
+              "name": "currentFolderId",
+              "value": "={{ $json.queue.shift() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b7c2e0e1-b8d9-419e-b9f0-eb68f4045b2a",
+      "name": "Pop Folder2",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1152,
+        1664
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/drive/v3/files",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "='{{ $json.currentFolderId }}' in parents and (mimeType = 'application/vnd.google-apps.folder' or mimeType = 'application/pdf') and trashed = false"
+            },
+            {
+              "name": "fields",
+              "value": "files(id, name, mimeType)"
+            },
+            {
+              "name": "pageSize",
+              "value": "1000"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -928,
+        1664
+      ],
+      "id": "6cf636bc-6720-4422-a09a-ad8a09756205",
+      "name": "Get Subfolders4",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "c3JkBM0DbSl0GakB",
+          "name": "Google Drive account Sage"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $node[\"Get Subfolders4\"].json.files || [];\nconst currentQueue = $node[\"Pop Folder2\"].json.queue || [];\nconst currentAllPdfs = $node[\"Pop Folder2\"].json.allPdfs || [];\n\nconst newFolders = items.filter(f => f.mimeType === 'application/vnd.google-apps.folder').map(f => f.id);\nconst newPdfs = items.filter(f => f.mimeType === 'application/pdf');\nreturn {\n  queue: [...currentQueue, ...newFolders],\n  allPdfs: [...currentAllPdfs, ...newPdfs]\n};"
+      },
+      "id": "a7b47230-5dfc-4989-a462-5033c09b3f1f",
+      "name": "Update State2",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -704,
+        1824
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -2048,
+        1856
+      ],
+      "id": "661583d1-fa5b-416e-ad28-f36e31429a81",
+      "name": "Schedule Trigger2"
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/drive/v3/files",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleDriveOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "='{{ $json.currentFolderId }}' in parents and (mimeType = 'application/vnd.google-apps.folder' or mimeType = 'application/pdf') and trashed = false"
+            },
+            {
+              "name": "fields",
+              "value": "files(id, name, mimeType)"
+            },
+            {
+              "name": "pageSize",
+              "value": "1000"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        -1504,
+        2208
+      ],
+      "id": "006325c4-ef95-4fcf-b909-c786d4f6ae9f",
+      "name": "Get Subfolders5",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "c3JkBM0DbSl0GakB",
+          "name": "Google Drive account Sage"
+        }
+      }
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-07T00:17:43.594Z",
+      "createdAt": "2026-02-07T00:17:43.594Z",
+      "role": "workflow:owner",
+      "workflowId": "JSZYWCQLCuVhhGje56mOV",
+      "projectId": "IGL0EzJNN8XZ65mm"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-02-10T01:33:14.334Z",
+  "versionId": "2d8a9cbf-ffa5-43b8-96da-8fd3cde9b260"
+}
