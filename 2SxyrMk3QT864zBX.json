@@ -1,0 +1,52 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {},
+  "createdAt": "2025-12-03T04:03:33.066Z",
+  "id": "2SxyrMk3QT864zBX",
+  "isArchived": false,
+  "meta": null,
+  "name": "My workflow 6",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "27d3a16c-5312-418b-9e4b-3b55afd13bb3",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "643896ac-81fd-49a5-a95e-cb2b27958739",
+      "name": "Webhook",
+      "webhookId": "27d3a16c-5312-418b-9e4b-3b55afd13bb3"
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [
+    {
+      "updatedAt": "2025-12-03T04:03:33.075Z",
+      "createdAt": "2025-12-03T04:03:33.075Z",
+      "role": "workflow:owner",
+      "workflowId": "2SxyrMk3QT864zBX",
+      "projectId": "IXgyKSoq6RADLFoU"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2025-12-03T04:03:33.066Z",
+  "versionId": "5b781334-c394-493a-b753-1d8a01ba787e"
+}
