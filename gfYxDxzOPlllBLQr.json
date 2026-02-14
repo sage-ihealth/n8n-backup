@@ -1,0 +1,72 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get tracking details for a shipment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-13T18:52:13.226Z",
+  "id": "gfYxDxzOPlllBLQr",
+  "isArchived": true,
+  "meta": null,
+  "name": "My workflow 7",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "c037580c-aff9-464e-91bc-09517d158dc9",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dhl",
+      "typeVersion": 1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "dfcea9b0-93fd-499f-97a8-9b0e8a60bc48",
+      "name": "Get tracking details for a shipment"
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-13T18:52:13.231Z",
+      "createdAt": "2026-01-13T18:52:13.231Z",
+      "role": "workflow:owner",
+      "workflowId": "gfYxDxzOPlllBLQr",
+      "projectId": "IGL0EzJNN8XZ65mm"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-01-26T19:09:04.000Z",
+  "versionId": "1b08150a-369d-463a-ba36-2327bb4cd3bf"
+}
