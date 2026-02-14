@@ -1,0 +1,459 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-02-13T22:24:49.000Z",
+    "createdAt": "2026-02-13T22:23:53.829Z",
+    "versionId": "446cd5ab-5f2b-425f-8ff7-dc26bff952d3",
+    "workflowId": "UbxWmVU6OgIEPDhF",
+    "nodes": [
+      {
+        "parameters": {
+          "url": "https://chat.googleapis.com/v1/spaces/AAQAEnnivow/messages",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "googleChatOAuth2Api",
+          "sendQuery": true,
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "filter",
+                "value": "=createTime > \"{{$json.previousDayStart}}\"\nAND createTime < \"{{$json.previousDayEnd}}\""
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.3,
+        "position": [
+          208,
+          0
+        ],
+        "id": "5989cd82-573d-4026-b65c-00ff40812a3e",
+        "name": "HTTP Request",
+        "credentials": {
+          "googleChatOAuth2Api": {
+            "id": "c3Kyi7soxQDc29ht",
+            "name": "Chat account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "table": "MOBILE_APP_AND_DEVICE_COMPLAINTS_RAW",
+          "columns": "NAME, SENDER, CREATETIME, TEXT, THREAD, SPACE, ARGUMENTTEXT, EMOJIREACTIONSUMMARIES, ATTACHEDGIFS, FORMATTEDTEXT, QUOTEDMESSAGEMETADATA, THREADREPLY, ATTACHMENT, ANNOTATIONS, LASTUPDATETIME"
+        },
+        "type": "n8n-nodes-base.snowflake",
+        "typeVersion": 1,
+        "position": [
+          816,
+          -112
+        ],
+        "id": "29079617-87d9-4064-a315-2720411de614",
+        "name": "Snowflake",
+        "credentials": {
+          "snowflake": {
+            "id": "ujr2x5QCc0bRwis4",
+            "name": "Snowflake account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "triggerAtHour": 5
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          -256,
+          0
+        ],
+        "id": "9db8574c-7453-4c06-8033-b6a60a7adc40",
+        "name": "Schedule Trigger"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Ensure we handle the \"messages\" array from the Google Chat List operation\nconst inputData = $input.all();\nlet results = [];\n\ninputData.forEach(item => {\n    // Check if the input is a list of messages (from a 'List' operation) \n    // or a single message (from a 'Get' or 'Create' operation)\n    const messages = item.json.messages || [item.json];\n\n    messages.forEach(msg => {\n        results.push({\n            json: {\n                NAME: msg.name || null,\n                SENDER: msg.sender ? JSON.stringify(msg.sender) : null,\n                CREATETIME: msg.createTime || null,\n                TEXT: msg.text || null,\n                THREAD: msg.thread ? JSON.stringify(msg.thread) : null,\n                SPACE: msg.space ? JSON.stringify(msg.space) : null,\n                ARGUMENTTEXT: msg.argumentText || null,\n                EMOJIREACTIONSUMMARIES: msg.emojiReactionSummaries ? JSON.stringify(msg.emojiReactionSummaries) : null,\n                ATTACHEDGIFS: msg.attachedGifs ? JSON.stringify(msg.attachedGifs) : null,\n                FORMATTEDTEXT: msg.formattedText || null,\n                QUOTEDMESSAGEMETADATA: msg.quotedMessageMetadata ? JSON.stringify(msg.quotedMessageMetadata) : null,\n                THREADREPLY: msg.threadReply ? JSON.stringify(msg.threadReply) : null,\n                ATTACHMENT: msg.attachment ? JSON.stringify(msg.attachment) : null,\n                ANNOTATIONS: msg.annotations ? JSON.stringify(msg.annotations) : null,\n                LASTUPDATETIME: msg.lastUpdateTime || null\n            }\n        });\n    });\n});\n\nreturn results;\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          608,
+          -112
+        ],
+        "id": "70e88a80-51a2-4cd4-916a-09fa3c950923",
+        "name": "Code in Python (Beta)"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "82bded95-13cd-4878-a901-22e809986d97",
+                "leftValue": "={{ Object.keys($json).length }}",
+                "rightValue": 0,
+                "operator": {
+                  "type": "number",
+                  "operation": "gt"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          416,
+          0
+        ],
+        "id": "12b22272-6fa0-4a4f-935e-33d0a2e38014",
+        "name": "If"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Get timestamp from Schedule Trigger input\nconst executionTime = new Date($json.timestamp);\n\n// Convert to Los Angeles timezone\nconst executionInLA = new Date(\n  executionTime.toLocaleString(\"en-US\", {\n    timeZone: \"America/Los_Angeles\",\n  })\n);\n\n// Go back one day\nexecutionInLA.setDate(executionInLA.getDate() - 1);\n\n// Start of previous day\nconst previousDayStart = new Date(executionInLA);\npreviousDayStart.setHours(0, 0, 0, 0);\n\n// End of previous day\nconst previousDayEnd = new Date(executionInLA);\npreviousDayEnd.setHours(23, 59, 59, 999);\n\nreturn [\n  {\n    previousDayStart: previousDayStart.toISOString(),\n    previousDayEnd: previousDayEnd.toISOString(),\n  }\n];\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -16,
+          0
+        ],
+        "id": "548c1f2f-f884-47af-b4bc-7f5012190ed5",
+        "name": "Get yesterday date"
+      }
+    ],
+    "connections": {
+      "HTTP Request": {
+        "main": [
+          [
+            {
+              "node": "If",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Snowflake": {
+        "main": [
+          []
+        ]
+      },
+      "Code in Python (Beta)": {
+        "main": [
+          [
+            {
+              "node": "Snowflake",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Schedule Trigger": {
+        "main": [
+          [
+            {
+              "node": "Get yesterday date",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If": {
+        "main": [
+          [
+            {
+              "node": "Code in Python (Beta)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Get yesterday date": {
+        "main": [
+          [
+            {
+              "node": "HTTP Request",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "sathish saidula",
+    "name": "Version 446cd5ab",
+    "description": "Adjust filter to get dynamic dates to read chat messages",
+    "autosaved": true
+  },
+  "activeVersionId": "446cd5ab-5f2b-425f-8ff7-dc26bff952d3",
+  "connections": {
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Snowflake": {
+      "main": [
+        []
+      ]
+    },
+    "Code in Python (Beta)": {
+      "main": [
+        [
+          {
+            "node": "Snowflake",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get yesterday date",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Code in Python (Beta)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get yesterday date": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-01-14T01:27:01.516Z",
+  "id": "UbxWmVU6OgIEPDhF",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "Mobile App Complaints Snowflake Integration",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "https://chat.googleapis.com/v1/spaces/AAQAEnnivow/messages",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleChatOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "filter",
+              "value": "=createTime > \"{{$json.previousDayStart}}\"\nAND createTime < \"{{$json.previousDayEnd}}\""
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        208,
+        0
+      ],
+      "id": "5989cd82-573d-4026-b65c-00ff40812a3e",
+      "name": "HTTP Request",
+      "credentials": {
+        "googleChatOAuth2Api": {
+          "id": "c3Kyi7soxQDc29ht",
+          "name": "Chat account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "table": "MOBILE_APP_AND_DEVICE_COMPLAINTS_RAW",
+        "columns": "NAME, SENDER, CREATETIME, TEXT, THREAD, SPACE, ARGUMENTTEXT, EMOJIREACTIONSUMMARIES, ATTACHEDGIFS, FORMATTEDTEXT, QUOTEDMESSAGEMETADATA, THREADREPLY, ATTACHMENT, ANNOTATIONS, LASTUPDATETIME"
+      },
+      "type": "n8n-nodes-base.snowflake",
+      "typeVersion": 1,
+      "position": [
+        816,
+        -112
+      ],
+      "id": "29079617-87d9-4064-a315-2720411de614",
+      "name": "Snowflake",
+      "credentials": {
+        "snowflake": {
+          "id": "ujr2x5QCc0bRwis4",
+          "name": "Snowflake account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 5
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -256,
+        0
+      ],
+      "id": "9db8574c-7453-4c06-8033-b6a60a7adc40",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Ensure we handle the \"messages\" array from the Google Chat List operation\nconst inputData = $input.all();\nlet results = [];\n\ninputData.forEach(item => {\n    // Check if the input is a list of messages (from a 'List' operation) \n    // or a single message (from a 'Get' or 'Create' operation)\n    const messages = item.json.messages || [item.json];\n\n    messages.forEach(msg => {\n        results.push({\n            json: {\n                NAME: msg.name || null,\n                SENDER: msg.sender ? JSON.stringify(msg.sender) : null,\n                CREATETIME: msg.createTime || null,\n                TEXT: msg.text || null,\n                THREAD: msg.thread ? JSON.stringify(msg.thread) : null,\n                SPACE: msg.space ? JSON.stringify(msg.space) : null,\n                ARGUMENTTEXT: msg.argumentText || null,\n                EMOJIREACTIONSUMMARIES: msg.emojiReactionSummaries ? JSON.stringify(msg.emojiReactionSummaries) : null,\n                ATTACHEDGIFS: msg.attachedGifs ? JSON.stringify(msg.attachedGifs) : null,\n                FORMATTEDTEXT: msg.formattedText || null,\n                QUOTEDMESSAGEMETADATA: msg.quotedMessageMetadata ? JSON.stringify(msg.quotedMessageMetadata) : null,\n                THREADREPLY: msg.threadReply ? JSON.stringify(msg.threadReply) : null,\n                ATTACHMENT: msg.attachment ? JSON.stringify(msg.attachment) : null,\n                ANNOTATIONS: msg.annotations ? JSON.stringify(msg.annotations) : null,\n                LASTUPDATETIME: msg.lastUpdateTime || null\n            }\n        });\n    });\n});\n\nreturn results;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        608,
+        -112
+      ],
+      "id": "70e88a80-51a2-4cd4-916a-09fa3c950923",
+      "name": "Code in Python (Beta)"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "82bded95-13cd-4878-a901-22e809986d97",
+              "leftValue": "={{ Object.keys($json).length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        416,
+        0
+      ],
+      "id": "12b22272-6fa0-4a4f-935e-33d0a2e38014",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get timestamp from Schedule Trigger input\nconst executionTime = new Date($json.timestamp);\n\n// Convert to Los Angeles timezone\nconst executionInLA = new Date(\n  executionTime.toLocaleString(\"en-US\", {\n    timeZone: \"America/Los_Angeles\",\n  })\n);\n\n// Go back one day\nexecutionInLA.setDate(executionInLA.getDate() - 1);\n\n// Start of previous day\nconst previousDayStart = new Date(executionInLA);\npreviousDayStart.setHours(0, 0, 0, 0);\n\n// End of previous day\nconst previousDayEnd = new Date(executionInLA);\npreviousDayEnd.setHours(23, 59, 59, 999);\n\nreturn [\n  {\n    previousDayStart: previousDayStart.toISOString(),\n    previousDayEnd: previousDayEnd.toISOString(),\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -16,
+        0
+      ],
+      "id": "548c1f2f-f884-47af-b4bc-7f5012190ed5",
+      "name": "Get yesterday date"
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {
+    "Schedule Trigger": [
+      {
+        "json": {
+          "timestamp": "2026-02-03T05:00:24.007-05:00",
+          "Readable date": "February 3rd 2026, 5:00:24 am",
+          "Readable time": "5:00:24 am",
+          "Day of week": "Tuesday",
+          "Year": "2026",
+          "Month": "February",
+          "Day of month": "03",
+          "Hour": "05",
+          "Minute": "00",
+          "Second": "24",
+          "Timezone": "America/New_York (UTC-05:00)"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "errorWorkflow": "Jhg8IyXKHb7IuHGs_FmeP"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-01-14T01:27:01.521Z",
+      "createdAt": "2026-01-14T01:27:01.521Z",
+      "role": "workflow:owner",
+      "workflowId": "UbxWmVU6OgIEPDhF",
+      "projectId": "kugITzN49x98FAtM"
+    }
+  ],
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    }
+  },
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2026-02-13T22:23:53.828Z",
+  "versionId": "446cd5ab-5f2b-425f-8ff7-dc26bff952d3"
+}
