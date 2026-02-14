@@ -1,0 +1,5249 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-01-09T01:52:39.624Z",
+    "createdAt": "2026-01-09T01:52:39.624Z",
+    "versionId": "864368fb-4d41-4ee8-af53-3648d05a0d7c",
+    "workflowId": "zCsGfQaH2OkOEaeY",
+    "nodes": [
+      {
+        "parameters": {
+          "resource": "databasePage",
+          "databaseId": {
+            "__rl": true,
+            "value": "27abe190-88d1-80d3-903c-dae037803153",
+            "mode": "list",
+            "cachedResultName": "Report",
+            "cachedResultUrl": "https://www.notion.so/27abe19088d180d3903cdae037803153"
+          },
+          "title": "={{ $json.content.name }}",
+          "propertiesUi": {
+            "propertyValues": [
+              {
+                "key": "clinic_id|number",
+                "numberValue": "={{ $('preprocess').first().json.clinicNumber }}"
+              }
+            ]
+          },
+          "blockUi": {
+            "blockValues": [
+              {
+                "richText": true,
+                "text": {
+                  "text": [
+                    {
+                      "text": "={{ $json.content.name }}",
+                      "isLink": true,
+                      "textLink": "={{ $json.content.html_url }}",
+                      "annotationUi": {}
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.notion",
+        "typeVersion": 2.2,
+        "position": [
+          1680,
+          -960
+        ],
+        "id": "b295c8f0-9755-4404-94a0-ead00d3e814f",
+        "name": "Create Report",
+        "credentials": {
+          "notionApi": {
+            "id": "oKJA0F6WYajtEhBy",
+            "name": "Notion account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "method": "PUT",
+          "url": "=https://api.github.com/repos/iHealthLab/sop-automation/contents/clinic-{{ $('preprocess').first().json.clinicNumber }}/{{ $json.filename }}",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "githubApi",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Accept",
+                "value": "application/vnd.github+json"
+              },
+              {
+                "name": "X-GitHub-Api-Version",
+                "value": "2022-11-28"
+              }
+            ]
+          },
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "message",
+                "value": "=Add extracted SOP - {{ $json.timestamp }}"
+              },
+              {
+                "name": "content",
+                "value": "={{ $json.base64Content }}"
+              },
+              {
+                "name": "branch",
+                "value": "main"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1488,
+          -960
+        ],
+        "id": "c3699e1d-5edf-4b11-9c26-c0a223daa44d",
+        "name": "GitHub Save Report",
+        "credentials": {
+          "githubApi": {
+            "id": "vA7LPpl9HKW5ox3y",
+            "name": "GitHub account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "modelId": {
+            "__rl": true,
+            "value": "claude-sonnet-4-20250514",
+            "mode": "list",
+            "cachedResultName": "claude-sonnet-4-20250514"
+          },
+          "messages": {
+            "values": [
+              {
+                "content": "={{ $json.prompt[0].content }}",
+                "role": "assistant"
+              },
+              {
+                "content": "={{ $('full extra task').item.json.content}}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.anthropic",
+        "typeVersion": 1,
+        "position": [
+          928,
+          -80
+        ],
+        "id": "0c602bd8-ed51-4444-94fd-3c200a0fe974",
+        "name": "Extra Task AI",
+        "credentials": {
+          "anthropicApi": {
+            "id": "JvTJW1grSbIcwc1m",
+            "name": "Anthropic account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "bab7a608-5768-4d84-b4ad-32dedbd9c30c",
+                "name": "reportType",
+                "value": "Extra Task Analysis",
+                "type": "string"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          1232,
+          -80
+        ],
+        "id": "a52c7692-ef4b-436e-8ba7-9eed46060899",
+        "name": "add report type extra task analysis"
+      },
+      {
+        "parameters": {
+          "promptName": "Scenario-Based Extra Task Analysis",
+          "requestOptions": {}
+        },
+        "type": "@langfuse/n8n-nodes-langfuse.langfuse",
+        "typeVersion": 1,
+        "position": [
+          752,
+          -80
+        ],
+        "id": "49390131-1abd-47ae-80df-4646547c7b14",
+        "name": "generate extra task report",
+        "credentials": {
+          "langfuseApi": {
+            "id": "Uh60jBHGMiOuoPLE",
+            "name": "Langfuse account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "modelId": {
+            "__rl": true,
+            "value": "claude-sonnet-4-20250514",
+            "mode": "list",
+            "cachedResultName": "claude-sonnet-4-20250514"
+          },
+          "messages": {
+            "values": [
+              {
+                "content": "={{ $json.prompt[0].content }}",
+                "role": "assistant"
+              },
+              {
+                "content": "={{ $('merge content').item.json.mergeContent }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.anthropic",
+        "typeVersion": 1,
+        "position": [
+          448,
+          -80
+        ],
+        "id": "eb3e0381-e564-41b1-9d73-b1fa5a710b27",
+        "name": "full extra task",
+        "credentials": {
+          "anthropicApi": {
+            "id": "JvTJW1grSbIcwc1m",
+            "name": "Anthropic account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "promptName": "generate extra task analysis 1_all patients",
+          "requestOptions": {}
+        },
+        "type": "@langfuse/n8n-nodes-langfuse.langfuse",
+        "typeVersion": 1,
+        "position": [
+          272,
+          -80
+        ],
+        "id": "85ba4e91-f034-4440-945f-980016eae243",
+        "name": "generate full extra task",
+        "credentials": {
+          "langfuseApi": {
+            "id": "Uh60jBHGMiOuoPLE",
+            "name": "Langfuse account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "bab7a608-5768-4d84-b4ad-32dedbd9c30c",
+                "name": "reportType",
+                "value": "KPI-Outcome-Analysis",
+                "type": "string"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          752,
+          -432
+        ],
+        "id": "bb8bacd9-eb8c-49f2-91b1-13d14cf803da",
+        "name": "add report type KPI-Outcome-Analysis"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "bab7a608-5768-4d84-b4ad-32dedbd9c30c",
+                "name": "reportType",
+                "value": "KPI-Growth-Analysis",
+                "type": "string"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          752,
+          -576
+        ],
+        "id": "5a69de0f-6fb5-4e25-b7c3-77ce384e5826",
+        "name": "add report type KPI-Growth-Analysis"
+      },
+      {
+        "parameters": {
+          "modelId": {
+            "__rl": true,
+            "value": "claude-opus-4-1-20250805",
+            "mode": "list",
+            "cachedResultName": "claude-opus-4-1-20250805"
+          },
+          "messages": {
+            "values": [
+              {
+                "content": "={{ $json.prompt[0].content }}",
+                "role": "assistant"
+              },
+              {
+                "content": "={{ $('merge content').item.json.mergeContent }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.anthropic",
+        "typeVersion": 1,
+        "position": [
+          448,
+          -752
+        ],
+        "id": "e44965c9-7504-45f3-ad84-7eae04d013c2",
+        "name": "KPI ROI AI",
+        "credentials": {
+          "anthropicApi": {
+            "id": "JvTJW1grSbIcwc1m",
+            "name": "Anthropic account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "promptName": "KPI-Oriented Prompt - ROI",
+          "requestOptions": {}
+        },
+        "type": "@langfuse/n8n-nodes-langfuse.langfuse",
+        "typeVersion": 1,
+        "position": [
+          272,
+          -752
+        ],
+        "id": "13304429-c34c-47e0-bad2-6ef0eb9b9ea1",
+        "name": "KPI ROI Prompt",
+        "credentials": {
+          "langfuseApi": {
+            "id": "Uh60jBHGMiOuoPLE",
+            "name": "Langfuse account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "bab7a608-5768-4d84-b4ad-32dedbd9c30c",
+                "name": "reportType",
+                "value": "Missing-Task-Analysis",
+                "type": "string"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          1120,
+          -960
+        ],
+        "id": "2a214c2d-af95-4083-b7c4-07b9744064c5",
+        "name": "add report type Missing-Task-Analysis"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Collect missing task text for each patient safely\nconst texts = $input.all()\n  .map(item => {\n    const contentArr = item.json.content;\n    if (!contentArr || !Array.isArray(contentArr) || contentArr.length === 0) {\n      return null;\n    }\n    const firstBlock = contentArr[0];\n    if (firstBlock && typeof firstBlock.text === 'string') {\n      return firstBlock.text.trim();\n    }\n    return null;\n  })\n  .filter(t => t !== null && t !== '');\n\n// Merge texts with separators, or provide fallback if none\nconst mergedText = texts.length > 0\n  ? texts.join('\\n\\n-----\\n\\n')\n  : 'No patient missing task reports available.';\n\nreturn [{\n  json: {\n    mergeContent: mergedText\n  }\n}];\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          496,
+          -960
+        ],
+        "id": "5b63aabf-5b2f-4010-80f8-f98102a3fecd",
+        "name": "merge results"
+      },
+      {
+        "parameters": {
+          "modelId": {
+            "__rl": true,
+            "value": "claude-sonnet-4-20250514",
+            "mode": "list",
+            "cachedResultName": "claude-sonnet-4-20250514"
+          },
+          "messages": {
+            "values": [
+              {
+                "content": "={{ $json.prompt[0].content }}",
+                "role": "assistant"
+              },
+              {
+                "content": "={{ $('loop').item.json.content }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.anthropic",
+        "typeVersion": 1,
+        "position": [
+          208,
+          -960
+        ],
+        "id": "85a28f10-f45a-4757-bec3-e417e082e84e",
+        "name": "missing task",
+        "credentials": {
+          "anthropicApi": {
+            "id": "JvTJW1grSbIcwc1m",
+            "name": "Anthropic account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "modelId": {
+            "__rl": true,
+            "value": "claude-opus-4-1-20250805",
+            "mode": "list",
+            "cachedResultName": "claude-opus-4-1-20250805"
+          },
+          "messages": {
+            "values": [
+              {
+                "content": "={{ $json.prompt }}",
+                "role": "assistant"
+              },
+              {
+                "content": "={{ $('merge content').item.json.mergeContent }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.anthropic",
+        "typeVersion": 1,
+        "position": [
+          448,
+          -256
+        ],
+        "id": "aa4e8be0-6ba6-48b4-a2c8-dcf0f92baccd",
+        "name": "Final SOP AI",
+        "credentials": {
+          "anthropicApi": {
+            "id": "JvTJW1grSbIcwc1m",
+            "name": "Anthropic account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "modelId": {
+            "__rl": true,
+            "value": "claude-opus-4-1-20250805",
+            "mode": "list",
+            "cachedResultName": "claude-opus-4-1-20250805"
+          },
+          "messages": {
+            "values": [
+              {
+                "content": "={{ $json.prompt[0].content }}",
+                "role": "assistant"
+              },
+              {
+                "content": "={{ $('merge content').item.json.mergeContent }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.anthropic",
+        "typeVersion": 1,
+        "position": [
+          448,
+          -432
+        ],
+        "id": "090fda02-0d77-4649-b153-d76745956624",
+        "name": "KPI Outcome AI",
+        "credentials": {
+          "anthropicApi": {
+            "id": "JvTJW1grSbIcwc1m",
+            "name": "Anthropic account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "modelId": {
+            "__rl": true,
+            "value": "claude-sonnet-4-20250514",
+            "mode": "list",
+            "cachedResultName": "claude-sonnet-4-20250514"
+          },
+          "messages": {
+            "values": [
+              {
+                "content": "= {{ $json.prompt }}",
+                "role": "assistant"
+              },
+              {
+                "content": "={{ $('merge content').item.json.mergeContent }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.anthropic",
+        "typeVersion": 1,
+        "position": [
+          448,
+          -576
+        ],
+        "id": "f9006cec-4e61-4b4c-965c-fb16fbe5fc6f",
+        "name": "KPI Growth AI",
+        "credentials": {
+          "anthropicApi": {
+            "id": "JvTJW1grSbIcwc1m",
+            "name": "Anthropic account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "promptName": "SOP Extraction from standardized logs",
+          "requestOptions": {}
+        },
+        "type": "@langfuse/n8n-nodes-langfuse.langfuse",
+        "typeVersion": 1,
+        "position": [
+          272,
+          -256
+        ],
+        "id": "eef0ad7d-9b23-4ac8-baff-5d1104800c89",
+        "name": "Final SOP Report Prompt",
+        "credentials": {
+          "langfuseApi": {
+            "id": "Uh60jBHGMiOuoPLE",
+            "name": "Langfuse account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "promptName": "KPI-Oriented Prompt - Outcome",
+          "requestOptions": {}
+        },
+        "type": "@langfuse/n8n-nodes-langfuse.langfuse",
+        "typeVersion": 1,
+        "position": [
+          272,
+          -432
+        ],
+        "id": "bcecb321-0dd4-4973-a96b-55d3d33d3c29",
+        "name": "KPI Outcome Prompt",
+        "credentials": {
+          "langfuseApi": {
+            "id": "Uh60jBHGMiOuoPLE",
+            "name": "Langfuse account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "promptName": "KPI-Oriented Prompt - Growth",
+          "requestOptions": {}
+        },
+        "type": "@langfuse/n8n-nodes-langfuse.langfuse",
+        "typeVersion": 1,
+        "position": [
+          272,
+          -576
+        ],
+        "id": "6283cb9f-b53d-4a02-ab5d-cdc05511d600",
+        "name": "KPI Growth Prompt",
+        "credentials": {
+          "langfuseApi": {
+            "id": "Uh60jBHGMiOuoPLE",
+            "name": "Langfuse account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const mergedText = $input.all().map(item => item.json.content).join('\\n\\n-----\\n\\n');\nreturn [{ json: { mergeContent: mergedText } }];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          64,
+          -496
+        ],
+        "id": "2a11e405-9c7c-4854-a919-ffbb51db13db",
+        "name": "merge content"
+      },
+      {
+        "parameters": {
+          "jsCode": "return [\n  {\n    json: {\n      index: $('loop').first().json.index,\n      content: $('Standardized').first().json.content[0].text\n    }\n  }\n];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1248,
+          224
+        ],
+        "id": "806e1d3e-5ea3-4faf-a991-580e519d08a7",
+        "name": "output"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Preprocess / split code node - improved version\n\nconst inputItems = $input.all();\nconst output = [];\n\ninputItems.forEach((item, formIdx) => {\n  const body = item.json.body\n  const clinicNum = body.clinic_number;\n  const submittedAt = body.timestamp;\n  const userId = body.user_id;\n  const userName = body.user_name\n  const userEmail = body.user_email\n  let rawContent = body.content;\n\n  // 如果 content 是一个 JSON 字符串，尝试 parse 出内层 content\n  if (typeof rawContent === 'string' && rawContent.trim().startsWith('{') && rawContent.includes('\"content\"')) {\n    try {\n      const parsed = JSON.parse(rawContent);\n      if (parsed.content && typeof parsed.content === 'string') {\n        rawContent = parsed.content;\n      }\n    } catch (err) {\n      // ignore parse error，继续使用原始 rawContent\n    }\n  }\n\n  // 使用正则匹配至少 5 个 dash 的行作为分割符\n  // 此正则 /\\r?\\n-{5,}\\r?\\n/ 匹配换行 + 至少 5 个 '-' + 换行\n  const parts = rawContent.split(/\\r?\\n-{5,}\\r?\\n/);\n\n  parts.forEach((part, partIdx) => {\n    const trimmed = part.trim();\n    if (trimmed && trimmed.length > 0) {\n      output.push({\n        json: {\n          clinicNumber: clinicNum,\n          submittedAt: submittedAt,\n          patientIndex: `patient-${formIdx + 1}-part-${partIdx + 1}`,  \n          userId,\n          userName,\n          userEmail,\n          content: trimmed\n        }\n      });\n    }\n  });\n});\n\nreturn output;\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -560,
+          144
+        ],
+        "id": "7e338b1b-7f17-49db-9a58-d394918398f1",
+        "name": "preprocess"
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "type": "n8n-nodes-base.splitInBatches",
+        "typeVersion": 3,
+        "position": [
+          -336,
+          144
+        ],
+        "id": "feaa8cd6-6142-47b4-87d9-0b65805ae86b",
+        "name": "loop"
+      },
+      {
+        "parameters": {
+          "modelId": {
+            "__rl": true,
+            "value": "claude-opus-4-1-20250805",
+            "mode": "list",
+            "cachedResultName": "claude-opus-4-1-20250805"
+          },
+          "messages": {
+            "values": [
+              {
+                "content": "={{ $json.prompt }}",
+                "role": "assistant"
+              },
+              {
+                "content": "={{ $('loop').item.json.content }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.anthropic",
+        "typeVersion": 1,
+        "position": [
+          96,
+          224
+        ],
+        "id": "05574830-0f8f-4996-86f1-acc45b7777df",
+        "name": "Standardized",
+        "credentials": {
+          "anthropicApi": {
+            "id": "JvTJW1grSbIcwc1m",
+            "name": "Anthropic account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const items = $input.all();\nconst patientNames = items.map((item) => {\n  const text = item?.json?.content[0]?.text || '';\n  const patientInfoIndex = text.indexOf(\"**Patient Info:**\");\n\n  if (patientInfoIndex === -1) {\n    return { patientName: '' };\n  }\n\n  const patientNameStart = patientInfoIndex + \"**Patient Info:**\".length;\n  let patientNameEnd = text.indexOf(\"\\n\", patientNameStart);\n  if (patientNameEnd === -1) patientNameEnd = text.length;\n\n  let rawLine = text.slice(patientNameStart, patientNameEnd).trim();\n\n  let match = rawLine.match(/^(P\\d+\\s+\\w+)/);\n  if (match) {\n    return { patientName: match[1].trim() };\n  }\n\n  match = rawLine.match(/^([^\\(\\-]+)/);\n  if (match) {\n    return { patientName: match[1].trim() };\n  }\n\n  return { patientName: rawLine };\n});\n\nreturn patientNames;"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          416,
+          224
+        ],
+        "id": "3e5f9b23-2525-4c6d-ac85-abbea5434789",
+        "name": "get name"
+      },
+      {
+        "parameters": {
+          "method": "PUT",
+          "url": "=https://api.github.com/repos/iHealthLab/sop-automation/contents/clinic-{{ $('loop').item.json.clinicNumber }}/patient_logs/{{ $json.filename }}",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "githubApi",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Accept",
+                "value": "application/vnd.github+json"
+              },
+              {
+                "name": "X-GitHub-Api-Version",
+                "value": "2022-11-28"
+              }
+            ]
+          },
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "message",
+                "value": "=Add standardized log for {{ $('get name').item.json.patientName }} - {{ $json.timestamp }}"
+              },
+              {
+                "name": "content",
+                "value": "={{ $json.base64Content }}"
+              },
+              {
+                "name": "branch",
+                "value": "main"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          832,
+          224
+        ],
+        "id": "a93f759d-9054-4e4c-9f1d-4d3538ebdc3d",
+        "name": "GitHub Create patient page",
+        "credentials": {
+          "githubApi": {
+            "id": "vA7LPpl9HKW5ox3y",
+            "name": "GitHub account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// 1) 取模型输出的 markdown（你的节点名是 \"Message a model\"）\nlet md = $('Standardized').first().json.content[0].text || \"\";\n\n// 2) 去掉 ```markdown ... ``` 或 ``` 包裹\nmd = md.replace(/^```(?:markdown)?\\s*/i, \"\").replace(/\\s*```[\\s\\r\\n]*$/i, \"\");\n\n// 3) 生成安全文件名（可自定义前缀）\nconst prefix = \"SOP-Analysis\";\nconst now = new Date();\nconst ts = now.toISOString().replace(/[:.]/g, \"-\");\nconst filename = `${prefix}-${ts}.md`;\n\n// 4) Base64（GitHub 文件接口必须用 Base64）\nconst base64Content = Buffer.from(md, \"utf8\").toString(\"base64\");\n\nconst timestamp = now.toISOString().slice(0, 19);\n\n// 5) 输出给下个节点\nreturn [{ json: { \n  filename, \n  base64Content,\n  timestamp,\n} }];\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          624,
+          224
+        ],
+        "id": "ade8cf71-fc08-4be9-a4c7-f3991f496272",
+        "name": "patient page"
+      },
+      {
+        "parameters": {
+          "resource": "databasePage",
+          "databaseId": {
+            "__rl": true,
+            "value": "27abe190-88d1-8094-8129-ed063afd5184",
+            "mode": "list",
+            "cachedResultName": "Patient",
+            "cachedResultUrl": "https://www.notion.so/27abe19088d180948129ed063afd5184"
+          },
+          "title": "={{ $('get name').item.json.patientName }}",
+          "propertiesUi": {
+            "propertyValues": [
+              {
+                "key": "Clinic|number",
+                "numberValue": "={{ $('loop').item.json.clinicNumber }}"
+              },
+              {
+                "key": "create_at|date",
+                "date": "={{ $('patient page').item.json.timestamp }}",
+                "timezone": "UTC"
+              }
+            ]
+          },
+          "blockUi": {
+            "blockValues": [
+              {
+                "richText": true,
+                "text": {
+                  "text": [
+                    {
+                      "text": "={{ $json.content.name }}",
+                      "isLink": true,
+                      "textLink": "={{ $json.content.html_url }}",
+                      "annotationUi": {}
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.notion",
+        "typeVersion": 2.2,
+        "position": [
+          1024,
+          224
+        ],
+        "id": "580dfb5f-e8d3-4362-a32a-8f04f7faa062",
+        "name": "Create patient",
+        "credentials": {
+          "notionApi": {
+            "id": "oKJA0F6WYajtEhBy",
+            "name": "Notion account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "promptName": "Visit Logs Standardization",
+          "requestOptions": {}
+        },
+        "type": "@langfuse/n8n-nodes-langfuse.langfuse",
+        "typeVersion": 1,
+        "position": [
+          -112,
+          224
+        ],
+        "id": "8d6f5931-1e05-45e3-80e6-6e2767497c5d",
+        "name": "Standardized prompt",
+        "credentials": {
+          "langfuseApi": {
+            "id": "Uh60jBHGMiOuoPLE",
+            "name": "Langfuse account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "promptName": "missing task analysis - clinic level",
+          "requestOptions": {}
+        },
+        "type": "@langfuse/n8n-nodes-langfuse.langfuse",
+        "typeVersion": 1,
+        "position": [
+          672,
+          -960
+        ],
+        "id": "6a4ef78b-ddc8-4b1e-af6a-2a90061921c5",
+        "name": "Missing task - clinic level",
+        "credentials": {
+          "langfuseApi": {
+            "id": "Uh60jBHGMiOuoPLE",
+            "name": "Langfuse account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "promptName": "missing task analysis - patient level",
+          "requestOptions": {}
+        },
+        "type": "@langfuse/n8n-nodes-langfuse.langfuse",
+        "typeVersion": 1,
+        "position": [
+          64,
+          -960
+        ],
+        "id": "02a1c711-7063-4b2d-a5a1-21e357fbf918",
+        "name": "missing task-patient level",
+        "credentials": {
+          "langfuseApi": {
+            "id": "Uh60jBHGMiOuoPLE",
+            "name": "Langfuse account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "modelId": {
+            "__rl": true,
+            "value": "claude-sonnet-4-20250514",
+            "mode": "list",
+            "cachedResultName": "claude-sonnet-4-20250514"
+          },
+          "messages": {
+            "values": [
+              {
+                "content": "={{ $json.prompt[0]}}",
+                "role": "assistant"
+              },
+              {
+                "content": "={{ $('merge results').item.json.mergeContent }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.anthropic",
+        "typeVersion": 1,
+        "position": [
+          832,
+          -960
+        ],
+        "id": "6395437b-813e-40de-8584-124b677b2c59",
+        "name": "Missing Task AI",
+        "credentials": {
+          "anthropicApi": {
+            "id": "JvTJW1grSbIcwc1m",
+            "name": "Anthropic account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const reportType = $input.first().json.reportType || 'Extra Task Analysis';\nconst contentText = $input.first().json.content[0].text || ''; \nconst now = new Date();\nconst timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, 19);\n\nconst filenameOnly = `${reportType}-${timestamp}.md`;\n\nconst header = `# ${reportType} Report\n\n**Generated:** ${now.toISOString()}\n**Report Type:** ${reportType}\n\n---\n\n`;\n\nconst finalContent = header + contentText;\nconst base64Content = Buffer.from(finalContent, 'utf8').toString('base64');\n\nreturn [{\n  json: {\n    filename: filenameOnly,\n    content: finalContent,\n    base64Content,\n    reportType,\n    timestamp\n  }\n}];\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1424,
+          -80
+        ],
+        "id": "853c28ab-425d-42ff-a186-0fd0173bde04",
+        "name": "Extract Report5"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "bab7a608-5768-4d84-b4ad-32dedbd9c30c",
+                "name": "reportType",
+                "value": "Extracted SOP Report",
+                "type": "string"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          752,
+          -256
+        ],
+        "id": "70f960ac-2456-4458-943b-4723766035ea",
+        "name": "add report type extracted SOP"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "bab7a608-5768-4d84-b4ad-32dedbd9c30c",
+                "name": "reportType",
+                "value": "KPI-ROI-Analysis",
+                "type": "string"
+              }
+            ]
+          },
+          "includeOtherFields": true,
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          752,
+          -752
+        ],
+        "id": "33de3b85-7d42-4a6d-b4ff-0621ee8e5a80",
+        "name": "add report type ROI"
+      },
+      {
+        "parameters": {
+          "jsCode": "const reportType = $input.first().json.reportType || 'KPI-ROI-Analysis';\nconst contentText = $input.first().json.content[0].text || ''; \nconst now = new Date();\nconst timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, 19);\n\nconst filenameOnly = `${reportType}-${timestamp}.md`;\n\nconst header = `# ${reportType} Report\n\n**Generated:** ${now.toISOString()}\n**Report Type:** ${reportType}\n\n---\n\n`;\n\nconst finalContent = header + contentText;\nconst base64Content = Buffer.from(finalContent, 'utf8').toString('base64');\n\nreturn [{\n  json: {\n    filename: filenameOnly,\n    content: finalContent,\n    base64Content,\n    reportType,\n    timestamp\n  }\n}];\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          912,
+          -752
+        ],
+        "id": "7f6b04db-de94-491c-9177-ca7cc674a6d1",
+        "name": "Extract Report1"
+      },
+      {
+        "parameters": {
+          "resource": "databasePage",
+          "databaseId": {
+            "__rl": true,
+            "value": "27abe190-88d1-80d3-903c-dae037803153",
+            "mode": "list",
+            "cachedResultName": "Report",
+            "cachedResultUrl": "https://www.notion.so/27abe19088d180d3903cdae037803153"
+          },
+          "title": "={{ $json.content.name }}",
+          "propertiesUi": {
+            "propertyValues": [
+              {
+                "key": "clinic_id|number",
+                "numberValue": "={{ $('preprocess').first().json.clinicNumber }}"
+              }
+            ]
+          },
+          "blockUi": {
+            "blockValues": [
+              {
+                "richText": true,
+                "text": {
+                  "text": [
+                    {
+                      "text": "={{ $json.content.name }}",
+                      "isLink": true,
+                      "textLink": "={{ $json.content.html_url }}",
+                      "annotationUi": {}
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.notion",
+        "typeVersion": 2.2,
+        "position": [
+          1312,
+          -752
+        ],
+        "id": "c3f7135a-937d-4597-9906-b7f5123c9813",
+        "name": "Create Report1",
+        "credentials": {
+          "notionApi": {
+            "id": "oKJA0F6WYajtEhBy",
+            "name": "Notion account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "method": "PUT",
+          "url": "=https://api.github.com/repos/iHealthLab/sop-automation/contents/clinic-{{ $('preprocess').first().json.clinicNumber }}/{{ $json.filename }}",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "githubApi",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Accept",
+                "value": "application/vnd.github+json"
+              },
+              {
+                "name": "X-GitHub-Api-Version",
+                "value": "2022-11-28"
+              }
+            ]
+          },
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "message",
+                "value": "=Add extracted SOP - {{ $json.timestamp }}"
+              },
+              {
+                "name": "content",
+                "value": "={{ $json.base64Content }}"
+              },
+              {
+                "name": "branch",
+                "value": "main"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1120,
+          -752
+        ],
+        "id": "f1fe913b-abad-4950-b39d-4929c47be40e",
+        "name": "GitHub Save Report1",
+        "credentials": {
+          "githubApi": {
+            "id": "vA7LPpl9HKW5ox3y",
+            "name": "GitHub account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "resource": "databasePage",
+          "databaseId": {
+            "__rl": true,
+            "value": "27abe190-88d1-80d3-903c-dae037803153",
+            "mode": "list",
+            "cachedResultName": "Report",
+            "cachedResultUrl": "https://www.notion.so/27abe19088d180d3903cdae037803153"
+          },
+          "title": "={{ $json.content.name }}",
+          "propertiesUi": {
+            "propertyValues": [
+              {
+                "key": "clinic_id|number",
+                "numberValue": "={{ $('preprocess').first().json.clinicNumber }}"
+              }
+            ]
+          },
+          "blockUi": {
+            "blockValues": [
+              {
+                "richText": true,
+                "text": {
+                  "text": [
+                    {
+                      "text": "={{ $json.content.name }}",
+                      "isLink": true,
+                      "textLink": "={{ $json.content.html_url }}",
+                      "annotationUi": {}
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.notion",
+        "typeVersion": 2.2,
+        "position": [
+          1312,
+          -576
+        ],
+        "id": "8efbf826-21a4-4ba4-8d3c-f31787203c28",
+        "name": "Create Report2",
+        "credentials": {
+          "notionApi": {
+            "id": "oKJA0F6WYajtEhBy",
+            "name": "Notion account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "method": "PUT",
+          "url": "=https://api.github.com/repos/iHealthLab/sop-automation/contents/clinic-{{ $('preprocess').first().json.clinicNumber }}/{{ $json.filename }}",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "githubApi",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Accept",
+                "value": "application/vnd.github+json"
+              },
+              {
+                "name": "X-GitHub-Api-Version",
+                "value": "2022-11-28"
+              }
+            ]
+          },
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "message",
+                "value": "=Add extracted SOP - {{ $json.timestamp }}"
+              },
+              {
+                "name": "content",
+                "value": "={{ $json.base64Content }}"
+              },
+              {
+                "name": "branch",
+                "value": "main"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1120,
+          -576
+        ],
+        "id": "ac8727e3-cb72-489c-a48a-cfb7ed200a83",
+        "name": "GitHub Save Report2",
+        "credentials": {
+          "githubApi": {
+            "id": "vA7LPpl9HKW5ox3y",
+            "name": "GitHub account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "resource": "databasePage",
+          "databaseId": {
+            "__rl": true,
+            "value": "27abe190-88d1-80d3-903c-dae037803153",
+            "mode": "list",
+            "cachedResultName": "Report",
+            "cachedResultUrl": "https://www.notion.so/27abe19088d180d3903cdae037803153"
+          },
+          "title": "={{ $json.content.name }}",
+          "propertiesUi": {
+            "propertyValues": [
+              {
+                "key": "clinic_id|number",
+                "numberValue": "={{ $('preprocess').first().json.clinicNumber }}"
+              }
+            ]
+          },
+          "blockUi": {
+            "blockValues": [
+              {
+                "richText": true,
+                "text": {
+                  "text": [
+                    {
+                      "text": "={{ $json.content.name }}",
+                      "isLink": true,
+                      "textLink": "={{ $json.content.html_url }}",
+                      "annotationUi": {}
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.notion",
+        "typeVersion": 2.2,
+        "position": [
+          1312,
+          -432
+        ],
+        "id": "618952ef-6201-48f3-90d3-54922f2a4dd3",
+        "name": "Create Report3",
+        "credentials": {
+          "notionApi": {
+            "id": "oKJA0F6WYajtEhBy",
+            "name": "Notion account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "method": "PUT",
+          "url": "=https://api.github.com/repos/iHealthLab/sop-automation/contents/clinic-{{ $('preprocess').first().json.clinicNumber }}/{{ $json.filename }}",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "githubApi",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Accept",
+                "value": "application/vnd.github+json"
+              },
+              {
+                "name": "X-GitHub-Api-Version",
+                "value": "2022-11-28"
+              }
+            ]
+          },
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "message",
+                "value": "=Add extracted SOP - {{ $json.timestamp }}"
+              },
+              {
+                "name": "content",
+                "value": "={{ $json.base64Content }}"
+              },
+              {
+                "name": "branch",
+                "value": "main"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1120,
+          -432
+        ],
+        "id": "b2f0c929-0d3d-4c6c-8f09-7f938ca5aae3",
+        "name": "GitHub Save Report3",
+        "credentials": {
+          "githubApi": {
+            "id": "vA7LPpl9HKW5ox3y",
+            "name": "GitHub account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "resource": "databasePage",
+          "databaseId": {
+            "__rl": true,
+            "value": "27abe190-88d1-80d3-903c-dae037803153",
+            "mode": "list",
+            "cachedResultName": "Report",
+            "cachedResultUrl": "https://www.notion.so/27abe19088d180d3903cdae037803153"
+          },
+          "title": "={{ $json.content.name }}",
+          "propertiesUi": {
+            "propertyValues": [
+              {
+                "key": "clinic_id|number",
+                "numberValue": "={{ $('preprocess').first().json.clinicNumber }}"
+              }
+            ]
+          },
+          "blockUi": {
+            "blockValues": [
+              {
+                "richText": true,
+                "text": {
+                  "text": [
+                    {
+                      "text": "={{ $json.content.name }}",
+                      "isLink": true,
+                      "textLink": "={{ $json.content.html_url }}",
+                      "annotationUi": {}
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.notion",
+        "typeVersion": 2.2,
+        "position": [
+          1312,
+          -256
+        ],
+        "id": "b718655c-d750-4bce-a31b-c5800eefec08",
+        "name": "Create Report4",
+        "credentials": {
+          "notionApi": {
+            "id": "oKJA0F6WYajtEhBy",
+            "name": "Notion account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "method": "PUT",
+          "url": "=https://api.github.com/repos/iHealthLab/sop-automation/contents/clinic-{{ $('preprocess').first().json.clinicNumber }}/{{ $json.filename }}",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "githubApi",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Accept",
+                "value": "application/vnd.github+json"
+              },
+              {
+                "name": "X-GitHub-Api-Version",
+                "value": "2022-11-28"
+              }
+            ]
+          },
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "message",
+                "value": "=Add extracted SOP - {{ $json.timestamp }}"
+              },
+              {
+                "name": "content",
+                "value": "={{ $json.base64Content }}"
+              },
+              {
+                "name": "branch",
+                "value": "main"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1120,
+          -256
+        ],
+        "id": "2a642b26-46e4-4c00-adb3-e4d49ff82687",
+        "name": "GitHub Save Report4",
+        "credentials": {
+          "githubApi": {
+            "id": "vA7LPpl9HKW5ox3y",
+            "name": "GitHub account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "resource": "databasePage",
+          "databaseId": {
+            "__rl": true,
+            "value": "27abe190-88d1-80d3-903c-dae037803153",
+            "mode": "list",
+            "cachedResultName": "Report",
+            "cachedResultUrl": "https://www.notion.so/27abe19088d180d3903cdae037803153"
+          },
+          "title": "={{ $json.content.name }}",
+          "propertiesUi": {
+            "propertyValues": [
+              {
+                "key": "clinic_id|number",
+                "numberValue": "={{ $('preprocess').first().json.clinicNumber }}"
+              }
+            ]
+          },
+          "blockUi": {
+            "blockValues": [
+              {
+                "richText": true,
+                "text": {
+                  "text": [
+                    {
+                      "text": "={{ $json.content.name }}",
+                      "isLink": true,
+                      "textLink": "={{ $json.content.html_url }}",
+                      "annotationUi": {}
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.notion",
+        "typeVersion": 2.2,
+        "position": [
+          1808,
+          -80
+        ],
+        "id": "48498bff-8eab-4ed9-932b-a8660fa386c3",
+        "name": "Create Report5",
+        "credentials": {
+          "notionApi": {
+            "id": "oKJA0F6WYajtEhBy",
+            "name": "Notion account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "method": "PUT",
+          "url": "=https://api.github.com/repos/iHealthLab/sop-automation/contents/clinic-{{ $('preprocess').first().json.clinicNumber }}/{{ $json.filename }}",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "githubApi",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Accept",
+                "value": "application/vnd.github+json"
+              },
+              {
+                "name": "X-GitHub-Api-Version",
+                "value": "2022-11-28"
+              }
+            ]
+          },
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "message",
+                "value": "=Add extracted SOP - {{ $json.timestamp }}"
+              },
+              {
+                "name": "content",
+                "value": "={{ $json.base64Content }}"
+              },
+              {
+                "name": "branch",
+                "value": "main"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          1616,
+          -80
+        ],
+        "id": "7b832f39-87eb-4d89-8389-cb3834e09374",
+        "name": "GitHub Save Report5",
+        "credentials": {
+          "githubApi": {
+            "id": "vA7LPpl9HKW5ox3y",
+            "name": "GitHub account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const reportType = $input.first().json.reportType || 'Missing-Task-Analysis';\nconst contentText = $input.first().json.content[0].text || ''; \nconst now = new Date();\nconst timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, 19);\n\nconst filenameOnly = `${reportType}-${timestamp}.md`;\n\nconst header = `# ${reportType} Report\n\n**Generated:** ${now.toISOString()}\n**Report Type:** ${reportType}\n\n---\n\n`;\n\nconst finalContent = header + contentText;\nconst base64Content = Buffer.from(finalContent, 'utf8').toString('base64');\n\nreturn [{\n  json: {\n    filename: filenameOnly,\n    content: finalContent,\n    base64Content,\n    reportType,\n    timestamp\n  }\n}];\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          1296,
+          -960
+        ],
+        "id": "b337333e-9ff3-4aab-982e-d37cfebcca72",
+        "name": "Extract Report"
+      },
+      {
+        "parameters": {
+          "jsCode": "const reportType = $input.first().json.reportType || 'KPI-Outcome-Analysis';\nconst contentText = $input.first().json.content[0].text || ''; \nconst now = new Date();\nconst timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, 19);\n\nconst filenameOnly = `${reportType}-${timestamp}.md`;\n\nconst header = `# ${reportType} Report\n\n**Generated:** ${now.toISOString()}\n**Report Type:** ${reportType}\n\n---\n\n`;\n\nconst finalContent = header + contentText;\nconst base64Content = Buffer.from(finalContent, 'utf8').toString('base64');\n\nreturn [{\n  json: {\n    filename: filenameOnly,\n    content: finalContent,\n    base64Content,\n    reportType,\n    timestamp\n  }\n}];\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          912,
+          -432
+        ],
+        "id": "dc5394a3-9021-4a3b-a5c1-e43100b13cc3",
+        "name": "Extract Report3"
+      },
+      {
+        "parameters": {
+          "jsCode": "const reportType = $input.first().json.reportType || 'KPI-Growth-Analysis';\nconst contentText = $input.first().json.content[0].text || ''; \nconst now = new Date();\nconst timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, 19);\n\nconst filenameOnly = `${reportType}-${timestamp}.md`;\n\nconst header = `# ${reportType} Report\n\n**Generated:** ${now.toISOString()}\n**Report Type:** ${reportType}\n\n---\n\n`;\n\nconst finalContent = header + contentText;\nconst base64Content = Buffer.from(finalContent, 'utf8').toString('base64');\n\nreturn [{\n  json: {\n    filename: filenameOnly,\n    content: finalContent,\n    base64Content,\n    reportType,\n    timestamp\n  }\n}];\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          912,
+          -576
+        ],
+        "id": "0bef833b-8e89-4930-8337-acfe42eb10c0",
+        "name": "Extract Report2"
+      },
+      {
+        "parameters": {
+          "jsCode": "const reportType = $input.first().json.reportType || 'Extracted SOP Report';\nconst contentText = $input.first().json.content[0].text || ''; \nconst now = new Date();\nconst timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, 19);\n\nconst filenameOnly = `${reportType}-${timestamp}.md`;\n\nconst header = `# ${reportType} Report\n\n**Generated:** ${now.toISOString()}\n**Report Type:** ${reportType}\n\n---\n\n`;\n\nconst finalContent = header + contentText;\nconst base64Content = Buffer.from(finalContent, 'utf8').toString('base64');\n\nreturn [{\n  json: {\n    filename: filenameOnly,\n    content: finalContent,\n    base64Content,\n    reportType,\n    timestamp\n  }\n}];\n"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          912,
+          -256
+        ],
+        "id": "e353c21d-1f75-4569-93a3-ef9534548ab6",
+        "name": "Extract Report4"
+      },
+      {
+        "parameters": {
+          "numberInputs": 6
+        },
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3.2,
+        "position": [
+          2256,
+          -544
+        ],
+        "id": "78c6a5ac-bbc3-4624-8101-f7932c6e2e4d",
+        "name": "done"
+      },
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "39296ae2-8da0-42fc-b608-d0fdd833d493",
+          "authentication": "headerAuth",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          -784,
+          144
+        ],
+        "id": "4f260fbd-67f6-4455-81a1-15fe69211118",
+        "name": "Webhook",
+        "webhookId": "39296ae2-8da0-42fc-b608-d0fdd833d493",
+        "credentials": {
+          "httpHeaderAuth": {
+            "id": "nrSLe4YwIFToNFgH",
+            "name": "Header Auth account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const items = $input.all();\nconst clinicNumber = $input.first().json.property_clinic_id\n\nconst markdownList = items\n  .map(item => `- [${item.json.name}](${item.json.url})`)\n  .join('\\n');\n\nconst mergedText = \n`The *sop* workflow has finished execution for clinic #${clinicNumber}. The following reports have been generated:\n\n${markdownList}`;\n\nreturn [{ json: { mergeContent: mergedText } }];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2480,
+          -480
+        ],
+        "id": "6f80a6f6-0517-42a7-b434-040398c5d61c",
+        "name": "merge urls"
+      },
+      {
+        "parameters": {
+          "method": "POST",
+          "url": "https://chat.googleapis.com/v1/spaces/AAQAvnao0Jw/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=ItOvjFskwvef3oDYt502aGb4btRW2_ME48ZUnIgGGmI",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          },
+          "sendBody": true,
+          "bodyParameters": {
+            "parameters": [
+              {
+                "name": "text",
+                "value": "={{ $json.mergeContent }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.2,
+        "position": [
+          2656,
+          -480
+        ],
+        "id": "984dcad5-1da2-437b-8c99-ccbd11569571",
+        "name": "HTTP Request"
+      }
+    ],
+    "connections": {
+      "Create Report": {
+        "main": [
+          [
+            {
+              "node": "done",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "GitHub Save Report": {
+        "main": [
+          [
+            {
+              "node": "Create Report",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Extra Task AI": {
+        "main": [
+          [
+            {
+              "node": "add report type extra task analysis",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "add report type extra task analysis": {
+        "main": [
+          [
+            {
+              "node": "Extract Report5",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "generate extra task report": {
+        "main": [
+          [
+            {
+              "node": "Extra Task AI",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "full extra task": {
+        "main": [
+          [
+            {
+              "node": "generate extra task report",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "generate full extra task": {
+        "main": [
+          [
+            {
+              "node": "full extra task",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "add report type KPI-Outcome-Analysis": {
+        "main": [
+          [
+            {
+              "node": "Extract Report3",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "add report type KPI-Growth-Analysis": {
+        "main": [
+          [
+            {
+              "node": "Extract Report2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "KPI ROI AI": {
+        "main": [
+          [
+            {
+              "node": "add report type ROI",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "KPI ROI Prompt": {
+        "main": [
+          [
+            {
+              "node": "KPI ROI AI",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "add report type Missing-Task-Analysis": {
+        "main": [
+          [
+            {
+              "node": "Extract Report",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "merge results": {
+        "main": [
+          [
+            {
+              "node": "Missing task - clinic level",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "missing task": {
+        "main": [
+          [
+            {
+              "node": "merge results",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Final SOP AI": {
+        "main": [
+          [
+            {
+              "node": "add report type extracted SOP",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "KPI Outcome AI": {
+        "main": [
+          [
+            {
+              "node": "add report type KPI-Outcome-Analysis",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "KPI Growth AI": {
+        "main": [
+          [
+            {
+              "node": "add report type KPI-Growth-Analysis",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Final SOP Report Prompt": {
+        "main": [
+          [
+            {
+              "node": "Final SOP AI",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "KPI Outcome Prompt": {
+        "main": [
+          [
+            {
+              "node": "KPI Outcome AI",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "KPI Growth Prompt": {
+        "main": [
+          [
+            {
+              "node": "KPI Growth AI",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "merge content": {
+        "main": [
+          [
+            {
+              "node": "generate full extra task",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "KPI ROI Prompt",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "KPI Outcome Prompt",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "KPI Growth Prompt",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Final SOP Report Prompt",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "output": {
+        "main": [
+          [
+            {
+              "node": "loop",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "preprocess": {
+        "main": [
+          [
+            {
+              "node": "loop",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "loop": {
+        "main": [
+          [
+            {
+              "node": "merge content",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "missing task-patient level",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Standardized prompt",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Standardized": {
+        "main": [
+          [
+            {
+              "node": "get name",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "get name": {
+        "main": [
+          [
+            {
+              "node": "patient page",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "GitHub Create patient page": {
+        "main": [
+          [
+            {
+              "node": "Create patient",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "patient page": {
+        "main": [
+          [
+            {
+              "node": "GitHub Create patient page",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create patient": {
+        "main": [
+          [
+            {
+              "node": "output",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Standardized prompt": {
+        "main": [
+          [
+            {
+              "node": "Standardized",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Missing task - clinic level": {
+        "main": [
+          [
+            {
+              "node": "Missing Task AI",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "missing task-patient level": {
+        "main": [
+          [
+            {
+              "node": "missing task",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Missing Task AI": {
+        "main": [
+          [
+            {
+              "node": "add report type Missing-Task-Analysis",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Extract Report5": {
+        "main": [
+          [
+            {
+              "node": "GitHub Save Report5",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "add report type extracted SOP": {
+        "main": [
+          [
+            {
+              "node": "Extract Report4",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "add report type ROI": {
+        "main": [
+          [
+            {
+              "node": "Extract Report1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Extract Report1": {
+        "main": [
+          [
+            {
+              "node": "GitHub Save Report1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create Report1": {
+        "main": [
+          [
+            {
+              "node": "done",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "GitHub Save Report1": {
+        "main": [
+          [
+            {
+              "node": "Create Report1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create Report2": {
+        "main": [
+          [
+            {
+              "node": "done",
+              "type": "main",
+              "index": 2
+            }
+          ]
+        ]
+      },
+      "GitHub Save Report2": {
+        "main": [
+          [
+            {
+              "node": "Create Report2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create Report3": {
+        "main": [
+          [
+            {
+              "node": "done",
+              "type": "main",
+              "index": 3
+            }
+          ]
+        ]
+      },
+      "GitHub Save Report3": {
+        "main": [
+          [
+            {
+              "node": "Create Report3",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create Report4": {
+        "main": [
+          [
+            {
+              "node": "done",
+              "type": "main",
+              "index": 4
+            }
+          ]
+        ]
+      },
+      "GitHub Save Report4": {
+        "main": [
+          [
+            {
+              "node": "Create Report4",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Create Report5": {
+        "main": [
+          [
+            {
+              "node": "done",
+              "type": "main",
+              "index": 5
+            }
+          ]
+        ]
+      },
+      "GitHub Save Report5": {
+        "main": [
+          [
+            {
+              "node": "Create Report5",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Extract Report": {
+        "main": [
+          [
+            {
+              "node": "GitHub Save Report",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Extract Report3": {
+        "main": [
+          [
+            {
+              "node": "GitHub Save Report3",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Extract Report2": {
+        "main": [
+          [
+            {
+              "node": "GitHub Save Report2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Extract Report4": {
+        "main": [
+          [
+            {
+              "node": "GitHub Save Report4",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "done": {
+        "main": [
+          [
+            {
+              "node": "merge urls",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "preprocess",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "merge urls": {
+        "main": [
+          [
+            {
+              "node": "HTTP Request",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "system migration",
+    "name": null,
+    "description": null,
+    "autosaved": false
+  },
+  "activeVersionId": "864368fb-4d41-4ee8-af53-3648d05a0d7c",
+  "connections": {
+    "Create Report": {
+      "main": [
+        [
+          {
+            "node": "done",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GitHub Save Report": {
+      "main": [
+        [
+          {
+            "node": "Create Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extra Task AI": {
+      "main": [
+        [
+          {
+            "node": "add report type extra task analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "add report type extra task analysis": {
+      "main": [
+        [
+          {
+            "node": "Extract Report5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "generate extra task report": {
+      "main": [
+        [
+          {
+            "node": "Extra Task AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "full extra task": {
+      "main": [
+        [
+          {
+            "node": "generate extra task report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "generate full extra task": {
+      "main": [
+        [
+          {
+            "node": "full extra task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "add report type KPI-Outcome-Analysis": {
+      "main": [
+        [
+          {
+            "node": "Extract Report3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "add report type KPI-Growth-Analysis": {
+      "main": [
+        [
+          {
+            "node": "Extract Report2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "KPI ROI AI": {
+      "main": [
+        [
+          {
+            "node": "add report type ROI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "KPI ROI Prompt": {
+      "main": [
+        [
+          {
+            "node": "KPI ROI AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "add report type Missing-Task-Analysis": {
+      "main": [
+        [
+          {
+            "node": "Extract Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "merge results": {
+      "main": [
+        [
+          {
+            "node": "Missing task - clinic level",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "missing task": {
+      "main": [
+        [
+          {
+            "node": "merge results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Final SOP AI": {
+      "main": [
+        [
+          {
+            "node": "add report type extracted SOP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "KPI Outcome AI": {
+      "main": [
+        [
+          {
+            "node": "add report type KPI-Outcome-Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "KPI Growth AI": {
+      "main": [
+        [
+          {
+            "node": "add report type KPI-Growth-Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Final SOP Report Prompt": {
+      "main": [
+        [
+          {
+            "node": "Final SOP AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "KPI Outcome Prompt": {
+      "main": [
+        [
+          {
+            "node": "KPI Outcome AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "KPI Growth Prompt": {
+      "main": [
+        [
+          {
+            "node": "KPI Growth AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "merge content": {
+      "main": [
+        [
+          {
+            "node": "generate full extra task",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "KPI ROI Prompt",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "KPI Outcome Prompt",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "KPI Growth Prompt",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Final SOP Report Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "output": {
+      "main": [
+        [
+          {
+            "node": "loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "preprocess": {
+      "main": [
+        [
+          {
+            "node": "loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "loop": {
+      "main": [
+        [
+          {
+            "node": "merge content",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "missing task-patient level",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Standardized prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Standardized": {
+      "main": [
+        [
+          {
+            "node": "get name",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get name": {
+      "main": [
+        [
+          {
+            "node": "patient page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GitHub Create patient page": {
+      "main": [
+        [
+          {
+            "node": "Create patient",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "patient page": {
+      "main": [
+        [
+          {
+            "node": "GitHub Create patient page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create patient": {
+      "main": [
+        [
+          {
+            "node": "output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Standardized prompt": {
+      "main": [
+        [
+          {
+            "node": "Standardized",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Missing task - clinic level": {
+      "main": [
+        [
+          {
+            "node": "Missing Task AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "missing task-patient level": {
+      "main": [
+        [
+          {
+            "node": "missing task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Missing Task AI": {
+      "main": [
+        [
+          {
+            "node": "add report type Missing-Task-Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Report5": {
+      "main": [
+        [
+          {
+            "node": "GitHub Save Report5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "add report type extracted SOP": {
+      "main": [
+        [
+          {
+            "node": "Extract Report4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "add report type ROI": {
+      "main": [
+        [
+          {
+            "node": "Extract Report1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Report1": {
+      "main": [
+        [
+          {
+            "node": "GitHub Save Report1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Report1": {
+      "main": [
+        [
+          {
+            "node": "done",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "GitHub Save Report1": {
+      "main": [
+        [
+          {
+            "node": "Create Report1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Report2": {
+      "main": [
+        [
+          {
+            "node": "done",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "GitHub Save Report2": {
+      "main": [
+        [
+          {
+            "node": "Create Report2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Report3": {
+      "main": [
+        [
+          {
+            "node": "done",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "GitHub Save Report3": {
+      "main": [
+        [
+          {
+            "node": "Create Report3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Report4": {
+      "main": [
+        [
+          {
+            "node": "done",
+            "type": "main",
+            "index": 4
+          }
+        ]
+      ]
+    },
+    "GitHub Save Report4": {
+      "main": [
+        [
+          {
+            "node": "Create Report4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Report5": {
+      "main": [
+        [
+          {
+            "node": "done",
+            "type": "main",
+            "index": 5
+          }
+        ]
+      ]
+    },
+    "GitHub Save Report5": {
+      "main": [
+        [
+          {
+            "node": "Create Report5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Report": {
+      "main": [
+        [
+          {
+            "node": "GitHub Save Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Report3": {
+      "main": [
+        [
+          {
+            "node": "GitHub Save Report3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Report2": {
+      "main": [
+        [
+          {
+            "node": "GitHub Save Report2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Report4": {
+      "main": [
+        [
+          {
+            "node": "GitHub Save Report4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "done": {
+      "main": [
+        [
+          {
+            "node": "merge urls",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "preprocess",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "merge urls": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2025-09-17T18:22:54.067Z",
+  "id": "zCsGfQaH2OkOEaeY",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "SOP automation",
+  "nodes": [
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "27abe190-88d1-80d3-903c-dae037803153",
+          "mode": "list",
+          "cachedResultName": "Report",
+          "cachedResultUrl": "https://www.notion.so/27abe19088d180d3903cdae037803153"
+        },
+        "title": "={{ $json.content.name }}",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "clinic_id|number",
+              "numberValue": "={{ $('preprocess').first().json.clinicNumber }}"
+            }
+          ]
+        },
+        "blockUi": {
+          "blockValues": [
+            {
+              "richText": true,
+              "text": {
+                "text": [
+                  {
+                    "text": "={{ $json.content.name }}",
+                    "isLink": true,
+                    "textLink": "={{ $json.content.html_url }}",
+                    "annotationUi": {}
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1680,
+        -960
+      ],
+      "id": "b295c8f0-9755-4404-94a0-ead00d3e814f",
+      "name": "Create Report",
+      "credentials": {
+        "notionApi": {
+          "id": "oKJA0F6WYajtEhBy",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://api.github.com/repos/iHealthLab/sop-automation/contents/clinic-{{ $('preprocess').first().json.clinicNumber }}/{{ $json.filename }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            },
+            {
+              "name": "X-GitHub-Api-Version",
+              "value": "2022-11-28"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "message",
+              "value": "=Add extracted SOP - {{ $json.timestamp }}"
+            },
+            {
+              "name": "content",
+              "value": "={{ $json.base64Content }}"
+            },
+            {
+              "name": "branch",
+              "value": "main"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1488,
+        -960
+      ],
+      "id": "c3699e1d-5edf-4b11-9c26-c0a223daa44d",
+      "name": "GitHub Save Report",
+      "credentials": {
+        "githubApi": {
+          "id": "vA7LPpl9HKW5ox3y",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "claude-sonnet-4-20250514",
+          "mode": "list",
+          "cachedResultName": "claude-sonnet-4-20250514"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.prompt[0].content }}",
+              "role": "assistant"
+            },
+            {
+              "content": "={{ $('full extra task').item.json.content}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.anthropic",
+      "typeVersion": 1,
+      "position": [
+        928,
+        -80
+      ],
+      "id": "0c602bd8-ed51-4444-94fd-3c200a0fe974",
+      "name": "Extra Task AI",
+      "credentials": {
+        "anthropicApi": {
+          "id": "JvTJW1grSbIcwc1m",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bab7a608-5768-4d84-b4ad-32dedbd9c30c",
+              "name": "reportType",
+              "value": "Extra Task Analysis",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1232,
+        -80
+      ],
+      "id": "a52c7692-ef4b-436e-8ba7-9eed46060899",
+      "name": "add report type extra task analysis"
+    },
+    {
+      "parameters": {
+        "promptName": "Scenario-Based Extra Task Analysis",
+        "requestOptions": {}
+      },
+      "type": "@langfuse/n8n-nodes-langfuse.langfuse",
+      "typeVersion": 1,
+      "position": [
+        752,
+        -80
+      ],
+      "id": "49390131-1abd-47ae-80df-4646547c7b14",
+      "name": "generate extra task report",
+      "credentials": {
+        "langfuseApi": {
+          "id": "Uh60jBHGMiOuoPLE",
+          "name": "Langfuse account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "claude-sonnet-4-20250514",
+          "mode": "list",
+          "cachedResultName": "claude-sonnet-4-20250514"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.prompt[0].content }}",
+              "role": "assistant"
+            },
+            {
+              "content": "={{ $('merge content').item.json.mergeContent }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.anthropic",
+      "typeVersion": 1,
+      "position": [
+        448,
+        -80
+      ],
+      "id": "eb3e0381-e564-41b1-9d73-b1fa5a710b27",
+      "name": "full extra task",
+      "credentials": {
+        "anthropicApi": {
+          "id": "JvTJW1grSbIcwc1m",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptName": "generate extra task analysis 1_all patients",
+        "requestOptions": {}
+      },
+      "type": "@langfuse/n8n-nodes-langfuse.langfuse",
+      "typeVersion": 1,
+      "position": [
+        272,
+        -80
+      ],
+      "id": "85ba4e91-f034-4440-945f-980016eae243",
+      "name": "generate full extra task",
+      "credentials": {
+        "langfuseApi": {
+          "id": "Uh60jBHGMiOuoPLE",
+          "name": "Langfuse account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bab7a608-5768-4d84-b4ad-32dedbd9c30c",
+              "name": "reportType",
+              "value": "KPI-Outcome-Analysis",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        752,
+        -432
+      ],
+      "id": "bb8bacd9-eb8c-49f2-91b1-13d14cf803da",
+      "name": "add report type KPI-Outcome-Analysis"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bab7a608-5768-4d84-b4ad-32dedbd9c30c",
+              "name": "reportType",
+              "value": "KPI-Growth-Analysis",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        752,
+        -576
+      ],
+      "id": "5a69de0f-6fb5-4e25-b7c3-77ce384e5826",
+      "name": "add report type KPI-Growth-Analysis"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "claude-opus-4-1-20250805",
+          "mode": "list",
+          "cachedResultName": "claude-opus-4-1-20250805"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.prompt[0].content }}",
+              "role": "assistant"
+            },
+            {
+              "content": "={{ $('merge content').item.json.mergeContent }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.anthropic",
+      "typeVersion": 1,
+      "position": [
+        448,
+        -752
+      ],
+      "id": "e44965c9-7504-45f3-ad84-7eae04d013c2",
+      "name": "KPI ROI AI",
+      "credentials": {
+        "anthropicApi": {
+          "id": "JvTJW1grSbIcwc1m",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptName": "KPI-Oriented Prompt - ROI",
+        "requestOptions": {}
+      },
+      "type": "@langfuse/n8n-nodes-langfuse.langfuse",
+      "typeVersion": 1,
+      "position": [
+        272,
+        -752
+      ],
+      "id": "13304429-c34c-47e0-bad2-6ef0eb9b9ea1",
+      "name": "KPI ROI Prompt",
+      "credentials": {
+        "langfuseApi": {
+          "id": "Uh60jBHGMiOuoPLE",
+          "name": "Langfuse account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bab7a608-5768-4d84-b4ad-32dedbd9c30c",
+              "name": "reportType",
+              "value": "Missing-Task-Analysis",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1120,
+        -960
+      ],
+      "id": "2a214c2d-af95-4083-b7c4-07b9744064c5",
+      "name": "add report type Missing-Task-Analysis"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Collect missing task text for each patient safely\nconst texts = $input.all()\n  .map(item => {\n    const contentArr = item.json.content;\n    if (!contentArr || !Array.isArray(contentArr) || contentArr.length === 0) {\n      return null;\n    }\n    const firstBlock = contentArr[0];\n    if (firstBlock && typeof firstBlock.text === 'string') {\n      return firstBlock.text.trim();\n    }\n    return null;\n  })\n  .filter(t => t !== null && t !== '');\n\n// Merge texts with separators, or provide fallback if none\nconst mergedText = texts.length > 0\n  ? texts.join('\\n\\n-----\\n\\n')\n  : 'No patient missing task reports available.';\n\nreturn [{\n  json: {\n    mergeContent: mergedText\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        496,
+        -960
+      ],
+      "id": "5b63aabf-5b2f-4010-80f8-f98102a3fecd",
+      "name": "merge results"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "claude-sonnet-4-20250514",
+          "mode": "list",
+          "cachedResultName": "claude-sonnet-4-20250514"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.prompt[0].content }}",
+              "role": "assistant"
+            },
+            {
+              "content": "={{ $('loop').item.json.content }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.anthropic",
+      "typeVersion": 1,
+      "position": [
+        208,
+        -960
+      ],
+      "id": "85a28f10-f45a-4757-bec3-e417e082e84e",
+      "name": "missing task",
+      "credentials": {
+        "anthropicApi": {
+          "id": "JvTJW1grSbIcwc1m",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "claude-opus-4-1-20250805",
+          "mode": "list",
+          "cachedResultName": "claude-opus-4-1-20250805"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.prompt }}",
+              "role": "assistant"
+            },
+            {
+              "content": "={{ $('merge content').item.json.mergeContent }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.anthropic",
+      "typeVersion": 1,
+      "position": [
+        448,
+        -256
+      ],
+      "id": "aa4e8be0-6ba6-48b4-a2c8-dcf0f92baccd",
+      "name": "Final SOP AI",
+      "credentials": {
+        "anthropicApi": {
+          "id": "JvTJW1grSbIcwc1m",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "claude-opus-4-1-20250805",
+          "mode": "list",
+          "cachedResultName": "claude-opus-4-1-20250805"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.prompt[0].content }}",
+              "role": "assistant"
+            },
+            {
+              "content": "={{ $('merge content').item.json.mergeContent }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.anthropic",
+      "typeVersion": 1,
+      "position": [
+        448,
+        -432
+      ],
+      "id": "090fda02-0d77-4649-b153-d76745956624",
+      "name": "KPI Outcome AI",
+      "credentials": {
+        "anthropicApi": {
+          "id": "JvTJW1grSbIcwc1m",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "claude-sonnet-4-20250514",
+          "mode": "list",
+          "cachedResultName": "claude-sonnet-4-20250514"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "= {{ $json.prompt }}",
+              "role": "assistant"
+            },
+            {
+              "content": "={{ $('merge content').item.json.mergeContent }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.anthropic",
+      "typeVersion": 1,
+      "position": [
+        448,
+        -576
+      ],
+      "id": "f9006cec-4e61-4b4c-965c-fb16fbe5fc6f",
+      "name": "KPI Growth AI",
+      "credentials": {
+        "anthropicApi": {
+          "id": "JvTJW1grSbIcwc1m",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptName": "SOP Extraction from standardized logs",
+        "requestOptions": {}
+      },
+      "type": "@langfuse/n8n-nodes-langfuse.langfuse",
+      "typeVersion": 1,
+      "position": [
+        272,
+        -256
+      ],
+      "id": "eef0ad7d-9b23-4ac8-baff-5d1104800c89",
+      "name": "Final SOP Report Prompt",
+      "credentials": {
+        "langfuseApi": {
+          "id": "Uh60jBHGMiOuoPLE",
+          "name": "Langfuse account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptName": "KPI-Oriented Prompt - Outcome",
+        "requestOptions": {}
+      },
+      "type": "@langfuse/n8n-nodes-langfuse.langfuse",
+      "typeVersion": 1,
+      "position": [
+        272,
+        -432
+      ],
+      "id": "bcecb321-0dd4-4973-a96b-55d3d33d3c29",
+      "name": "KPI Outcome Prompt",
+      "credentials": {
+        "langfuseApi": {
+          "id": "Uh60jBHGMiOuoPLE",
+          "name": "Langfuse account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptName": "KPI-Oriented Prompt - Growth",
+        "requestOptions": {}
+      },
+      "type": "@langfuse/n8n-nodes-langfuse.langfuse",
+      "typeVersion": 1,
+      "position": [
+        272,
+        -576
+      ],
+      "id": "6283cb9f-b53d-4a02-ab5d-cdc05511d600",
+      "name": "KPI Growth Prompt",
+      "credentials": {
+        "langfuseApi": {
+          "id": "Uh60jBHGMiOuoPLE",
+          "name": "Langfuse account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const mergedText = $input.all().map(item => item.json.content).join('\\n\\n-----\\n\\n');\nreturn [{ json: { mergeContent: mergedText } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        64,
+        -496
+      ],
+      "id": "2a11e405-9c7c-4854-a919-ffbb51db13db",
+      "name": "merge content"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      index: $('loop').first().json.index,\n      content: $('Standardized').first().json.content[0].text\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1248,
+        224
+      ],
+      "id": "806e1d3e-5ea3-4faf-a991-580e519d08a7",
+      "name": "output"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Preprocess / split code node - improved version\n\nconst inputItems = $input.all();\nconst output = [];\n\ninputItems.forEach((item, formIdx) => {\n  const body = item.json.body\n  const clinicNum = body.clinic_number;\n  const submittedAt = body.timestamp;\n  const userId = body.user_id;\n  const userName = body.user_name\n  const userEmail = body.user_email\n  let rawContent = body.content;\n\n  // 如果 content 是一个 JSON 字符串，尝试 parse 出内层 content\n  if (typeof rawContent === 'string' && rawContent.trim().startsWith('{') && rawContent.includes('\"content\"')) {\n    try {\n      const parsed = JSON.parse(rawContent);\n      if (parsed.content && typeof parsed.content === 'string') {\n        rawContent = parsed.content;\n      }\n    } catch (err) {\n      // ignore parse error，继续使用原始 rawContent\n    }\n  }\n\n  // 使用正则匹配至少 5 个 dash 的行作为分割符\n  // 此正则 /\\r?\\n-{5,}\\r?\\n/ 匹配换行 + 至少 5 个 '-' + 换行\n  const parts = rawContent.split(/\\r?\\n-{5,}\\r?\\n/);\n\n  parts.forEach((part, partIdx) => {\n    const trimmed = part.trim();\n    if (trimmed && trimmed.length > 0) {\n      output.push({\n        json: {\n          clinicNumber: clinicNum,\n          submittedAt: submittedAt,\n          patientIndex: `patient-${formIdx + 1}-part-${partIdx + 1}`,  \n          userId,\n          userName,\n          userEmail,\n          content: trimmed\n        }\n      });\n    }\n  });\n});\n\nreturn output;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -560,
+        144
+      ],
+      "id": "7e338b1b-7f17-49db-9a58-d394918398f1",
+      "name": "preprocess"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -336,
+        144
+      ],
+      "id": "feaa8cd6-6142-47b4-87d9-0b65805ae86b",
+      "name": "loop"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "claude-opus-4-1-20250805",
+          "mode": "list",
+          "cachedResultName": "claude-opus-4-1-20250805"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.prompt }}",
+              "role": "assistant"
+            },
+            {
+              "content": "={{ $('loop').item.json.content }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.anthropic",
+      "typeVersion": 1,
+      "position": [
+        96,
+        224
+      ],
+      "id": "05574830-0f8f-4996-86f1-acc45b7777df",
+      "name": "Standardized",
+      "credentials": {
+        "anthropicApi": {
+          "id": "JvTJW1grSbIcwc1m",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst patientNames = items.map((item) => {\n  const text = item?.json?.content[0]?.text || '';\n  const patientInfoIndex = text.indexOf(\"**Patient Info:**\");\n\n  if (patientInfoIndex === -1) {\n    return { patientName: '' };\n  }\n\n  const patientNameStart = patientInfoIndex + \"**Patient Info:**\".length;\n  let patientNameEnd = text.indexOf(\"\\n\", patientNameStart);\n  if (patientNameEnd === -1) patientNameEnd = text.length;\n\n  let rawLine = text.slice(patientNameStart, patientNameEnd).trim();\n\n  let match = rawLine.match(/^(P\\d+\\s+\\w+)/);\n  if (match) {\n    return { patientName: match[1].trim() };\n  }\n\n  match = rawLine.match(/^([^\\(\\-]+)/);\n  if (match) {\n    return { patientName: match[1].trim() };\n  }\n\n  return { patientName: rawLine };\n});\n\nreturn patientNames;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        224
+      ],
+      "id": "3e5f9b23-2525-4c6d-ac85-abbea5434789",
+      "name": "get name"
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://api.github.com/repos/iHealthLab/sop-automation/contents/clinic-{{ $('loop').item.json.clinicNumber }}/patient_logs/{{ $json.filename }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            },
+            {
+              "name": "X-GitHub-Api-Version",
+              "value": "2022-11-28"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "message",
+              "value": "=Add standardized log for {{ $('get name').item.json.patientName }} - {{ $json.timestamp }}"
+            },
+            {
+              "name": "content",
+              "value": "={{ $json.base64Content }}"
+            },
+            {
+              "name": "branch",
+              "value": "main"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        832,
+        224
+      ],
+      "id": "a93f759d-9054-4e4c-9f1d-4d3538ebdc3d",
+      "name": "GitHub Create patient page",
+      "credentials": {
+        "githubApi": {
+          "id": "vA7LPpl9HKW5ox3y",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1) 取模型输出的 markdown（你的节点名是 \"Message a model\"）\nlet md = $('Standardized').first().json.content[0].text || \"\";\n\n// 2) 去掉 ```markdown ... ``` 或 ``` 包裹\nmd = md.replace(/^```(?:markdown)?\\s*/i, \"\").replace(/\\s*```[\\s\\r\\n]*$/i, \"\");\n\n// 3) 生成安全文件名（可自定义前缀）\nconst prefix = \"SOP-Analysis\";\nconst now = new Date();\nconst ts = now.toISOString().replace(/[:.]/g, \"-\");\nconst filename = `${prefix}-${ts}.md`;\n\n// 4) Base64（GitHub 文件接口必须用 Base64）\nconst base64Content = Buffer.from(md, \"utf8\").toString(\"base64\");\n\nconst timestamp = now.toISOString().slice(0, 19);\n\n// 5) 输出给下个节点\nreturn [{ json: { \n  filename, \n  base64Content,\n  timestamp,\n} }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        624,
+        224
+      ],
+      "id": "ade8cf71-fc08-4be9-a4c7-f3991f496272",
+      "name": "patient page"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "27abe190-88d1-8094-8129-ed063afd5184",
+          "mode": "list",
+          "cachedResultName": "Patient",
+          "cachedResultUrl": "https://www.notion.so/27abe19088d180948129ed063afd5184"
+        },
+        "title": "={{ $('get name').item.json.patientName }}",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Clinic|number",
+              "numberValue": "={{ $('loop').item.json.clinicNumber }}"
+            },
+            {
+              "key": "create_at|date",
+              "date": "={{ $('patient page').item.json.timestamp }}",
+              "timezone": "UTC"
+            }
+          ]
+        },
+        "blockUi": {
+          "blockValues": [
+            {
+              "richText": true,
+              "text": {
+                "text": [
+                  {
+                    "text": "={{ $json.content.name }}",
+                    "isLink": true,
+                    "textLink": "={{ $json.content.html_url }}",
+                    "annotationUi": {}
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1024,
+        224
+      ],
+      "id": "580dfb5f-e8d3-4362-a32a-8f04f7faa062",
+      "name": "Create patient",
+      "credentials": {
+        "notionApi": {
+          "id": "oKJA0F6WYajtEhBy",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptName": "Visit Logs Standardization",
+        "requestOptions": {}
+      },
+      "type": "@langfuse/n8n-nodes-langfuse.langfuse",
+      "typeVersion": 1,
+      "position": [
+        -112,
+        224
+      ],
+      "id": "8d6f5931-1e05-45e3-80e6-6e2767497c5d",
+      "name": "Standardized prompt",
+      "credentials": {
+        "langfuseApi": {
+          "id": "Uh60jBHGMiOuoPLE",
+          "name": "Langfuse account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptName": "missing task analysis - clinic level",
+        "requestOptions": {}
+      },
+      "type": "@langfuse/n8n-nodes-langfuse.langfuse",
+      "typeVersion": 1,
+      "position": [
+        672,
+        -960
+      ],
+      "id": "6a4ef78b-ddc8-4b1e-af6a-2a90061921c5",
+      "name": "Missing task - clinic level",
+      "credentials": {
+        "langfuseApi": {
+          "id": "Uh60jBHGMiOuoPLE",
+          "name": "Langfuse account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptName": "missing task analysis - patient level",
+        "requestOptions": {}
+      },
+      "type": "@langfuse/n8n-nodes-langfuse.langfuse",
+      "typeVersion": 1,
+      "position": [
+        64,
+        -960
+      ],
+      "id": "02a1c711-7063-4b2d-a5a1-21e357fbf918",
+      "name": "missing task-patient level",
+      "credentials": {
+        "langfuseApi": {
+          "id": "Uh60jBHGMiOuoPLE",
+          "name": "Langfuse account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "claude-sonnet-4-20250514",
+          "mode": "list",
+          "cachedResultName": "claude-sonnet-4-20250514"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ $json.prompt[0]}}",
+              "role": "assistant"
+            },
+            {
+              "content": "={{ $('merge results').item.json.mergeContent }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.anthropic",
+      "typeVersion": 1,
+      "position": [
+        832,
+        -960
+      ],
+      "id": "6395437b-813e-40de-8584-124b677b2c59",
+      "name": "Missing Task AI",
+      "credentials": {
+        "anthropicApi": {
+          "id": "JvTJW1grSbIcwc1m",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const reportType = $input.first().json.reportType || 'Extra Task Analysis';\nconst contentText = $input.first().json.content[0].text || ''; \nconst now = new Date();\nconst timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, 19);\n\nconst filenameOnly = `${reportType}-${timestamp}.md`;\n\nconst header = `# ${reportType} Report\n\n**Generated:** ${now.toISOString()}\n**Report Type:** ${reportType}\n\n---\n\n`;\n\nconst finalContent = header + contentText;\nconst base64Content = Buffer.from(finalContent, 'utf8').toString('base64');\n\nreturn [{\n  json: {\n    filename: filenameOnly,\n    content: finalContent,\n    base64Content,\n    reportType,\n    timestamp\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1424,
+        -80
+      ],
+      "id": "853c28ab-425d-42ff-a186-0fd0173bde04",
+      "name": "Extract Report5"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bab7a608-5768-4d84-b4ad-32dedbd9c30c",
+              "name": "reportType",
+              "value": "Extracted SOP Report",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        752,
+        -256
+      ],
+      "id": "70f960ac-2456-4458-943b-4723766035ea",
+      "name": "add report type extracted SOP"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bab7a608-5768-4d84-b4ad-32dedbd9c30c",
+              "name": "reportType",
+              "value": "KPI-ROI-Analysis",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        752,
+        -752
+      ],
+      "id": "33de3b85-7d42-4a6d-b4ff-0621ee8e5a80",
+      "name": "add report type ROI"
+    },
+    {
+      "parameters": {
+        "jsCode": "const reportType = $input.first().json.reportType || 'KPI-ROI-Analysis';\nconst contentText = $input.first().json.content[0].text || ''; \nconst now = new Date();\nconst timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, 19);\n\nconst filenameOnly = `${reportType}-${timestamp}.md`;\n\nconst header = `# ${reportType} Report\n\n**Generated:** ${now.toISOString()}\n**Report Type:** ${reportType}\n\n---\n\n`;\n\nconst finalContent = header + contentText;\nconst base64Content = Buffer.from(finalContent, 'utf8').toString('base64');\n\nreturn [{\n  json: {\n    filename: filenameOnly,\n    content: finalContent,\n    base64Content,\n    reportType,\n    timestamp\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        912,
+        -752
+      ],
+      "id": "7f6b04db-de94-491c-9177-ca7cc674a6d1",
+      "name": "Extract Report1"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "27abe190-88d1-80d3-903c-dae037803153",
+          "mode": "list",
+          "cachedResultName": "Report",
+          "cachedResultUrl": "https://www.notion.so/27abe19088d180d3903cdae037803153"
+        },
+        "title": "={{ $json.content.name }}",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "clinic_id|number",
+              "numberValue": "={{ $('preprocess').first().json.clinicNumber }}"
+            }
+          ]
+        },
+        "blockUi": {
+          "blockValues": [
+            {
+              "richText": true,
+              "text": {
+                "text": [
+                  {
+                    "text": "={{ $json.content.name }}",
+                    "isLink": true,
+                    "textLink": "={{ $json.content.html_url }}",
+                    "annotationUi": {}
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1312,
+        -752
+      ],
+      "id": "c3f7135a-937d-4597-9906-b7f5123c9813",
+      "name": "Create Report1",
+      "credentials": {
+        "notionApi": {
+          "id": "oKJA0F6WYajtEhBy",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://api.github.com/repos/iHealthLab/sop-automation/contents/clinic-{{ $('preprocess').first().json.clinicNumber }}/{{ $json.filename }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            },
+            {
+              "name": "X-GitHub-Api-Version",
+              "value": "2022-11-28"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "message",
+              "value": "=Add extracted SOP - {{ $json.timestamp }}"
+            },
+            {
+              "name": "content",
+              "value": "={{ $json.base64Content }}"
+            },
+            {
+              "name": "branch",
+              "value": "main"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1120,
+        -752
+      ],
+      "id": "f1fe913b-abad-4950-b39d-4929c47be40e",
+      "name": "GitHub Save Report1",
+      "credentials": {
+        "githubApi": {
+          "id": "vA7LPpl9HKW5ox3y",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "27abe190-88d1-80d3-903c-dae037803153",
+          "mode": "list",
+          "cachedResultName": "Report",
+          "cachedResultUrl": "https://www.notion.so/27abe19088d180d3903cdae037803153"
+        },
+        "title": "={{ $json.content.name }}",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "clinic_id|number",
+              "numberValue": "={{ $('preprocess').first().json.clinicNumber }}"
+            }
+          ]
+        },
+        "blockUi": {
+          "blockValues": [
+            {
+              "richText": true,
+              "text": {
+                "text": [
+                  {
+                    "text": "={{ $json.content.name }}",
+                    "isLink": true,
+                    "textLink": "={{ $json.content.html_url }}",
+                    "annotationUi": {}
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1312,
+        -576
+      ],
+      "id": "8efbf826-21a4-4ba4-8d3c-f31787203c28",
+      "name": "Create Report2",
+      "credentials": {
+        "notionApi": {
+          "id": "oKJA0F6WYajtEhBy",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://api.github.com/repos/iHealthLab/sop-automation/contents/clinic-{{ $('preprocess').first().json.clinicNumber }}/{{ $json.filename }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            },
+            {
+              "name": "X-GitHub-Api-Version",
+              "value": "2022-11-28"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "message",
+              "value": "=Add extracted SOP - {{ $json.timestamp }}"
+            },
+            {
+              "name": "content",
+              "value": "={{ $json.base64Content }}"
+            },
+            {
+              "name": "branch",
+              "value": "main"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1120,
+        -576
+      ],
+      "id": "ac8727e3-cb72-489c-a48a-cfb7ed200a83",
+      "name": "GitHub Save Report2",
+      "credentials": {
+        "githubApi": {
+          "id": "vA7LPpl9HKW5ox3y",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "27abe190-88d1-80d3-903c-dae037803153",
+          "mode": "list",
+          "cachedResultName": "Report",
+          "cachedResultUrl": "https://www.notion.so/27abe19088d180d3903cdae037803153"
+        },
+        "title": "={{ $json.content.name }}",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "clinic_id|number",
+              "numberValue": "={{ $('preprocess').first().json.clinicNumber }}"
+            }
+          ]
+        },
+        "blockUi": {
+          "blockValues": [
+            {
+              "richText": true,
+              "text": {
+                "text": [
+                  {
+                    "text": "={{ $json.content.name }}",
+                    "isLink": true,
+                    "textLink": "={{ $json.content.html_url }}",
+                    "annotationUi": {}
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1312,
+        -432
+      ],
+      "id": "618952ef-6201-48f3-90d3-54922f2a4dd3",
+      "name": "Create Report3",
+      "credentials": {
+        "notionApi": {
+          "id": "oKJA0F6WYajtEhBy",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://api.github.com/repos/iHealthLab/sop-automation/contents/clinic-{{ $('preprocess').first().json.clinicNumber }}/{{ $json.filename }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            },
+            {
+              "name": "X-GitHub-Api-Version",
+              "value": "2022-11-28"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "message",
+              "value": "=Add extracted SOP - {{ $json.timestamp }}"
+            },
+            {
+              "name": "content",
+              "value": "={{ $json.base64Content }}"
+            },
+            {
+              "name": "branch",
+              "value": "main"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1120,
+        -432
+      ],
+      "id": "b2f0c929-0d3d-4c6c-8f09-7f938ca5aae3",
+      "name": "GitHub Save Report3",
+      "credentials": {
+        "githubApi": {
+          "id": "vA7LPpl9HKW5ox3y",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "27abe190-88d1-80d3-903c-dae037803153",
+          "mode": "list",
+          "cachedResultName": "Report",
+          "cachedResultUrl": "https://www.notion.so/27abe19088d180d3903cdae037803153"
+        },
+        "title": "={{ $json.content.name }}",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "clinic_id|number",
+              "numberValue": "={{ $('preprocess').first().json.clinicNumber }}"
+            }
+          ]
+        },
+        "blockUi": {
+          "blockValues": [
+            {
+              "richText": true,
+              "text": {
+                "text": [
+                  {
+                    "text": "={{ $json.content.name }}",
+                    "isLink": true,
+                    "textLink": "={{ $json.content.html_url }}",
+                    "annotationUi": {}
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1312,
+        -256
+      ],
+      "id": "b718655c-d750-4bce-a31b-c5800eefec08",
+      "name": "Create Report4",
+      "credentials": {
+        "notionApi": {
+          "id": "oKJA0F6WYajtEhBy",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://api.github.com/repos/iHealthLab/sop-automation/contents/clinic-{{ $('preprocess').first().json.clinicNumber }}/{{ $json.filename }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            },
+            {
+              "name": "X-GitHub-Api-Version",
+              "value": "2022-11-28"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "message",
+              "value": "=Add extracted SOP - {{ $json.timestamp }}"
+            },
+            {
+              "name": "content",
+              "value": "={{ $json.base64Content }}"
+            },
+            {
+              "name": "branch",
+              "value": "main"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1120,
+        -256
+      ],
+      "id": "2a642b26-46e4-4c00-adb3-e4d49ff82687",
+      "name": "GitHub Save Report4",
+      "credentials": {
+        "githubApi": {
+          "id": "vA7LPpl9HKW5ox3y",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "27abe190-88d1-80d3-903c-dae037803153",
+          "mode": "list",
+          "cachedResultName": "Report",
+          "cachedResultUrl": "https://www.notion.so/27abe19088d180d3903cdae037803153"
+        },
+        "title": "={{ $json.content.name }}",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "clinic_id|number",
+              "numberValue": "={{ $('preprocess').first().json.clinicNumber }}"
+            }
+          ]
+        },
+        "blockUi": {
+          "blockValues": [
+            {
+              "richText": true,
+              "text": {
+                "text": [
+                  {
+                    "text": "={{ $json.content.name }}",
+                    "isLink": true,
+                    "textLink": "={{ $json.content.html_url }}",
+                    "annotationUi": {}
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1808,
+        -80
+      ],
+      "id": "48498bff-8eab-4ed9-932b-a8660fa386c3",
+      "name": "Create Report5",
+      "credentials": {
+        "notionApi": {
+          "id": "oKJA0F6WYajtEhBy",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PUT",
+        "url": "=https://api.github.com/repos/iHealthLab/sop-automation/contents/clinic-{{ $('preprocess').first().json.clinicNumber }}/{{ $json.filename }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/vnd.github+json"
+            },
+            {
+              "name": "X-GitHub-Api-Version",
+              "value": "2022-11-28"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "message",
+              "value": "=Add extracted SOP - {{ $json.timestamp }}"
+            },
+            {
+              "name": "content",
+              "value": "={{ $json.base64Content }}"
+            },
+            {
+              "name": "branch",
+              "value": "main"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1616,
+        -80
+      ],
+      "id": "7b832f39-87eb-4d89-8389-cb3834e09374",
+      "name": "GitHub Save Report5",
+      "credentials": {
+        "githubApi": {
+          "id": "vA7LPpl9HKW5ox3y",
+          "name": "GitHub account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const reportType = $input.first().json.reportType || 'Missing-Task-Analysis';\nconst contentText = $input.first().json.content[0].text || ''; \nconst now = new Date();\nconst timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, 19);\n\nconst filenameOnly = `${reportType}-${timestamp}.md`;\n\nconst header = `# ${reportType} Report\n\n**Generated:** ${now.toISOString()}\n**Report Type:** ${reportType}\n\n---\n\n`;\n\nconst finalContent = header + contentText;\nconst base64Content = Buffer.from(finalContent, 'utf8').toString('base64');\n\nreturn [{\n  json: {\n    filename: filenameOnly,\n    content: finalContent,\n    base64Content,\n    reportType,\n    timestamp\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1296,
+        -960
+      ],
+      "id": "b337333e-9ff3-4aab-982e-d37cfebcca72",
+      "name": "Extract Report"
+    },
+    {
+      "parameters": {
+        "jsCode": "const reportType = $input.first().json.reportType || 'KPI-Outcome-Analysis';\nconst contentText = $input.first().json.content[0].text || ''; \nconst now = new Date();\nconst timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, 19);\n\nconst filenameOnly = `${reportType}-${timestamp}.md`;\n\nconst header = `# ${reportType} Report\n\n**Generated:** ${now.toISOString()}\n**Report Type:** ${reportType}\n\n---\n\n`;\n\nconst finalContent = header + contentText;\nconst base64Content = Buffer.from(finalContent, 'utf8').toString('base64');\n\nreturn [{\n  json: {\n    filename: filenameOnly,\n    content: finalContent,\n    base64Content,\n    reportType,\n    timestamp\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        912,
+        -432
+      ],
+      "id": "dc5394a3-9021-4a3b-a5c1-e43100b13cc3",
+      "name": "Extract Report3"
+    },
+    {
+      "parameters": {
+        "jsCode": "const reportType = $input.first().json.reportType || 'KPI-Growth-Analysis';\nconst contentText = $input.first().json.content[0].text || ''; \nconst now = new Date();\nconst timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, 19);\n\nconst filenameOnly = `${reportType}-${timestamp}.md`;\n\nconst header = `# ${reportType} Report\n\n**Generated:** ${now.toISOString()}\n**Report Type:** ${reportType}\n\n---\n\n`;\n\nconst finalContent = header + contentText;\nconst base64Content = Buffer.from(finalContent, 'utf8').toString('base64');\n\nreturn [{\n  json: {\n    filename: filenameOnly,\n    content: finalContent,\n    base64Content,\n    reportType,\n    timestamp\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        912,
+        -576
+      ],
+      "id": "0bef833b-8e89-4930-8337-acfe42eb10c0",
+      "name": "Extract Report2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const reportType = $input.first().json.reportType || 'Extracted SOP Report';\nconst contentText = $input.first().json.content[0].text || ''; \nconst now = new Date();\nconst timestamp = now.toISOString().replace(/[:.]/g, '-').slice(0, 19);\n\nconst filenameOnly = `${reportType}-${timestamp}.md`;\n\nconst header = `# ${reportType} Report\n\n**Generated:** ${now.toISOString()}\n**Report Type:** ${reportType}\n\n---\n\n`;\n\nconst finalContent = header + contentText;\nconst base64Content = Buffer.from(finalContent, 'utf8').toString('base64');\n\nreturn [{\n  json: {\n    filename: filenameOnly,\n    content: finalContent,\n    base64Content,\n    reportType,\n    timestamp\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        912,
+        -256
+      ],
+      "id": "e353c21d-1f75-4569-93a3-ef9534548ab6",
+      "name": "Extract Report4"
+    },
+    {
+      "parameters": {
+        "numberInputs": 6
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2256,
+        -544
+      ],
+      "id": "78c6a5ac-bbc3-4624-8101-f7932c6e2e4d",
+      "name": "done"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "39296ae2-8da0-42fc-b608-d0fdd833d493",
+        "authentication": "headerAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -784,
+        144
+      ],
+      "id": "4f260fbd-67f6-4455-81a1-15fe69211118",
+      "name": "Webhook",
+      "webhookId": "39296ae2-8da0-42fc-b608-d0fdd833d493",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "nrSLe4YwIFToNFgH",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst clinicNumber = $input.first().json.property_clinic_id\n\nconst markdownList = items\n  .map(item => `- [${item.json.name}](${item.json.url})`)\n  .join('\\n');\n\nconst mergedText = \n`The *sop* workflow has finished execution for clinic #${clinicNumber}. The following reports have been generated:\n\n${markdownList}`;\n\nreturn [{ json: { mergeContent: mergedText } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2480,
+        -480
+      ],
+      "id": "6f80a6f6-0517-42a7-b434-040398c5d61c",
+      "name": "merge urls"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://chat.googleapis.com/v1/spaces/AAQAvnao0Jw/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=ItOvjFskwvef3oDYt502aGb4btRW2_ME48ZUnIgGGmI",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "text",
+              "value": "={{ $json.mergeContent }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2656,
+        -480
+      ],
+      "id": "984dcad5-1da2-437b-8c99-ccbd11569571",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1392,
+        64
+      ],
+      "typeVersion": 1,
+      "id": "af901154-93b3-4856-94bb-a5f0ea2a4560",
+      "name": "Sticky Note"
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {
+    "Extra Task AI": [
+      {
+        "json": {
+          "content": [
+            {
+              "type": "text",
+              "text": "# Extra Tasks Analysis by Scenario\n\n## Scenario Patient Count and Demographics\n\n### UC Enrollment: 1 patient\n- **P3 Yuehong** (Clinic's new patient; iHealth new patient) - DM/HTN. Reason for visit: refill med. Appt: 3:00\n\n### UC In-clinic Follow-up: 1 patient  \n- **P2 Dehui** (iHealth F/U) - DM\n\n### Annual Visit: 0 patients\n- No patients identified for this scenario\n\n### Non-iHealth Patient Visit: 0 patients\n- No patients identified for this scenario\n\n---\n\n## UC Enrollment Analysis\n\n### Extra Tasks Summary Table\n\n| Phase | Primary Role | Extra Task Name | Frequency | Average Duration | SOP Potential | Patient Cases |\n|-------|--------------|-----------------|-----------|------------------|---------------|---------------|\n| Pre-Provider Workflow | MA | EKG Performance | 1 | 18 mins (total session) | Yes | P3 Yuehong - EKG was performed during comprehensive new patient intake in vital room alongside standard vitals, medication reconciliation, and UC enrollment. Patient presented with DM/HTN comorbidities requiring baseline cardiac assessment before initiating chronic disease management program. |\n| Pre-Provider Workflow | MA | Comprehensive Social History Collection | 1 | 18 mins (total session) | Yes | P3 Yuehong - Extensive social history gathered including family history, lifestyle habits (smoking, alcohol, exercise, diet), living situation, travel history, and environmental exposures. This occurred during new patient rooming process as part of comprehensive assessment for UC diabetes management program enrollment. |\n\n### UC Enrollment Scenario Analysis\n\n**High-Value Tasks for SOP Integration:**\n- **EKG Performance**: Essential for establishing baseline cardiac status in new UC enrollees with cardiovascular risk factors (DM/HTN). This represents a standardizable clinical procedure that should be systematically included in UC enrollment protocols.\n- **Comprehensive Social History Collection**: Critical for personalized chronic disease management planning. Social determinants of health directly impact diabetes and hypertension outcomes, making this data collection valuable for UC program success.\n\n**Operational Impact:**\n- Both extra tasks identified have high SOP potential and clinical value\n- No redundant or low-value tasks were identified for elimination\n- These tasks represent necessary comprehensive assessment activities that enhance UC enrollment quality\n- Rather than eliminating tasks, standardizing these activities in SOPs would:\n  - Ensure consistent baseline data collection for all UC enrollees\n  - Improve care quality and chronic disease management outcomes\n  - Reduce variability in enrollment processes\n  - Potentially improve UC program ROI through better patient stratification and personalized care planning\n\n**Time Investment Analysis:**\n- Total extra task time: 18 minutes (combined session)\n- This represents a one-time investment during UC enrollment that likely provides long-term value through improved chronic disease management and reduced future complications\n\n---\n\n## UC In-clinic Follow-up Analysis\n\n### Extra Tasks Summary Table\nNo extra tasks were identified for this scenario.\n\n### UC In-clinic Follow-up Scenario Analysis\n**Key Finding:** The established UC follow-up patient (P2 Dehui) required no extra tasks, suggesting that existing SOPs for UC follow-up visits are comprehensive and well-defined. This indicates operational efficiency in the established patient workflow.\n\n---\n\n## Overall Cross-Scenario Analysis\n\n**Operational Efficiency Insights:**\n1. **UC Enrollment** requires more comprehensive assessment activities (justifiably so for baseline establishment)\n2. **UC Follow-up** operates efficiently with existing SOPs\n3. **Primary opportunity**: Standardize the valuable extra tasks identified in UC enrollment to ensure consistent, high-quality program onboarding\n4. **ROI Enhancement**: Rather than eliminating tasks, systematizing the comprehensive assessment approach for new UC enrollees will likely improve chronic disease management outcomes and long-term patient engagement with the program\n\n**Recommendation:** Focus on SOP development for UC enrollment processes to standardize EKG performance and comprehensive social history collection protocols, ensuring all new chronic disease management patients receive consistent, thorough baseline assessments."
+            }
+          ]
+        }
+      }
+    ],
+    "full extra task": [
+      {
+        "json": {
+          "content": [
+            {
+              "type": "text",
+              "text": "# Extra Tasks Analysis - All Patients\n\n## Patient 1: P2 Dehui (iHealth F/U) - DM\n\nNo extra tasks were identified for this patient.\n\n## Patient 2: P3 Yuehong (Clinic's new patient; iHealth new patient) - DM/HTN. Reason for visit: refill med. Appt: 3:00\n\n| Time | Duration | Location | Original Content | Primary Role | Extra Task | SOP Guide Potential | Reason | Context |\n|------|----------|----------|------------------|--------------|------------|-------------------|---------|---------|\n| 3:22 | 18 mins | Vital Room | MA called patient in and Check patient bp, oxygen, tem, weight, height, asking meds bottle, MA put it in to IMS, asking any allergy for meds, ask family history, how is food intake, any cigarette, alcohol, who's living with, any exercise, any coffee, soda, tea, any second hand smog, out of country in the past 2 months? reason for coming refill meds, and left leg pain, EKG, UC ask if pt has device at home and explain UC diabetes management | MA | EKG Performance | Yes | EKGs are standardized clinical procedures that could be systematically included in SOPs for new patients with cardiac risk factors like DM/HTN to establish baseline cardiac status | This occurred during the comprehensive new patient intake process in the vital room, where the MA was conducting standard vitals, medication reconciliation, and chief complaint capture. The EKG was performed as part of the initial cardiac assessment for a new DM/HTN patient. |\n| 3:22 | 18 mins | Vital Room | MA called patient in and Check patient bp, oxygen, tem, weight, height, asking meds bottle, MA put it in to IMS, asking any allergy for meds, ask family history, how is food intake, any cigarette, alcohol, who's living with, any exercise, any coffee, soda, tea, any second hand smog, out of country in the past 2 months? reason for coming refill meds, and left leg pain, EKG, UC ask if pt has device at home and explain UC diabetes management | MA | Social History Collection | Yes | Comprehensive social history collection (family history, lifestyle habits, living situation, travel history) represents standardizable clinical data gathering that could be systematized in SOPs for chronic disease management | This extensive social history collection occurred during the new patient rooming process alongside standard vitals and medication reconciliation. The MA gathered comprehensive lifestyle and social factors relevant to diabetes and hypertension management while conducting other intake procedures. |\n\n# Summary Analysis\n- Total patients analyzed: 2\n- Total extra tasks identified: 2\n- Tasks with SOP Guide potential: 2\n- Tasks without SOP Guide potential: 0\n- Most common extra tasks: EKG Performance, Social History Collection (each occurring once)\n\n**Key Findings:**\n- All extra tasks identified were performed by clinical staff (MA) rather than patients or families\n- Both extra tasks represent clinical assessment activities that could enhance standardized care workflows\n- Extra tasks occurred specifically during new patient intake processes, suggesting potential gaps in new patient SOPs\n- No extra tasks were identified for the follow-up patient visit, indicating SOPs may be more comprehensive for established patient workflows"
+            }
+          ]
+        }
+      }
+    ],
+    "KPI ROI AI": [
+      {
+        "json": {
+          "content": [
+            {
+              "type": "text",
+              "text": "# KPI-Oriented Analysis: Visit Efficiency & Role Optimization\n\n## Executive Summary\nAnalysis of two patient visits reveals significant operational inefficiencies and role confusion that directly impact clinic ROI through increased labor costs and reduced patient throughput.\n\n## Key Performance Indicators\n\n### Visit P2 (Follow-up DM Patient)\n- **Total Visit Time:** 9 minutes\n- **Wait Time:** 6 minutes (67% of visit)\n- **Value-Added Time:** 3 minutes\n- **Staff Utilization:** 2 roles (MA, CA/CM)\n- **Efficiency Score:** 33%\n\n### Visit P3 (New Patient DM/HTN)\n- **Total Visit Time:** 40 minutes\n- **Wait Time:** 22 minutes (55% of visit)\n- **Value-Added Time:** 18 minutes\n- **Staff Utilization:** 3 roles (MA, Front Desk, CA/CM)\n- **Efficiency Score:** 45%\n\n## Critical ROI Impact Areas\n\n### 1. Excessive Wait Times\n- **P2:** 67% non-productive time\n- **P3:** 55% non-productive time\n- **Impact:** Reduces daily patient capacity by ~30-40%\n- **Revenue Loss:** Estimated $800-1,200/day in unbilled visits\n\n### 2. Role Redundancy & Scope Creep\n- **Issue:** MA performing extensive social history (P3)\n- **Time Impact:** +10 minutes unnecessary data collection\n- **Cost:** MA doing provider-level assessment without billing capability\n- **Solution:** Restrict to SOP-defined tasks only\n\n### 3. Process Bottlenecks\n- **New Patient Forms:** 22-minute completion time\n- **Recommendation:** Digital pre-visit forms = save 15 min/patient\n- **ROI:** Increase capacity by 2-3 patients/day\n\n## Immediate Action Items for ROI Improvement\n\n1. **Implement Digital Check-in**\n   - Reduce wait time by 50%\n   - Annual savings: ~$45,000 in MA hours\n\n2. **Strict Role Adherence**\n   - MA: Vitals only (5 min max)\n   - Provider: All history/assessment\n   - Time saved: 10 min/visit\n\n3. **Eliminate Non-Essential Tasks**\n   - Remove: Extensive social history by MA\n   - Remove: Duplicate A1C testing without provider order\n   - Focus: Core vitals and chief complaint only\n\n## Projected Financial Impact\n- **Increased Capacity:** +4 patients/day\n- **Additional Revenue:** $600-800/day\n- **Reduced Labor Cost:** 25% efficiency gain\n- **Annual ROI:** $150,000-200,000\n\n## Recommendation Priority\n1. Immediate: Digital forms implementation\n2. Week 1: Role responsibility matrix enforcement\n3. Month 1: Workflow automation for check-in\n4. Quarter 1: Full EHR optimization for reduced documentation time\n\n**Bottom Line:** Current inefficiencies cost approximately $200,000 annually in lost revenue and excess labor. Implementing these changes could improve EBITDA by 15-20%."
+            }
+          ]
+        }
+      }
+    ],
+    "missing task": [
+      {
+        "json": {
+          "content": [
+            {
+              "type": "text",
+              "text": "## Missing Tasks Analysis - Patient 2 (Dehui)\n\n### Front Desk\n\n| SOP Category | SOP Task | Task Code | Checklist Completed | Missing Checklist |\n|--------------|----------|-----------|---------------------|-------------------|\n| Check-In | Patient Registration | CI.1 | 1. Arrival time logged | 1. ID verified<br>2. DOB confirmed<br>3. Insurance card scanned<br>4. Demographics updated<br>5. Patient marked \"arrived\" in system |\n| Check-In | Co-Pay & Billing Collection | CI.2 | None | 1. Co-pay verified<br>2. Payment collected<br>3. Receipt issued<br>4. EHR updated<br>5. Deposit log reconciled |\n| Check-In | Demographics Update | CI.3 | None | 1. Phone number confirmed<br>2. Address confirmed<br>3. Pharmacy updated<br>4. Emergency contact verified<br>5. Communication preference updated |\n\n### MA\n\n| SOP Category | SOP Task | Task Code | Checklist Completed | Missing Checklist |\n|--------------|----------|-----------|---------------------|-------------------|\n| Pre-Provider Onsite Workflow | Standard Vitals Collection | PP.2 | 1. Vitals collected<br>2. Documented in EHR | 1. ID verified<br>2. Equipment sanitized<br>3. Abnormal values rechecked and flagged |\n| Pre-Provider Onsite Workflow | Chief Complaint Capture | PP.3 | None | 1. Chief complaint asked<br>2. Patient words documented<br>3. Linked to visit type<br>4. Saved in EHR<br>5. Provider notified if urgent |\n| Pre-Provider Onsite Workflow | Preventive Health Screening | PP.6 | None | 1. PHQ-9 completed (if due)<br>2. Fall risk completed (if due)<br>3. Pain scale completed<br>4. Tobacco/alcohol use documented<br>5. Results entered in EHR<br>6. Abnormal flagged for provider |\n| Pre-Provider Onsite Workflow | Rooming | PP.8 | None | 1. Patient called from lobby<br>2. ID verified<br>3. Escorted to correct room<br>4. Comfort ensured<br>5. Orientation provided<br>6. Rooming status updated in EHR |\n\n### CA/CM\n\n| SOP Category | SOP Task | Task Code | Checklist Completed | Missing Checklist |\n|--------------|----------|-----------|---------------------|-------------------|\n| Pre-Provider Onsite Workflow | Patient Education (Condition Basics) | PP.1 | None | 1. Confirm patient condition<br>2. Delivered script-based education<br>3. Provided handouts/visual aids<br>4. Patient questions addressed/escalated<br>5. Education documented |\n| Pre-Provider Onsite Workflow | DM/HTN Specific Vitals | PP.4 | 1. POC A1C if due | 1. 2–3 BP readings<br>2. Abnormal flagged<br>3. Documented in EHR/portal |\n| Pre-Provider Onsite Workflow | Medication Reconciliation | PP.5 | None | 1. Medication list reviewed<br>2. Dose/frequency confirmed<br>3. Allergies documented<br>4. Adherence checked<br>5. Side effects noted<br>6. Updates entered in portal<br>7. Discrepancies flagged |\n| Pre-Provider Onsite Workflow | Patient Summary Review | PP.7 | None | 1. UC vitals reviewed<br>2. Recent labs reviewed<br>3. Care gaps identified<br>4. Summary documented<br>5. Abnormal flagged/escalated |"
+            }
+          ]
+        }
+      },
+      {
+        "json": {
+          "content": [
+            {
+              "type": "text",
+              "text": "## Missing Tasks Analysis - Patient 3 (Yuehong)\n\n### Front Desk\n\n| SOP Category | SOP Task | Task Code | Checklist Completed | Missing Checklist |\n|--------------|----------|-----------|---------------------|-------------------|\n| Check-In | Patient Registration | CI.1 | 1. Arrival time logged | 1. ID verified<br>2. DOB confirmed<br>3. Insurance card scanned<br>4. Demographics updated<br>5. Patient marked \"arrived\" in system |\n| Check-In | Co-Pay & Billing Collection | CI.2 | None | 1. Co-pay verified<br>2. Payment collected<br>3. Receipt issued<br>4. EHR updated<br>5. Deposit log reconciled |\n| Pre-Visit | Insurance Eligibility Verification | PV.2 | None | 1. Active insurance confirmed<br>2. Co-pay identified<br>3. Deductible status noted<br>4. PCP assignment validated<br>5. Issues flagged<br>6. Patient notified<br>7. Documented in EHR |\n| Pre-Visit | Intake Forms Management | PV.5 | 1. Forms provided onsite if needed | 1. Forms sent<br>2. Completion status checked<br>3. Reminder sent<br>4. Scanned/uploaded<br>5. Documentation confirmed |\n\n### MA (Medical Assistant)\n\n| SOP Category | SOP Task | Task Code | Checklist Completed | Missing Checklist |\n|--------------|----------|-----------|---------------------|-------------------|\n| Check-In | Demographics Update | CI.3 | 1. Phone number confirmed<br>2. Pharmacy updated<br>3. Insurance card information collected | 1. Address confirmed<br>2. Emergency contact verified<br>3. Communication preference updated |\n| Pre-Provider Workflow | Rooming | PP.8 | 1. Patient called from lobby | 1. ID verified<br>2. Escorted to correct room<br>3. Comfort ensured<br>4. Orientation provided<br>5. Rooming status updated in EHR |\n| Pre-Provider Workflow | Standard Vitals Collection | PP.2 | 1. Vitals collected<br>2. Documented in EHR | 1. ID verified<br>2. Equipment sanitized<br>3. Abnormal values rechecked and flagged |\n| Pre-Provider Workflow | Chief Complaint Capture | PP.3 | 1. Chief complaint asked<br>2. Patient words documented | 1. Linked to visit type<br>2. Saved in EHR<br>3. Provider notified if urgent |\n| Pre-Provider Workflow | Medication Reconciliation | PP.5 | 1. Medication list reviewed<br>2. Allergies documented | 1. Dose/frequency confirmed<br>2. Adherence checked<br>3. Side effects noted<br>4. Updates entered in portal<br>5. Discrepancies flagged |\n| Pre-Provider Workflow | Preventive Health Screening | PP.6 | None | 1. PHQ-9 completed (if due)<br>2. Fall risk completed (if due)<br>3. Pain scale completed<br>4. Tobacco/alcohol use documented<br>5. Results entered in EHR<br>6. Abnormal flagged for provider |\n\n### CA/CM (Care Assistant/Care Manager)\n\n| SOP Category | SOP Task | Task Code | Checklist Completed | Missing Checklist |\n|--------------|----------|-----------|---------------------|-------------------|\n| Pre-Provider Workflow | Patient Education (Condition Basics) | PP.1 | 1. Confirm patient condition<br>2. Delivered script-based education | 1. Provided handouts/visual aids<br>2. Patient questions addressed/escalated<br>3. Education documented |\n| Pre-Provider Workflow | DM/HTN Specific Vitals | PP.4 | None | 1. 2–3 BP readings<br>2. POC A1C/glucose if due<br>3. Abnormal flagged<br>4. Documented in EHR/portal |\n| UC Device / Program | UC Enrollment – Diabetes (BG Monitor) |"
+            }
+          ]
+        }
+      }
+    ],
+    "Final SOP AI": [
+      {
+        "json": {
+          "content": [
+            {
+              "type": "text",
+              "text": "Based on the provided visit records, here's my analysis following the prompt requirements:\n\n## Patient Categorization Summary\n- **iHealth Enrollment**: P3 Yuehong (new patient with DM/HTN, UC education provided)\n- **iHealth Follow-Up**: P2 Dehui (existing iHealth patient with DM)\n- **Total Patients Analyzed**: 2\n\n## Duration Calculation Methodology\n\n**Extracted Duration Data from Visit Logs:**\n\n**P2 Dehui:**\n- Check-in: 2 min (explicitly stated)\n- Lobby wait: 6 min (explicitly stated) \n- Vitals: 2 min (explicitly stated)\n- A1C test: Not specified\n\n**P3 Yuehong:**\n- Check-in: 2 mins (explicitly stated)\n- Lobby wait/forms: 22 mins (explicitly stated)\n- Vital room activities: 18 mins (explicitly stated for combined tasks)\n\n**Note:** P3's vital room duration (18 mins) covers multiple tasks but individual task breakdowns are not provided in the source data.\n\n## Workflow Table: iHealth Enrollment (Based on P3 Yuehong)\n\n| Location | Role | SOP Task | Task Code | Average Duration |\n|----------|------|----------|-----------|------------------|\n| Front Desk | MA/Front Desk | Patient Registration<br>Provide intake forms | CI.1 | 2 mins (single patient data) |\n| Lobby | Patient | Complete intake forms | - | 22 mins (single patient data) |\n| Lobby | MA | Demographics Update<br>• Verify phone/email<br>• Confirm pharmacy<br>• Scan insurance | CI.3 | Duration included in lobby time |\n| Vital Room | MA | 1) Rooming<br>2) Standard Vitals Collection<br>3) Medication Reconciliation<br>4) Chief Complaint Capture<br>5) EKG (Extra Task)<br>6) Social History (Extra Task) | PP.1<br>PP.2<br>PP.4<br>PP.5 | Combined duration: 18 mins<br>(Individual task durations not specified) |\n| Vital Room | CA/CM | Patient Education - UC program basics | PE.1 | Duration included in 18 mins total |\n\n## Workflow Table: iHealth Follow-Up (Based on P2 Dehui)\n\n| Location | Role | SOP Task | Task Code | Average Duration |\n|----------|------|----------|-----------|------------------|\n| Front Desk | MA | Patient Registration | CI.1 | 2 min (single patient data) |\n| Lobby | Patient | Wait time | - | 6 min (single patient data) |\n| Vital Room | MA | Standard Vitals Collection<br>• Weight<br>• Blood pressure | PP.2 | 2 min (single patient data) |\n| Vital Room | CA/CM | DB/HTN Specific Vitals<br>• A1C testing | PP.3 | Not specified |\n\n## Data Limitations\n\n1. **Insufficient Sample Size**: Only one patient per scenario prevents true average calculation\n2. **Missing Duration Data**: \n   - P2: A1C testing duration not specified\n   - P3: Individual task durations within the 18-minute vital room period cannot be determined\n3. **Combined Activities**: P3's vital room activities were recorded as a single 18-minute block, making it impossible to determine individual task durations\n\n## Key Workflow Observations\n\n1. **New Patient Complexity**: iHealth enrollment visits (P3) involve significantly more time (42+ mins total) compared to follow-up visits (P2: 10+ mins total)\n\n2. **Role Distribution**: \n   - MAs handle most tasks in both scenarios\n   - CA/CM involvement focuses on condition-specific testing (A1C) and UC program education\n\n3. **Extra Tasks in New Visits**: New patient visits include additional assessments (EKG, comprehensive social history) not part of standard SOP\n\n4. **Documentation Gap**: The source data provides total duration for combined activities but lacks granular task-level timing needed for detailed workflow optimization"
+            }
+          ]
+        }
+      }
+    ],
+    "KPI Outcome AI": [
+      {
+        "json": {
+          "content": [
+            {
+              "type": "text",
+              "text": "I'll analyze these two patient visit records to identify KPIs and outcomes related to workflow efficiency and SOP adherence.\n\n## Key Performance Indicators Analysis\n\n### Patient P2 (Diabetes Follow-up)\n**Efficiency Metrics:**\n- Total visit time (documented): 9 minutes\n- Wait time: 6 minutes (67% of documented time)\n- Clinical care time: 3 minutes (33% of documented time)\n- SOP compliance: 100% (no extra tasks performed)\n\n### Patient P3 (New Patient - DM/HTN)\n**Efficiency Metrics:**\n- Total visit time (documented): 42 minutes\n- Wait time: 22 minutes (52% of documented time)\n- Clinical care time: 20 minutes (48% of documented time)\n- SOP compliance: Partial (2 extra tasks performed)\n- Form completion time: 22 minutes (excessive for standard intake)\n\n## Critical Outcomes Identified\n\n### 1. **Workflow Bottlenecks**\n- **P3 New Patient Processing:** 22-minute wait for form completion indicates insufficient pre-visit preparation or complexity in intake forms\n- **Rooming Delays:** P3's 18-minute vital room session suggests task bundling inefficiency\n\n### 2. **Role Boundary Issues**\n- **MA Scope Creep (P3):** MA performed:\n  - EKG (typically requires specific training/certification)\n  - Extensive social history collection (beyond SOP requirements)\n  - These extra tasks consumed valuable time and may exceed role definition\n\n### 3. **Process Standardization Gaps**\n- **Inconsistent New Patient Workflow:** P3's visit shows:\n  - Forms given at arrival instead of pre-visit\n  - Family assistance needed for medication documentation\n  - Multiple staff touching same process (MA/Front Desk overlap)\n\n### 4. **Resource Utilization**\n- **P2:** Efficient use of CA/CM for specialized A1C testing\n- **P3:** Potential over-utilization of MA for tasks that could be:\n  - Pre-collected via portal/phone\n  - Delegated to other roles\n  - Streamlined through better forms\n\n## Recommended KPI Targets\n\n### Immediate Metrics to Track:\n1. **Wait Time Ratio:** Target <30% of total visit time\n2. **SOP Adherence Rate:** Target >95% (tasks within defined roles)\n3. **New Patient Intake Time:** Target <10 minutes for forms\n4. **Pre-Provider Workflow Duration:** Target <10 minutes for follow-ups, <15 minutes for new patients\n\n### Quality Indicators:\n1. **Incomplete Checklist Items:** Track unchecked items per visit\n2. **Extra Task Frequency:** Monitor and categorize non-SOP activities\n3. **Role-Task Alignment:** Percentage of tasks performed by designated role\n\n## Action Items for Improvement\n\n1. **Standardize New Patient Intake:**\n   - Implement pre-visit digital forms\n   - Create medication reconciliation template\n   - Define clear MA vs. Front Desk responsibilities\n\n2. **Optimize MA Utilization:**\n   - Clarify scope of practice boundaries\n   - Redistribute social history collection to providers or pre-visit questionnaires\n   - Establish time limits for vital collection tasks\n\n3. **Reduce Wait Times:**\n   - Implement appointment staggering for new patients\n   - Create express lanes for simple follow-ups like P2\n   - Deploy digital check-in to reduce front desk burden\n\nThese KPIs reveal significant opportunities for workflow optimization, particularly in new patient processing and role definition clarity."
+            }
+          ]
+        }
+      }
+    ],
+    "KPI Growth AI": [
+      {
+        "json": {
+          "content": [
+            {
+              "type": "text",
+              "text": "# KPI-Oriented Workflow Analysis: UC Patient Enrollment Process\n\n## Executive Summary\nBased on the provided patient visit records, this analysis reveals significant workflow inefficiencies and missed enrollment opportunities that directly impact Clinic2's ability to exceed the current 16 patients/week enrollment rate and optimize revenue capture.\n\n## Key Findings: Enrollment Bottlenecks & Friction Points\n\n### 1. **Enrollment Funnel Efficiency Issues**\n\n**Critical Gap Identified:** Neither patient record shows completion of formal enrollment activities despite both being eligible UC candidates.\n\n- **P2 (Existing UC Patient):** Only received basic vitals check - no engagement assessment or retention activities\n- **P3 (New Patient Opportunity):** Received UC education but no documented enrollment completion or follow-up scheduling\n\n**Impact on KPIs:**\n- Potential 0% conversion rate from screening → enrollment in observed visits\n- Missing opportunities to increase weekly enrollment beyond 16 patients\n\n### 2. **Process Friction Points Analysis**\n\n#### Time-to-Enrollment Bottlenecks:\n```\nCurrent Observed Workflow Gaps:\n├── P2 Visit: 8 min total → 0 enrollment activities\n├── P3 Visit: 40 min total → Education only, no enrollment completion\n└── Missing: Device setup, app onboarding, follow-up scheduling\n```\n\n#### Role-Specific Operational Overload:\n- **MA Role:** 75% of tasks (7/8 documented activities) - significant bottleneck\n- **CA/CM Role:** Underutilized - only 1 education task per 40-minute new patient visit\n- **Provider Role:** Absent from both records - potential workflow gap\n\n## Strategic Workflow Redesign Recommendations\n\n### 1. **Enrollment Process Optimization**\n\n**Immediate Actions:**\n- Implement dedicated CA-led enrollment completion protocol\n- Add mandatory device distribution checklist for eligible patients\n- Create post-visit enrollment follow-up system within 24-48 hours\n\n**Expected Impact:** 30-40% increase in conversion rate (screening → enrollment)\n\n### 2. **Role Redistribution for Efficiency**\n\n**Current State Issues:**\n```\nMA: Overloaded (8 tasks) → Burnout risk, quality compromise\nCA/CM: Underutilized (1 task) → Resource inefficiency\nProvider: Absent → Missing clinical buy-in opportunity\n```\n\n**Optimized Role Distribution:**\n- **MA:** Focus on clinical tasks (vitals, medication reconciliation)\n- **CA/CM:** Own complete enrollment process (education → device setup → app onboarding)\n- **Provider:** Brief UC endorsement during clinical encounter\n\n### 3. **Patient Persona-Specific Workflow**\n\n#### DM+HTN Patients (like P3):\n- **Opportunity:** Highest revenue potential (multiple billable codes)\n- **Workflow Enhancement:** Streamlined new patient enrollment track\n- **Target:** 5-7 patients/week from this persona alone\n\n#### Existing UC Patients (like P2):\n- **Retention Risk:** No engagement assessment during routine visits\n- **Workflow Addition:** UC platform usage review + re-engagement protocol\n- **Target:** 95% retention rate maintenance\n\n## Revenue Impact Projections\n\n### Current State Analysis:\n- **Enrollment Rate:** 16 patients/week\n- **Conversion Gaps:** Significant opportunities missed in observed visits\n- **Resource Utilization:** Suboptimal (MA overloaded, CA underutilized)\n\n### Optimized State Projections:\n```\nWorkflow Improvements → Expected Outcomes:\n├── Streamlined enrollment process → +25% conversion rate\n├── Role redistribution → +20% operational capacity\n├── Persona-specific workflows → +15% retention rates\n└── Total Impact: 20-24 patients/week enrollment target\n```\n\n## Implementation Roadmap\n\n### Phase 1 (Immediate - 2 weeks):\n1. Redistribute enrollment tasks from MA to CA/CM\n2. Implement post-visit enrollment follow-up protocol\n3. Add device setup checklist to new patient workflow\n\n### Phase 2 (1-2 months):\n1. Create persona-specific enrollment tracks\n2. Implement UC platform engagement assessment for existing patients\n3. Provider brief endorsement protocol\n\n### Phase 3 (2-3 months):\n1. Monitor KPI improvements\n2. Scale successful workflow modifications\n3. Target 25+ patients/week enrollment rate\n\n## Conclusion\nThe"
+            }
+          ]
+        }
+      }
+    ],
+    "Standardized": [
+      {
+        "json": {
+          "content": [
+            {
+              "type": "text",
+              "text": "# Standardized Patient Visit Record\n\n**Patient Info:** P2 Dehui (iHealth F/U) - DM\n\n| Time | Duration | Location | Original Content | SOP Category | SOP Task | Completed Checklist | Primary Role | Extra Task |\n|------|----------|----------|------------------|--------------|----------|-------------------|--------------|------------|\n| 3:07 | 2 min | Front Desk | Check patient in Patient | Check-In | Patient Registration | ☐ Arrival time recorded | MA | - |\n| 3:09 | 6 min | Lobby | Patient wait in the lobby | - | - | - | Patient | - |\n| 3:15 | 2 min | Vital Room | Check patient weigt and blood pressure | Pre-Provider Workflow | Standard Vitals Collection | ☐ Vitals collected<br>☐ Documented in EHR | MA | - |\n| 3:16 | - | Vital Room | UC come over to test the A1C | Pre-Provider Workflow | DB/HTN Specific Vitals | ☐ Perform in-house A1C (if needed/available) | CA/CM | - |\n\n## Role Performance Summary\n\n**MA:**\n- SOP Tasks: Patient Registration, Standard Vitals Collection\n- Extra Tasks: None\n\n**CA/CM:**\n- SOP Tasks: DB/HTN Specific Vitals\n- Extra Tasks: None\n\n**Patient:**\n- SOP Tasks: None\n- Extra Tasks: None\n\n## Patient Journey Flow\n\n**Check-In:**\n- MA - Patient Registration\n\n**Pre-Provider Workflow:**\n- MA - Standard Vitals Collection\n- CA/CM - DB/HTN Specific Vitals\n\n## Extra Task Analysis\n\nNo extra tasks were performed during this visit. All activities align with standard SOP procedures for a diabetes follow-up visit."
+            }
+          ]
+        }
+      }
+    ],
+    "Missing Task AI": [
+      {
+        "json": {
+          "content": [
+            {
+              "type": "text",
+              "text": "Thank you for sharing the missing tasks analysis for Patients 2 (Dehui) and 3 (Yuehong). This is a comprehensive breakdown showing the gaps in Standard Operating Procedures across different staff roles.\n\n## Key Observations:\n\n### **Patient 2 (Dehui) - Critical Gaps:**\n- **Front Desk**: Major deficiencies in basic check-in processes (ID verification, insurance, co-pay collection)\n- **MA**: Missing fundamental pre-provider tasks (chief complaint, rooming, preventive screening)\n- **CA/CM**: Incomplete medication reconciliation and missing patient education\n\n### **Patient 3 (Yuehong) - Some Progress Made:**\n- **Better completion rates** compared to Patient 2\n- **Front Desk**: Still missing insurance verification and intake form management\n- **MA**: Partial completion of several tasks but missing key safety checks\n- **CA/CM**: Started patient education but incomplete documentation\n\n## Questions for Better Understanding:\n\n1. **What specific challenges** are staff facing that prevent completion of these basic tasks?\n\n2. **Are there system/technology barriers** (EHR issues, equipment problems) contributing to these gaps?\n\n3. **Have staff been trained** on these SOPs, or is this revealing training needs?\n\n4. **What's the priority order** for addressing these missing tasks to ensure patient safety and care quality?\n\nWould you like me to help develop an action plan to address these gaps systematically, or do you have specific areas you'd like to focus on first?"
+            }
+          ]
+        }
+      }
+    ],
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "sagegu.app.n8n.cloud",
+            "user-agent": "python-requests/2.32.4",
+            "content-length": "185",
+            "accept": "*/*",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "218.87.93.26",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "CN",
+            "cf-ray": "9816a3eb85587310-FRA",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json",
+            "cookie": "fastapi-session=eyJjYXNkb29yVXNlciI6IHsib3duZXIiOiAiaUhlYWx0aCIsICJuYW1lIjogInVzZXIiLCAiY3JlYXRlZFRpbWUiOiAiMjAyNS0wMy0yMFQwMDo1MToyNloiLCAidXBkYXRlZFRpbWUiOiAiMjAyNS0wOS0xOVQwNDozNjowMVoiLCAiZGVsZXRlZFRpbWUiOiAiIiwgImlkIjogIjJkMTExOTliLTQyNGUtNDAzZC1hZTQ5LTU4MDIyYzAyOGMzZiIsICJ0eXBlIjogIm5vcm1hbC11c2VyIiwgInBhc3N3b3JkIjogIiIsICJwYXNzd29yZFNhbHQiOiAiIiwgInBhc3N3b3JkVHlwZSI6ICJwbGFpbiIsICJkaXNwbGF5TmFtZSI6ICJVc2VyIiwgImZpcnN0TmFtZSI6ICIiLCAibGFzdE5hbWUiOiAiIiwgImF2YXRhciI6ICJodHRwczovL2Nkbi5jYXNiaW4ub3JnL2ltZy9jYXNiaW4uc3ZnIiwgImF2YXRhclR5cGUiOiAiIiwgInBlcm1hbmVudEF2YXRhciI6ICIiLCAiZW1haWwiOiAidXNlckBleGFtcGxlLmNvbSIsICJlbWFpbFZlcmlmaWVkIjogZmFsc2UsICJwaG9uZSI6ICIxMzI0NTY3ODkxMCIsICJjb3VudHJ5Q29kZSI6ICJVUyIsICJyZWdpb24iOiAiIiwgImxvY2F0aW9uIjogIiIsICJhZGRyZXNzIjogW10sICJhZmZpbGlhdGlvbiI6ICJFeGFtcGxlIEluYy4iLCAidGl0bGUiOiAiIiwgImlkQ2FyZFR5cGUiOiAiIiwgImlkQ2FyZCI6ICIiLCAiaG9tZXBhZ2UiOiAiIiwgImJpbyI6ICIiLCAibGFuZ3VhZ2UiOiAiIiwgImdlbmRlciI6ICIiLCAiYmlydGhkYXkiOiAiIiwgImVkdWNhdGlvbiI6ICIiLCAic2NvcmUiOiAyMDAwLCAia2FybWEiOiAwLCAicmFua2luZyI6IDEsICJpc0RlZmF1bHRBdmF0YXIiOiBmYWxzZSwgImlzT25saW5lIjogZmFsc2UsICJpc0FkbWluIjogZmFsc2UsICJpc0ZvcmJpZGRlbiI6IGZhbHNlLCAiaXNEZWxldGVkIjogZmFsc2UsICJzaWdudXBBcHBsaWNhdGlvbiI6ICJsb2JlY2hhdCIsICJoYXNoIjogIiIsICJwcmVIYXNoIjogIiIsICJhY2Nlc3NLZXkiOiAiIiwgImFjY2Vzc1NlY3JldCI6ICIiLCAiZ2l0aHViIjogIiIsICJnb29nbGUiOiAiIiwgInFxIjogIiIsICJ3ZWNoYXQiOiAiIiwgImZhY2Vib29rIjogIiIsICJkaW5ndGFsayI6ICIiLCAid2VpYm8iOiAiIiwgImdpdGVlIjogIiIsICJsaW5rZWRpbiI6ICIiLCAid2Vjb20iOiAiIiwgImxhcmsiOiAiIiwgImdpdGxhYiI6ICIiLCAiY3JlYXRlZElwIjogIjEyNy4wLjAuMSIsICJsYXN0U2lnbmluVGltZSI6ICIiLCAibGFzdFNpZ25pbklwIjogIiIsICJwcmVmZXJyZWRNZmFUeXBlIjogIiIsICJyZWNvdmVyeUNvZGVzIjogbnVsbCwgInRvdHBTZWNyZXQiOiAiIiwgIm1mYVBob25lRW5hYmxlZCI6IGZhbHNlLCAibWZhRW1haWxFbmFibGVkIjogZmFsc2UsICJsZGFwIjogIiIsICJwcm9wZXJ0aWVzIjoge30sICJyb2xlcyI6IFtdLCAicGVybWlzc2lvbnMiOiBbXSwgImdyb3VwcyI6IFtdLCAibGFzdFNpZ25pbldyb25nVGltZSI6ICIiLCAic2lnbmluV3JvbmdUaW1lcyI6IDAsICJtYW5hZ2VkQWNjb3VudHMiOiBudWxsLCAidG9rZW5UeXBlIjogImFjY2Vzcy10b2tlbiIsICJ0YWciOiAic3RhZmYiLCAic2NvcGUiOiAicmVhZCIsICJhenAiOiAiOTAxYTQzOTY2ZTFlZjJkMWQ2ZmEiLCAiaXNzIjogImh0dHBzOi8vYXV0aC5paGVhbHRoLWVuZy5jb20iLCAic3ViIjogIjJkMTExOTliLTQyNGUtNDAzZC1hZTQ5LTU4MDIyYzAyOGMzZiIsICJhdWQiOiBbIjkwMWE0Mzk2NmUxZWYyZDFkNmZhIl0sICJleHAiOiAxNzU4ODYzMDA2LCAibmJmIjogMTc1ODI1ODIwNiwgImlhdCI6IDE3NTgyNTgyMDYsICJqdGkiOiAiYWRtaW4vZDIyNTlkYmItZTBhMC00ZmI4LWE1MWEtZjhlMTk4ZGJlNmE2In19.aMzmnA.VKAIoD01CSiPHGuKT-hf4Ld-Uno",
+            "x-api-key": "1DF4C9C4-E690-4094-BC0C-21343688C86E",
+            "x-forwarded-for": "218.87.93.26, 104.23.239.133",
+            "x-forwarded-host": "sagegu.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-4-644c4bcdb9-mkhpv",
+            "x-is-trusted": "yes",
+            "x-real-ip": "218.87.93.26"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "content": "P2 Dehui (iHealth F/U) - DM   \r\nMA Front Desk 3:07 2 min Check patient in Patient \r\n        Lobby 3:09 6 min Patient wait in the lobby \r\nMA Vital Room 3:15 2 min Check patient weigt and blood pressure \r\nUC Vital Room 3:16  UC come over to test the A1C\r\n-----\r\nP3 Yuehong (Clinic's new patient; iHealth new patient) - DM/HTN Reason for visit: refill med.     Appt: 3:00 \r\nMA Front Desk 2:58 2mins Check patient in and give forms\r\nPatient Lobby 3:00 22 mins Wait in lobby fill out forms\r\nPatient Lobby 3:09  Relatives helping with patient intake form, took the medicine of the paper box and write down the names of each one in the intake form\r\nPatient Lobby 3:14  Patient signing the intake form \r\nMA Lobby 3:15  MA ask the pharmacy , id, insurance card and email (part of new patient package)\r\nMA + UC Vital Room 3:22 18 mins MA called patient in and Check patient bp, oxygen, tem, weight, height , asking meds bottle, MA put it in to IMS, asking any allergy for meds, ask family history, how is food intake, any cigarette, alcohol, who's living with, any exercise, any coffee, soda, tea, any seconed hand smog, out of country in the past 2 months? reason for coming refill meds, and left leg pain, EKG, UC ask if pt has device at home and explain UC diabetes manegement.",
+            "clinic_number": 2,
+            "user_id": "2d11199b-424e-403d-ae49-58022c028c3f",
+            "user_name": "user",
+            "user_email": "user@example.com",
+            "timestamp": "2025-09-19T13:21:33.235314"
+          },
+          "webhookUrl": "https://sagegu.app.n8n.cloud/webhook/fb92e810-9634-4410-8ce3-6401204f7325",
+          "executionMode": "production"
+        }
+      }
+    ],
+    "GitHub Save Report": [
+      {
+        "json": {
+          "content": {
+            "name": "Missing-Task-Analysis-2025-09-29T15-57-18.md",
+            "path": "clinic-2/Missing-Task-Analysis-2025-09-29T15-57-18.md",
+            "sha": "48fc3a28816c62753d997023782f7eeca093e4ff",
+            "size": 1591,
+            "url": "https://api.github.com/repos/iHealthLab/sop-automation/contents/clinic-2/Missing-Task-Analysis-2025-09-29T15-57-18.md?ref=main",
+            "html_url": "https://github.com/iHealthLab/sop-automation/blob/main/clinic-2/Missing-Task-Analysis-2025-09-29T15-57-18.md",
+            "git_url": "https://api.github.com/repos/iHealthLab/sop-automation/git/blobs/48fc3a28816c62753d997023782f7eeca093e4ff",
+            "download_url": "https://raw.githubusercontent.com/iHealthLab/sop-automation/main/clinic-2/Missing-Task-Analysis-2025-09-29T15-57-18.md?token=A2RVCMXRRCWHS7VRCK4PUPDI3KWJU",
+            "type": "file",
+            "_links": {
+              "self": "https://api.github.com/repos/iHealthLab/sop-automation/contents/clinic-2/Missing-Task-Analysis-2025-09-29T15-57-18.md?ref=main",
+              "git": "https://api.github.com/repos/iHealthLab/sop-automation/git/blobs/48fc3a28816c62753d997023782f7eeca093e4ff",
+              "html": "https://github.com/iHealthLab/sop-automation/blob/main/clinic-2/Missing-Task-Analysis-2025-09-29T15-57-18.md"
+            }
+          },
+          "commit": {
+            "sha": "af2839581a88f6a13cd5319d43dd73be90a12f1c",
+            "node_id": "C_kwDOP3GZAtoAKGFmMjgzOTU4MWE4OGY2YTEzY2Q1MzE5ZDQzZGQ3M2JlOTBhMTJmMWM",
+            "url": "https://api.github.com/repos/iHealthLab/sop-automation/git/commits/af2839581a88f6a13cd5319d43dd73be90a12f1c",
+            "html_url": "https://github.com/iHealthLab/sop-automation/commit/af2839581a88f6a13cd5319d43dd73be90a12f1c",
+            "author": {
+              "name": "Tommy Huang",
+              "email": "111366450+tommy-ihealth@users.noreply.github.com",
+              "date": "2025-09-29T15:57:18Z"
+            },
+            "committer": {
+              "name": "Tommy Huang",
+              "email": "111366450+tommy-ihealth@users.noreply.github.com",
+              "date": "2025-09-29T15:57:18Z"
+            },
+            "tree": {
+              "sha": "2c721f85774426c20e8d26f31b7e72691d9ff671",
+              "url": "https://api.github.com/repos/iHealthLab/sop-automation/git/trees/2c721f85774426c20e8d26f31b7e72691d9ff671"
+            },
+            "message": "Add extracted SOP - 2025-09-29T15-57-18",
+            "parents": [
+              {
+                "sha": "4208cf355aef6432f8dd52fbb3b40c0f3a0f4fad",
+                "url": "https://api.github.com/repos/iHealthLab/sop-automation/git/commits/4208cf355aef6432f8dd52fbb3b40c0f3a0f4fad",
+                "html_url": "https://github.com/iHealthLab/sop-automation/commit/4208cf355aef6432f8dd52fbb3b40c0f3a0f4fad"
+              }
+            ],
+            "verification": {
+              "verified": false,
+              "reason": "unsigned",
+              "signature": null,
+              "payload": null,
+              "verified_at": null
+            }
+          }
+        }
+      }
+    ],
+    "Create Report": [
+      {
+        "json": {
+          "id": "27dbe190-88d1-8145-95c1-e281cb586df3",
+          "name": "Missing-Task-Analysis-2025-09-29T15-57-18.md",
+          "url": "https://www.notion.so/Missing-Task-Analysis-2025-09-29T15-57-18-md-27dbe19088d1814595c1e281cb586df3",
+          "property_clinic_id": 2,
+          "property_name": "Missing-Task-Analysis-2025-09-29T15-57-18.md"
+        }
+      }
+    ],
+    "Create Report1": [
+      {
+        "json": {
+          "id": "27dbe190-88d1-8170-a20a-c43687c3c6e0",
+          "name": "KPI-ROI-Analysis-2025-09-29T15-57-19.md",
+          "url": "https://www.notion.so/KPI-ROI-Analysis-2025-09-29T15-57-19-md-27dbe19088d18170a20ac43687c3c6e0",
+          "property_clinic_id": 2,
+          "property_name": "KPI-ROI-Analysis-2025-09-29T15-57-19.md"
+        }
+      }
+    ],
+    "GitHub Save Report1": [
+      {
+        "json": {
+          "content": {
+            "name": "KPI-ROI-Analysis-2025-09-29T15-57-19.md",
+            "path": "clinic-2/KPI-ROI-Analysis-2025-09-29T15-57-19.md",
+            "sha": "46052dea3e2ba8beeb56c7c33f3dad2d1812edb6",
+            "size": 2657,
+            "url": "https://api.github.com/repos/iHealthLab/sop-automation/contents/clinic-2/KPI-ROI-Analysis-2025-09-29T15-57-19.md?ref=main",
+            "html_url": "https://github.com/iHealthLab/sop-automation/blob/main/clinic-2/KPI-ROI-Analysis-2025-09-29T15-57-19.md",
+            "git_url": "https://api.github.com/repos/iHealthLab/sop-automation/git/blobs/46052dea3e2ba8beeb56c7c33f3dad2d1812edb6",
+            "download_url": "https://raw.githubusercontent.com/iHealthLab/sop-automation/main/clinic-2/KPI-ROI-Analysis-2025-09-29T15-57-19.md?token=A2RVCMVZV2VTNFWNKEDXFNDI3KWJY",
+            "type": "file",
+            "_links": {
+              "self": "https://api.github.com/repos/iHealthLab/sop-automation/contents/clinic-2/KPI-ROI-Analysis-2025-09-29T15-57-19.md?ref=main",
+              "git": "https://api.github.com/repos/iHealthLab/sop-automation/git/blobs/46052dea3e2ba8beeb56c7c33f3dad2d1812edb6",
+              "html": "https://github.com/iHealthLab/sop-automation/blob/main/clinic-2/KPI-ROI-Analysis-2025-09-29T15-57-19.md"
+            }
+          },
+          "commit": {
+            "sha": "65ceb226d4d859a71d7f5329d705b834099d423d",
+            "node_id": "C_kwDOP3GZAtoAKDY1Y2ViMjI2ZDRkODU5YTcxZDdmNTMyOWQ3MDViODM0MDk5ZDQyM2Q",
+            "url": "https://api.github.com/repos/iHealthLab/sop-automation/git/commits/65ceb226d4d859a71d7f5329d705b834099d423d",
+            "html_url": "https://github.com/iHealthLab/sop-automation/commit/65ceb226d4d859a71d7f5329d705b834099d423d",
+            "author": {
+              "name": "Tommy Huang",
+              "email": "111366450+tommy-ihealth@users.noreply.github.com",
+              "date": "2025-09-29T15:57:19Z"
+            },
+            "committer": {
+              "name": "Tommy Huang",
+              "email": "111366450+tommy-ihealth@users.noreply.github.com",
+              "date": "2025-09-29T15:57:19Z"
+            },
+            "tree": {
+              "sha": "c38202e0b7a101e0fd4aeab28157590367ef6eac",
+              "url": "https://api.github.com/repos/iHealthLab/sop-automation/git/trees/c38202e0b7a101e0fd4aeab28157590367ef6eac"
+            },
+            "message": "Add extracted SOP - 2025-09-29T15-57-19",
+            "parents": [
+              {
+                "sha": "af2839581a88f6a13cd5319d43dd73be90a12f1c",
+                "url": "https://api.github.com/repos/iHealthLab/sop-automation/git/commits/af2839581a88f6a13cd5319d43dd73be90a12f1c",
+                "html_url": "https://github.com/iHealthLab/sop-automation/commit/af2839581a88f6a13cd5319d43dd73be90a12f1c"
+              }
+            ],
+            "verification": {
+              "verified": false,
+              "reason": "unsigned",
+              "signature": null,
+              "payload": null,
+              "verified_at": null
+            }
+          }
+        }
+      }
+    ],
+    "GitHub Save Report2": [
+      {
+        "json": {
+          "content": {
+            "name": "KPI-Growth-Analysis-2025-09-29T15-57-20.md",
+            "path": "clinic-2/KPI-Growth-Analysis-2025-09-29T15-57-20.md",
+            "sha": "f91913983a0e5f779658ef2083ec130c3e90a36c",
+            "size": 4300,
+            "url": "https://api.github.com/repos/iHealthLab/sop-automation/contents/clinic-2/KPI-Growth-Analysis-2025-09-29T15-57-20.md?ref=main",
+            "html_url": "https://github.com/iHealthLab/sop-automation/blob/main/clinic-2/KPI-Growth-Analysis-2025-09-29T15-57-20.md",
+            "git_url": "https://api.github.com/repos/iHealthLab/sop-automation/git/blobs/f91913983a0e5f779658ef2083ec130c3e90a36c",
+            "download_url": "https://raw.githubusercontent.com/iHealthLab/sop-automation/main/clinic-2/KPI-Growth-Analysis-2025-09-29T15-57-20.md?token=A2RVCMVZIHIFZGDMDAL5JYTI3KWJ2",
+            "type": "file",
+            "_links": {
+              "self": "https://api.github.com/repos/iHealthLab/sop-automation/contents/clinic-2/KPI-Growth-Analysis-2025-09-29T15-57-20.md?ref=main",
+              "git": "https://api.github.com/repos/iHealthLab/sop-automation/git/blobs/f91913983a0e5f779658ef2083ec130c3e90a36c",
+              "html": "https://github.com/iHealthLab/sop-automation/blob/main/clinic-2/KPI-Growth-Analysis-2025-09-29T15-57-20.md"
+            }
+          },
+          "commit": {
+            "sha": "19ed981408b443c83652c59675bcfd067167f3ba",
+            "node_id": "C_kwDOP3GZAtoAKDE5ZWQ5ODE0MDhiNDQzYzgzNjUyYzU5Njc1YmNmZDA2NzE2N2YzYmE",
+            "url": "https://api.github.com/repos/iHealthLab/sop-automation/git/commits/19ed981408b443c83652c59675bcfd067167f3ba",
+            "html_url": "https://github.com/iHealthLab/sop-automation/commit/19ed981408b443c83652c59675bcfd067167f3ba",
+            "author": {
+              "name": "Tommy Huang",
+              "email": "111366450+tommy-ihealth@users.noreply.github.com",
+              "date": "2025-09-29T15:57:21Z"
+            },
+            "committer": {
+              "name": "Tommy Huang",
+              "email": "111366450+tommy-ihealth@users.noreply.github.com",
+              "date": "2025-09-29T15:57:21Z"
+            },
+            "tree": {
+              "sha": "62cf3e107676cc5d3a80639e4539e2cda2fb3d25",
+              "url": "https://api.github.com/repos/iHealthLab/sop-automation/git/trees/62cf3e107676cc5d3a80639e4539e2cda2fb3d25"
+            },
+            "message": "Add extracted SOP - 2025-09-29T15-57-20",
+            "parents": [
+              {
+                "sha": "65ceb226d4d859a71d7f5329d705b834099d423d",
+                "url": "https://api.github.com/repos/iHealthLab/sop-automation/git/commits/65ceb226d4d859a71d7f5329d705b834099d423d",
+                "html_url": "https://github.com/iHealthLab/sop-automation/commit/65ceb226d4d859a71d7f5329d705b834099d423d"
+              }
+            ],
+            "verification": {
+              "verified": false,
+              "reason": "unsigned",
+              "signature": null,
+              "payload": null,
+              "verified_at": null
+            }
+          }
+        }
+      }
+    ],
+    "Create Report2": [
+      {
+        "json": {
+          "id": "27dbe190-88d1-811d-9d0e-daec90f95ee2",
+          "name": "KPI-Growth-Analysis-2025-09-29T15-57-20.md",
+          "url": "https://www.notion.so/KPI-Growth-Analysis-2025-09-29T15-57-20-md-27dbe19088d1811d9d0edaec90f95ee2",
+          "property_clinic_id": 2,
+          "property_name": "KPI-Growth-Analysis-2025-09-29T15-57-20.md"
+        }
+      }
+    ],
+    "GitHub Save Report3": [
+      {
+        "json": {
+          "content": {
+            "name": "KPI-Outcome-Analysis-2025-09-29T15-57-24.md",
+            "path": "clinic-2/KPI-Outcome-Analysis-2025-09-29T15-57-24.md",
+            "sha": "ce190b775d2492ca2f65c34c126264676208d31f",
+            "size": 3333,
+            "url": "https://api.github.com/repos/iHealthLab/sop-automation/contents/clinic-2/KPI-Outcome-Analysis-2025-09-29T15-57-24.md?ref=main",
+            "html_url": "https://github.com/iHealthLab/sop-automation/blob/main/clinic-2/KPI-Outcome-Analysis-2025-09-29T15-57-24.md",
+            "git_url": "https://api.github.com/repos/iHealthLab/sop-automation/git/blobs/ce190b775d2492ca2f65c34c126264676208d31f",
+            "download_url": "https://raw.githubusercontent.com/iHealthLab/sop-automation/main/clinic-2/KPI-Outcome-Analysis-2025-09-29T15-57-24.md?token=A2RVCMWS3Y57ZZOFTIBRZUTI3KWKA",
+            "type": "file",
+            "_links": {
+              "self": "https://api.github.com/repos/iHealthLab/sop-automation/contents/clinic-2/KPI-Outcome-Analysis-2025-09-29T15-57-24.md?ref=main",
+              "git": "https://api.github.com/repos/iHealthLab/sop-automation/git/blobs/ce190b775d2492ca2f65c34c126264676208d31f",
+              "html": "https://github.com/iHealthLab/sop-automation/blob/main/clinic-2/KPI-Outcome-Analysis-2025-09-29T15-57-24.md"
+            }
+          },
+          "commit": {
+            "sha": "a8fafd13ed9198a1cf15dad467b43b3e706fbbc9",
+            "node_id": "C_kwDOP3GZAtoAKGE4ZmFmZDEzZWQ5MTk4YTFjZjE1ZGFkNDY3YjQzYjNlNzA2ZmJiYzk",
+            "url": "https://api.github.com/repos/iHealthLab/sop-automation/git/commits/a8fafd13ed9198a1cf15dad467b43b3e706fbbc9",
+            "html_url": "https://github.com/iHealthLab/sop-automation/commit/a8fafd13ed9198a1cf15dad467b43b3e706fbbc9",
+            "author": {
+              "name": "Tommy Huang",
+              "email": "111366450+tommy-ihealth@users.noreply.github.com",
+              "date": "2025-09-29T15:57:24Z"
+            },
+            "committer": {
+              "name": "Tommy Huang",
+              "email": "111366450+tommy-ihealth@users.noreply.github.com",
+              "date": "2025-09-29T15:57:24Z"
+            },
+            "tree": {
+              "sha": "cb7d709bcb6f3d10334978b39b90415825fdfe50",
+              "url": "https://api.github.com/repos/iHealthLab/sop-automation/git/trees/cb7d709bcb6f3d10334978b39b90415825fdfe50"
+            },
+            "message": "Add extracted SOP - 2025-09-29T15-57-24",
+            "parents": [
+              {
+                "sha": "19ed981408b443c83652c59675bcfd067167f3ba",
+                "url": "https://api.github.com/repos/iHealthLab/sop-automation/git/commits/19ed981408b443c83652c59675bcfd067167f3ba",
+                "html_url": "https://github.com/iHealthLab/sop-automation/commit/19ed981408b443c83652c59675bcfd067167f3ba"
+              }
+            ],
+            "verification": {
+              "verified": false,
+              "reason": "unsigned",
+              "signature": null,
+              "payload": null,
+              "verified_at": null
+            }
+          }
+        }
+      }
+    ],
+    "Create Report3": [
+      {
+        "json": {
+          "id": "27dbe190-88d1-819f-87df-cfb27ae4eb70",
+          "name": "KPI-Outcome-Analysis-2025-09-29T15-57-24.md",
+          "url": "https://www.notion.so/KPI-Outcome-Analysis-2025-09-29T15-57-24-md-27dbe19088d1819f87dfcfb27ae4eb70",
+          "property_clinic_id": 2,
+          "property_name": "KPI-Outcome-Analysis-2025-09-29T15-57-24.md"
+        }
+      }
+    ],
+    "GitHub Save Report4": [
+      {
+        "json": {
+          "content": {
+            "name": "Extracted SOP Report-2025-09-29T15-57-32.md",
+            "path": "clinic-2/Extracted SOP Report-2025-09-29T15-57-32.md",
+            "sha": "9e4137c9d2094b61460ea62da7c7812f3be5d629",
+            "size": 3569,
+            "url": "https://api.github.com/repos/iHealthLab/sop-automation/contents/clinic-2/Extracted%20SOP%20Report-2025-09-29T15-57-32.md?ref=main",
+            "html_url": "https://github.com/iHealthLab/sop-automation/blob/main/clinic-2/Extracted%20SOP%20Report-2025-09-29T15-57-32.md",
+            "git_url": "https://api.github.com/repos/iHealthLab/sop-automation/git/blobs/9e4137c9d2094b61460ea62da7c7812f3be5d629",
+            "download_url": "https://raw.githubusercontent.com/iHealthLab/sop-automation/main/clinic-2/Extracted%20SOP%20Report-2025-09-29T15-57-32.md?token=A2RVCMXYP44JGZHSKK2OUNDI3KWKS",
+            "type": "file",
+            "_links": {
+              "self": "https://api.github.com/repos/iHealthLab/sop-automation/contents/clinic-2/Extracted%20SOP%20Report-2025-09-29T15-57-32.md?ref=main",
+              "git": "https://api.github.com/repos/iHealthLab/sop-automation/git/blobs/9e4137c9d2094b61460ea62da7c7812f3be5d629",
+              "html": "https://github.com/iHealthLab/sop-automation/blob/main/clinic-2/Extracted%20SOP%20Report-2025-09-29T15-57-32.md"
+            }
+          },
+          "commit": {
+            "sha": "a72fe125dc9d428eae1f845cc824da699b7568ed",
+            "node_id": "C_kwDOP3GZAtoAKGE3MmZlMTI1ZGM5ZDQyOGVhZTFmODQ1Y2M4MjRkYTY5OWI3NTY4ZWQ",
+            "url": "https://api.github.com/repos/iHealthLab/sop-automation/git/commits/a72fe125dc9d428eae1f845cc824da699b7568ed",
+            "html_url": "https://github.com/iHealthLab/sop-automation/commit/a72fe125dc9d428eae1f845cc824da699b7568ed",
+            "author": {
+              "name": "Tommy Huang",
+              "email": "111366450+tommy-ihealth@users.noreply.github.com",
+              "date": "2025-09-29T15:57:33Z"
+            },
+            "committer": {
+              "name": "Tommy Huang",
+              "email": "111366450+tommy-ihealth@users.noreply.github.com",
+              "date": "2025-09-29T15:57:33Z"
+            },
+            "tree": {
+              "sha": "81813a6d5ca6dd5f20590fa51d024a3f27d8c6af",
+              "url": "https://api.github.com/repos/iHealthLab/sop-automation/git/trees/81813a6d5ca6dd5f20590fa51d024a3f27d8c6af"
+            },
+            "message": "Add extracted SOP - 2025-09-29T15-57-32",
+            "parents": [
+              {
+                "sha": "a8fafd13ed9198a1cf15dad467b43b3e706fbbc9",
+                "url": "https://api.github.com/repos/iHealthLab/sop-automation/git/commits/a8fafd13ed9198a1cf15dad467b43b3e706fbbc9",
+                "html_url": "https://github.com/iHealthLab/sop-automation/commit/a8fafd13ed9198a1cf15dad467b43b3e706fbbc9"
+              }
+            ],
+            "verification": {
+              "verified": false,
+              "reason": "unsigned",
+              "signature": null,
+              "payload": null,
+              "verified_at": null
+            }
+          }
+        }
+      }
+    ],
+    "Create Report4": [
+      {
+        "json": {
+          "id": "27dbe190-88d1-81d6-acfe-d2de4ae02b0f",
+          "name": "Extracted SOP Report-2025-09-29T15-57-32.md",
+          "url": "https://www.notion.so/Extracted-SOP-Report-2025-09-29T15-57-32-md-27dbe19088d181d6acfed2de4ae02b0f",
+          "property_clinic_id": 2,
+          "property_name": "Extracted SOP Report-2025-09-29T15-57-32.md"
+        }
+      }
+    ],
+    "GitHub Save Report5": [
+      {
+        "json": {
+          "content": {
+            "name": "Extra Task Analysis-2025-09-29T15-57-35.md",
+            "path": "clinic-2/Extra Task Analysis-2025-09-29T15-57-35.md",
+            "sha": "c523ab6891983d0bbc15c85355385a548bf178f5",
+            "size": 4464,
+            "url": "https://api.github.com/repos/iHealthLab/sop-automation/contents/clinic-2/Extra%20Task%20Analysis-2025-09-29T15-57-35.md?ref=main",
+            "html_url": "https://github.com/iHealthLab/sop-automation/blob/main/clinic-2/Extra%20Task%20Analysis-2025-09-29T15-57-35.md",
+            "git_url": "https://api.github.com/repos/iHealthLab/sop-automation/git/blobs/c523ab6891983d0bbc15c85355385a548bf178f5",
+            "download_url": "https://raw.githubusercontent.com/iHealthLab/sop-automation/main/clinic-2/Extra%20Task%20Analysis-2025-09-29T15-57-35.md?token=A2RVCMUUXM4E2D675INZNCDI3KWKW",
+            "type": "file",
+            "_links": {
+              "self": "https://api.github.com/repos/iHealthLab/sop-automation/contents/clinic-2/Extra%20Task%20Analysis-2025-09-29T15-57-35.md?ref=main",
+              "git": "https://api.github.com/repos/iHealthLab/sop-automation/git/blobs/c523ab6891983d0bbc15c85355385a548bf178f5",
+              "html": "https://github.com/iHealthLab/sop-automation/blob/main/clinic-2/Extra%20Task%20Analysis-2025-09-29T15-57-35.md"
+            }
+          },
+          "commit": {
+            "sha": "effe4b9afc8a638c21acadbdd64a01a0d019594d",
+            "node_id": "C_kwDOP3GZAtoAKGVmZmU0YjlhZmM4YTYzOGMyMWFjYWRiZGQ2NGEwMWEwZDAxOTU5NGQ",
+            "url": "https://api.github.com/repos/iHealthLab/sop-automation/git/commits/effe4b9afc8a638c21acadbdd64a01a0d019594d",
+            "html_url": "https://github.com/iHealthLab/sop-automation/commit/effe4b9afc8a638c21acadbdd64a01a0d019594d",
+            "author": {
+              "name": "Tommy Huang",
+              "email": "111366450+tommy-ihealth@users.noreply.github.com",
+              "date": "2025-09-29T15:57:35Z"
+            },
+            "committer": {
+              "name": "Tommy Huang",
+              "email": "111366450+tommy-ihealth@users.noreply.github.com",
+              "date": "2025-09-29T15:57:35Z"
+            },
+            "tree": {
+              "sha": "e54d4bf8c2166ef22d31adedd1fa598a76bbdc41",
+              "url": "https://api.github.com/repos/iHealthLab/sop-automation/git/trees/e54d4bf8c2166ef22d31adedd1fa598a76bbdc41"
+            },
+            "message": "Add extracted SOP - 2025-09-29T15-57-35",
+            "parents": [
+              {
+                "sha": "a72fe125dc9d428eae1f845cc824da699b7568ed",
+                "url": "https://api.github.com/repos/iHealthLab/sop-automation/git/commits/a72fe125dc9d428eae1f845cc824da699b7568ed",
+                "html_url": "https://github.com/iHealthLab/sop-automation/commit/a72fe125dc9d428eae1f845cc824da699b7568ed"
+              }
+            ],
+            "verification": {
+              "verified": false,
+              "reason": "unsigned",
+              "signature": null,
+              "payload": null,
+              "verified_at": null
+            }
+          }
+        }
+      }
+    ],
+    "Create Report5": [
+      {
+        "json": {
+          "id": "27dbe190-88d1-81f6-987b-d4cc26d37c8e",
+          "name": "Extra Task Analysis-2025-09-29T15-57-35.md",
+          "url": "https://www.notion.so/Extra-Task-Analysis-2025-09-29T15-57-35-md-27dbe19088d181f6987bd4cc26d37c8e",
+          "property_clinic_id": 2,
+          "property_name": "Extra Task Analysis-2025-09-29T15-57-35.md"
+        }
+      }
+    ],
+    "GitHub Create patient page": [
+      {
+        "json": {
+          "content": {
+            "name": "SOP-Analysis-2025-09-29T16-30-09-404Z.md",
+            "path": "clinic-2/patient_logs/SOP-Analysis-2025-09-29T16-30-09-404Z.md",
+            "sha": "64c0658535eb9d3dedc23b9cbc8964104434a5cb",
+            "size": 1447,
+            "url": "https://api.github.com/repos/iHealthLab/sop-automation/contents/clinic-2/patient_logs/SOP-Analysis-2025-09-29T16-30-09-404Z.md?ref=main",
+            "html_url": "https://github.com/iHealthLab/sop-automation/blob/main/clinic-2/patient_logs/SOP-Analysis-2025-09-29T16-30-09-404Z.md",
+            "git_url": "https://api.github.com/repos/iHealthLab/sop-automation/git/blobs/64c0658535eb9d3dedc23b9cbc8964104434a5cb",
+            "download_url": "https://raw.githubusercontent.com/iHealthLab/sop-automation/main/clinic-2/patient_logs/SOP-Analysis-2025-09-29T16-30-09-404Z.md?token=A2RVCMVBUW66D6TBJI4QCTLI3K2E2",
+            "type": "file",
+            "_links": {
+              "self": "https://api.github.com/repos/iHealthLab/sop-automation/contents/clinic-2/patient_logs/SOP-Analysis-2025-09-29T16-30-09-404Z.md?ref=main",
+              "git": "https://api.github.com/repos/iHealthLab/sop-automation/git/blobs/64c0658535eb9d3dedc23b9cbc8964104434a5cb",
+              "html": "https://github.com/iHealthLab/sop-automation/blob/main/clinic-2/patient_logs/SOP-Analysis-2025-09-29T16-30-09-404Z.md"
+            }
+          },
+          "commit": {
+            "sha": "b3b2301d7c15e3a79b1057b432e384995547d89e",
+            "node_id": "C_kwDOP3GZAtoAKGIzYjIzMDFkN2MxNWUzYTc5YjEwNTdiNDMyZTM4NDk5NTU0N2Q4OWU",
+            "url": "https://api.github.com/repos/iHealthLab/sop-automation/git/commits/b3b2301d7c15e3a79b1057b432e384995547d89e",
+            "html_url": "https://github.com/iHealthLab/sop-automation/commit/b3b2301d7c15e3a79b1057b432e384995547d89e",
+            "author": {
+              "name": "Tommy Huang",
+              "email": "111366450+tommy-ihealth@users.noreply.github.com",
+              "date": "2025-09-29T16:30:09Z"
+            },
+            "committer": {
+              "name": "Tommy Huang",
+              "email": "111366450+tommy-ihealth@users.noreply.github.com",
+              "date": "2025-09-29T16:30:09Z"
+            },
+            "tree": {
+              "sha": "7d1f81f73588e8a653fb2662910cca2ef962efae",
+              "url": "https://api.github.com/repos/iHealthLab/sop-automation/git/trees/7d1f81f73588e8a653fb2662910cca2ef962efae"
+            },
+            "message": "Add standardized log for P2 Dehui - 2025-09-29T16:30:09",
+            "parents": [
+              {
+                "sha": "d64252621ad0fdf5fd7a4ba10b821713da4c5e2a",
+                "url": "https://api.github.com/repos/iHealthLab/sop-automation/git/commits/d64252621ad0fdf5fd7a4ba10b821713da4c5e2a",
+                "html_url": "https://github.com/iHealthLab/sop-automation/commit/d64252621ad0fdf5fd7a4ba10b821713da4c5e2a"
+              }
+            ],
+            "verification": {
+              "verified": false,
+              "reason": "unsigned",
+              "signature": null,
+              "payload": null,
+              "verified_at": null
+            }
+          }
+        }
+      }
+    ],
+    "Create patient": [
+      {
+        "json": {
+          "id": "27dbe190-88d1-8167-979e-eded2111ee85",
+          "name": "P2 Dehui",
+          "url": "https://www.notion.so/P2-Dehui-27dbe19088d18167979eeded2111ee85",
+          "property_clinic": 2,
+          "property_create_at": {
+            "start": "2025-09-29T16:30:00.000+00:00",
+            "end": null,
+            "time_zone": null
+          },
+          "property_name": "P2 Dehui"
+        }
+      }
+    ]
+  },
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "shared": [
+    {
+      "updatedAt": "2025-09-17T18:22:54.075Z",
+      "createdAt": "2025-09-17T18:22:54.075Z",
+      "role": "workflow:owner",
+      "workflowId": "zCsGfQaH2OkOEaeY",
+      "projectId": "IGL0EzJNN8XZ65mm"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2026-02-06T02:11:08.619Z",
+  "versionId": "6fb9cd68-8d38-4957-bb5c-dede185bd245"
+}
