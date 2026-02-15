@@ -2,19 +2,7 @@
   "active": false,
   "activeVersion": null,
   "activeVersionId": null,
-  "connections": {
-    "When clicking ‘Execute workflow’": {
-      "main": [
-        [
-          {
-            "node": "Send a message",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    }
-  },
+  "connections": {},
   "createdAt": "2026-02-09T19:51:59.714Z",
   "id": "cS3Nh-WT2qvlxHTd1a1zf",
   "isArchived": false,
@@ -23,17 +11,6 @@
   },
   "name": "JiraGmail",
   "nodes": [
-    {
-      "parameters": {},
-      "type": "n8n-nodes-base.manualTrigger",
-      "typeVersion": 1,
-      "position": [
-        -288,
-        -16
-      ],
-      "id": "c2af356b-092b-47a8-afbc-d64513a130c6",
-      "name": "When clicking ‘Execute workflow’"
-    },
     {
       "parameters": {
         "sendTo": "thongle.sj@gmail.com",
@@ -44,40 +21,16 @@
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.2,
       "position": [
-        -32,
-        -16
+        112,
+        160
       ],
       "id": "41fc0a42-94cb-4d7a-9fe3-5720c0aebe15",
       "name": "Send a message",
       "webhookId": "ac36d8c3-d1ef-4060-a3cb-0dbe8fd807dd",
       "credentials": {
         "gmailOAuth2": {
-          "id": "lpWGjHW7hEgclJC5",
-          "name": "GoogleAuth"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "authenticateWebhook": true,
-        "events": [
-          "jira:issue_created"
-        ],
-        "additionalFields": {}
-      },
-      "type": "n8n-nodes-base.jiraTrigger",
-      "typeVersion": 1.1,
-      "position": [
-        80,
-        128
-      ],
-      "id": "b4e52315-0527-48d8-9410-6c2118347b17",
-      "name": "Jira Trigger",
-      "webhookId": "9d6d04f6-dd67-4e48-9d02-7f641c7d8c03",
-      "credentials": {
-        "jiraSoftwareCloudApi": {
-          "id": "8MFK8GhY79UNHP7W",
-          "name": "Jira SW Cloud account 4"
+          "id": "x89iQpnTYY84Kf2j",
+          "name": "Gmail OAuth"
         }
       }
     }
@@ -104,6 +57,6 @@
   "staticData": null,
   "tags": [],
   "triggerCount": 0,
-  "updatedAt": "2026-02-14T00:45:53.282Z",
-  "versionId": "8724ae08-57db-49d8-afd5-aa49b67b3414"
+  "updatedAt": "2026-02-14T19:10:26.901Z",
+  "versionId": "14b0753a-83cc-4842-a93b-385e9d40989a"
 }
