@@ -13,6 +13,7 @@
   "nodes": [
     {
       "parameters": {
+        "authentication": "serviceAccount",
         "sendTo": "thongle.sj@gmail.com",
         "subject": "lalala",
         "message": "lalalala",
@@ -26,13 +27,50 @@
       ],
       "id": "41fc0a42-94cb-4d7a-9fe3-5720c0aebe15",
       "name": "Send a message",
-      "webhookId": "ac36d8c3-d1ef-4060-a3cb-0dbe8fd807dd",
+      "webhookId": "ac36d8c3-d1ef-4060-a3cb-0dbe8fd807dd"
+    },
+    {
+      "parameters": {
+        "events": [
+          "jira:issue_deleted"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.jiraTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "5a1105d3-6a0f-4b24-a60e-3b57cd803e78",
+      "name": "Jira Trigger",
+      "webhookId": "9db681dd-796b-41e0-b514-0327023375fc",
       "credentials": {
-        "gmailOAuth2": {
-          "id": "x89iQpnTYY84Kf2j",
-          "name": "Gmail OAuth"
+        "jiraSoftwareCloudApi": {
+          "id": "8MFK8GhY79UNHP7W",
+          "name": "JiraCloud Auth"
         }
       }
+    },
+    {
+      "parameters": {
+        "resource": "drive",
+        "operation": "get",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        944,
+        48
+      ],
+      "id": "c446a4b6-e952-4c3d-bd4e-73d4fd7c6fe8",
+      "name": "Get shared drive"
     }
   ],
   "origin": "n8n",
@@ -57,6 +95,6 @@
   "staticData": null,
   "tags": [],
   "triggerCount": 0,
-  "updatedAt": "2026-02-14T19:10:26.901Z",
-  "versionId": "14b0753a-83cc-4842-a93b-385e9d40989a"
+  "updatedAt": "2026-02-16T15:50:43.007Z",
+  "versionId": "8ec8221c-f402-49af-ae4f-ee65e4546331"
 }
