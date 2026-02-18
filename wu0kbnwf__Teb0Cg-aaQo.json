@@ -1,59 +1,18 @@
 {
   "active": true,
   "activeVersion": {
-    "updatedAt": "2026-02-14T00:02:43.000Z",
-    "createdAt": "2026-02-14T00:00:23.582Z",
-    "versionId": "7911f8b7-58fc-4bbf-9fa5-b276f1ca1aff",
+    "updatedAt": "2026-02-17T22:32:36.000Z",
+    "createdAt": "2026-02-17T22:31:59.473Z",
+    "versionId": "93650cb7-a892-45e7-8ab4-aaa8d686a50d",
     "workflowId": "wu0kbnwf__Teb0Cg-aaQo",
     "nodes": [
       {
         "parameters": {
-          "pollTimes": {
-            "item": [
-              {
-                "hour": 7
-              }
-            ]
-          },
-          "documentId": {
-            "__rl": true,
-            "value": "1DUUs1UpR-BQom29Zh5c5lQD_W6APJauMDBq4moBosOs",
-            "mode": "list",
-            "cachedResultName": "Complaints",
-            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DUUs1UpR-BQom29Zh5c5lQD_W6APJauMDBq4moBosOs/edit?usp=drivesdk"
-          },
-          "sheetName": {
-            "__rl": true,
-            "value": 1391960032,
-            "mode": "list",
-            "cachedResultName": "Sheet1",
-            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DUUs1UpR-BQom29Zh5c5lQD_W6APJauMDBq4moBosOs/edit#gid=1391960032"
-          },
-          "event": "rowAdded",
-          "options": {}
-        },
-        "type": "n8n-nodes-base.googleSheetsTrigger",
-        "typeVersion": 1,
-        "position": [
-          -688,
-          0
-        ],
-        "id": "26ab8d0e-e16d-48bc-a301-003553f99903",
-        "name": "Google Sheets Trigger",
-        "credentials": {
-          "googleSheetsTriggerOAuth2Api": {
-            "id": "i7hKcAk9laKu5xIQ",
-            "name": "Google Sheets Trigger account 3"
-          }
-        }
-      },
-      {
-        "parameters": {
           "modelId": {
             "__rl": true,
-            "value": "gpt-4o",
+            "value": "gpt-5.2",
             "mode": "list",
-            "cachedResultName": "GPT-4O"
+            "cachedResultName": "GPT-5.2"
           },
           "responses": {
             "values": [
@@ -76,8 +35,8 @@
         "type": "@n8n/n8n-nodes-langchain.openAi",
         "typeVersion": 2.1,
         "position": [
-          48,
-          0
+          0,
+          16
         ],
         "id": "f78953e1-7eb2-402e-8089-beaa76e8bc4a",
         "name": "Message a model",
@@ -125,8 +84,8 @@
         "type": "n8n-nodes-base.filter",
         "typeVersion": 2.3,
         "position": [
-          -304,
-          0
+          -224,
+          16
         ],
         "id": "0cf47280-39df-49c9-b149-19d9e1e21e41",
         "name": "Filter for complaints"
@@ -152,7 +111,7 @@
             "mappingMode": "defineBelow",
             "value": {
               "deficiency_type": "={{ $json.output[0].content[0].text.deficiency_types }}",
-              "source_id": "={{ $('Edit Fields').item.json.source_id }}"
+              "source_id": "={{ $('Get row(s) in sheet').item.json.source_id }}"
             },
             "matchingColumns": [
               "source_id"
@@ -358,8 +317,8 @@
         "type": "n8n-nodes-base.googleSheets",
         "typeVersion": 4.7,
         "position": [
-          496,
-          0
+          416,
+          16
         ],
         "id": "d6805cf6-bf2b-4f05-94d3-a3b3bdfaa2cd",
         "name": "Update row in sheet",
@@ -369,20 +328,82 @@
             "name": "Google Sheets account 7"
           }
         }
+      },
+      {
+        "parameters": {
+          "documentId": {
+            "__rl": true,
+            "value": "1DUUs1UpR-BQom29Zh5c5lQD_W6APJauMDBq4moBosOs",
+            "mode": "list",
+            "cachedResultName": "Complaints",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DUUs1UpR-BQom29Zh5c5lQD_W6APJauMDBq4moBosOs/edit?usp=drivesdk"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": 1391960032,
+            "mode": "list",
+            "cachedResultName": "Sheet1",
+            "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DUUs1UpR-BQom29Zh5c5lQD_W6APJauMDBq4moBosOs/edit#gid=1391960032"
+          },
+          "filtersUI": {
+            "values": [
+              {
+                "lookupColumn": "date",
+                "lookupValue": "={{ $json.yesterday }}"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "position": [
+          -448,
+          16
+        ],
+        "id": "c6f0989a-88e9-40a0-9601-c78c3789fe5c",
+        "name": "Get row(s) in sheet",
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "VkqVQG6uCx2rHBuX",
+            "name": "Google Sheets account 7"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "triggerAtHour": 7
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          -880,
+          16
+        ],
+        "id": "3f5a86b2-6663-47b7-8ad4-d64e70a1e21e",
+        "name": "Schedule Trigger"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Get timestamp from Schedule Trigger input\nconst executionTime = new Date($json.timestamp);\n\n// Convert to Los Angeles timezone\nconst executionInLA = new Date(\n  executionTime.toLocaleString(\"en-US\", {\n    timeZone: \"America/Los_Angeles\",\n  })\n);\n\n// Go back one day\nexecutionInLA.setDate(executionInLA.getDate() - 1);\n\n// Format as YYYY-MM-DD\nconst year = executionInLA.getFullYear();\nconst month = String(executionInLA.getMonth() + 1).padStart(2, \"0\");\nconst day = String(executionInLA.getDate()).padStart(2, \"0\");\n\nconst yesterday = `${year}-${month}-${day}`;\n\nreturn [\n  {\n    yesterday,\n  }\n];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -656,
+          16
+        ],
+        "id": "e461155e-7ed0-4dc5-8932-e328d1951513",
+        "name": "Code in JavaScript"
       }
     ],
     "connections": {
-      "Google Sheets Trigger": {
-        "main": [
-          [
-            {
-              "node": "Filter for complaints",
-              "type": "main",
-              "index": 0
-            }
-          ]
-        ]
-      },
       "Filter for complaints": {
         "main": [
           [
@@ -404,26 +425,48 @@
             }
           ]
         ]
+      },
+      "Get row(s) in sheet": {
+        "main": [
+          [
+            {
+              "node": "Filter for complaints",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Schedule Trigger": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript": {
+        "main": [
+          [
+            {
+              "node": "Get row(s) in sheet",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
       }
     },
     "authors": "sathish saidula",
-    "name": "Version 7911f8b7",
-    "description": "1. Reads records from complaints sheets when a row is added.\n2. Filters for 'Complaints' and 'QA Review' records.\n3. Processes data to get deficiency type(s) using chatGPT.\n4. Writes the data back into the deficiency_type column in the same sheet.",
+    "name": "Version 93650cb7",
+    "description": "change gpt model from 4o to 5.2",
     "autosaved": true
   },
-  "activeVersionId": "7911f8b7-58fc-4bbf-9fa5-b276f1ca1aff",
+  "activeVersionId": "93650cb7-a892-45e7-8ab4-aaa8d686a50d",
   "connections": {
-    "Google Sheets Trigger": {
-      "main": [
-        [
-          {
-            "node": "Filter for complaints",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Filter for complaints": {
       "main": [
         [
@@ -445,6 +488,39 @@
           }
         ]
       ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Filter for complaints",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "createdAt": "2026-02-13T22:51:35.336Z",
@@ -457,52 +533,11 @@
   "nodes": [
     {
       "parameters": {
-        "pollTimes": {
-          "item": [
-            {
-              "hour": 7
-            }
-          ]
-        },
-        "documentId": {
-          "__rl": true,
-          "value": "1DUUs1UpR-BQom29Zh5c5lQD_W6APJauMDBq4moBosOs",
-          "mode": "list",
-          "cachedResultName": "Complaints",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DUUs1UpR-BQom29Zh5c5lQD_W6APJauMDBq4moBosOs/edit?usp=drivesdk"
-        },
-        "sheetName": {
-          "__rl": true,
-          "value": 1391960032,
-          "mode": "list",
-          "cachedResultName": "Sheet1",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DUUs1UpR-BQom29Zh5c5lQD_W6APJauMDBq4moBosOs/edit#gid=1391960032"
-        },
-        "event": "rowAdded",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.googleSheetsTrigger",
-      "typeVersion": 1,
-      "position": [
-        -688,
-        0
-      ],
-      "id": "26ab8d0e-e16d-48bc-a301-003553f99903",
-      "name": "Google Sheets Trigger",
-      "credentials": {
-        "googleSheetsTriggerOAuth2Api": {
-          "id": "i7hKcAk9laKu5xIQ",
-          "name": "Google Sheets Trigger account 3"
-        }
-      }
-    },
-    {
-      "parameters": {
         "modelId": {
           "__rl": true,
-          "value": "gpt-4o",
+          "value": "gpt-5.2",
           "mode": "list",
-          "cachedResultName": "GPT-4O"
+          "cachedResultName": "GPT-5.2"
         },
         "responses": {
           "values": [
@@ -525,8 +560,8 @@
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 2.1,
       "position": [
-        48,
-        0
+        0,
+        16
       ],
       "id": "f78953e1-7eb2-402e-8089-beaa76e8bc4a",
       "name": "Message a model",
@@ -574,8 +609,8 @@
       "type": "n8n-nodes-base.filter",
       "typeVersion": 2.3,
       "position": [
-        -304,
-        0
+        -224,
+        16
       ],
       "id": "0cf47280-39df-49c9-b149-19d9e1e21e41",
       "name": "Filter for complaints"
@@ -601,7 +636,7 @@
           "mappingMode": "defineBelow",
           "value": {
             "deficiency_type": "={{ $json.output[0].content[0].text.deficiency_types }}",
-            "source_id": "={{ $('Edit Fields').item.json.source_id }}"
+            "source_id": "={{ $('Get row(s) in sheet').item.json.source_id }}"
           },
           "matchingColumns": [
             "source_id"
@@ -807,8 +842,8 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        496,
-        0
+        416,
+        16
       ],
       "id": "d6805cf6-bf2b-4f05-94d3-a3b3bdfaa2cd",
       "name": "Update row in sheet",
@@ -818,6 +853,79 @@
           "name": "Google Sheets account 7"
         }
       }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1DUUs1UpR-BQom29Zh5c5lQD_W6APJauMDBq4moBosOs",
+          "mode": "list",
+          "cachedResultName": "Complaints",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DUUs1UpR-BQom29Zh5c5lQD_W6APJauMDBq4moBosOs/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1391960032,
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DUUs1UpR-BQom29Zh5c5lQD_W6APJauMDBq4moBosOs/edit#gid=1391960032"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "date",
+              "lookupValue": "={{ $json.yesterday }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -448,
+        16
+      ],
+      "id": "c6f0989a-88e9-40a0-9601-c78c3789fe5c",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "VkqVQG6uCx2rHBuX",
+          "name": "Google Sheets account 7"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 7
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -880,
+        16
+      ],
+      "id": "3f5a86b2-6663-47b7-8ad4-d64e70a1e21e",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get timestamp from Schedule Trigger input\nconst executionTime = new Date($json.timestamp);\n\n// Convert to Los Angeles timezone\nconst executionInLA = new Date(\n  executionTime.toLocaleString(\"en-US\", {\n    timeZone: \"America/Los_Angeles\",\n  })\n);\n\n// Go back one day\nexecutionInLA.setDate(executionInLA.getDate() - 1);\n\n// Format as YYYY-MM-DD\nconst year = executionInLA.getFullYear();\nconst month = String(executionInLA.getMonth() + 1).padStart(2, \"0\");\nconst day = String(executionInLA.getDate()).padStart(2, \"0\");\n\nconst yesterday = `${year}-${month}-${day}`;\n\nreturn [\n  {\n    yesterday,\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -656,
+        16
+      ],
+      "id": "e461155e-7ed0-4dc5-8932-e328d1951513",
+      "name": "Code in JavaScript"
     }
   ],
   "origin": "n8n",
@@ -845,6 +953,6 @@
   "staticData": null,
   "tags": [],
   "triggerCount": 1,
-  "updatedAt": "2026-02-14T00:00:23.580Z",
-  "versionId": "7911f8b7-58fc-4bbf-9fa5-b276f1ca1aff"
+  "updatedAt": "2026-02-17T22:31:59.472Z",
+  "versionId": "93650cb7-a892-45e7-8ab4-aaa8d686a50d"
 }
