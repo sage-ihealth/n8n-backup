@@ -7,49 +7,17 @@
       "main": [
         [
           {
+            "node": "Zone",
+            "type": "main",
+            "index": 0
+          },
+          {
             "node": "company",
             "type": "main",
             "index": 0
           },
           {
-            "node": "zone",
-            "type": "main",
-            "index": 0
-          },
-          {
             "node": "area",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "clinic",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "care director",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "company": {
-      "main": [
-        [
-          {
-            "node": "Code in JavaScript1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "zone": {
-      "main": [
-        [
-          {
-            "node": "Code in JavaScript",
             "type": "main",
             "index": 0
           }
@@ -67,40 +35,7 @@
         ]
       ]
     },
-    "clinic": {
-      "main": [
-        [
-          {
-            "node": "Code in JavaScript3",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get a prompt": {
-      "main": [
-        [
-          {
-            "node": "Edit Fields",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Code in JavaScript1": {
-      "main": [
-        [
-          {
-            "node": "Get a prompt",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Edit Fields": {
       "main": [
         [
           {
@@ -111,106 +46,7 @@
         ]
       ]
     },
-    "care director": {
-      "main": [
-        [
-          {
-            "node": "Code in JavaScript4",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Code in JavaScript": {
-      "main": [
-        [
-          {
-            "node": "Get a prompt1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Code in JavaScript2": {
-      "main": [
-        [
-          {
-            "node": "Get a prompt2",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Code in JavaScript3": {
-      "main": [
-        [
-          {
-            "node": "Get a prompt3",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Code in JavaScript4": {
-      "main": [
-        [
-          {
-            "node": "Get a prompt4",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get a prompt1": {
-      "main": [
-        [
-          {
-            "node": "Edit Fields1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get a prompt4": {
-      "main": [
-        [
-          {
-            "node": "Edit Fields2",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get a prompt3": {
-      "main": [
-        [
-          {
-            "node": "Edit Fields3",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get a prompt2": {
-      "main": [
-        [
-          {
-            "node": "Edit Fields4",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Edit Fields1": {
       "main": [
         [
           {
@@ -221,7 +57,7 @@
         ]
       ]
     },
-    "Edit Fields4": {
+    "Code in JavaScript2": {
       "main": [
         [
           {
@@ -232,35 +68,18 @@
         ]
       ]
     },
-    "Edit Fields3": {
-      "main": [
-        [
-          {
-            "node": "Message a model3",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Edit Fields2": {
-      "main": [
-        [
-          {
-            "node": "Message a model4",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "Message a model2": {
       "main": [
         [
           {
-            "node": "Message a model5",
+            "node": "Create a draft3",
             "type": "main",
             "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
           }
         ]
       ]
@@ -272,6 +91,11 @@
             "node": "Create a draft1",
             "type": "main",
             "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
           }
         ]
       ]
@@ -280,31 +104,14 @@
       "main": [
         [
           {
-            "node": "Message a model5",
+            "node": "Create a draft2",
             "type": "main",
             "index": 0
-          }
-        ]
-      ]
-    },
-    "Message a model3": {
-      "main": [
-        [
+          },
           {
-            "node": "Message a model5",
+            "node": "Merge",
             "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Message a model4": {
-      "main": [
-        [
-          {
-            "node": "Message a model5",
-            "type": "main",
-            "index": 0
+            "index": 1
           }
         ]
       ]
@@ -322,6 +129,65 @@
     },
     "Create a draft1": {
       "main": [
+        []
+      ]
+    },
+    "Zone": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "company": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a draft2": {
+      "main": [
+        []
+      ]
+    },
+    "Create a draft3": {
+      "main": [
+        []
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript3": {
+      "main": [
         [
           {
             "node": "Message a model5",
@@ -338,7 +204,7 @@
   "meta": {
     "templateCredsSetupCompleted": true
   },
-  "name": "My workflow 32",
+  "name": "Weekly OKR Summary",
   "nodes": [
     {
       "parameters": {
@@ -373,76 +239,10 @@
         },
         "sheetName": {
           "__rl": true,
-          "value": "gid=0",
+          "value": 335553914,
           "mode": "list",
-          "cachedResultName": "company",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-SZG6vaM0Z7tzfKMwB9QMsdlpkznhcALUu1M91RvRFY/edit#gid=0"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.googleSheets",
-      "typeVersion": 4.7,
-      "position": [
-        224,
-        -192
-      ],
-      "id": "b3d7cbad-c55a-4793-956e-8281df2edbae",
-      "name": "company",
-      "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "VkqVQG6uCx2rHBuX",
-          "name": "Google Sheets account 7"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "documentId": {
-          "__rl": true,
-          "value": "1-SZG6vaM0Z7tzfKMwB9QMsdlpkznhcALUu1M91RvRFY",
-          "mode": "list",
-          "cachedResultName": "company",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-SZG6vaM0Z7tzfKMwB9QMsdlpkznhcALUu1M91RvRFY/edit?usp=drivesdk"
-        },
-        "sheetName": {
-          "__rl": true,
-          "value": 410794723,
-          "mode": "list",
-          "cachedResultName": "zone",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-SZG6vaM0Z7tzfKMwB9QMsdlpkznhcALUu1M91RvRFY/edit#gid=410794723"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.googleSheets",
-      "typeVersion": 4.7,
-      "position": [
-        224,
-        0
-      ],
-      "id": "2a4cc36e-1b0a-469f-9cd6-4ed6325eb98e",
-      "name": "zone",
-      "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "VkqVQG6uCx2rHBuX",
-          "name": "Google Sheets account 7"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "documentId": {
-          "__rl": true,
-          "value": "1-SZG6vaM0Z7tzfKMwB9QMsdlpkznhcALUu1M91RvRFY",
-          "mode": "list",
-          "cachedResultName": "company",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-SZG6vaM0Z7tzfKMwB9QMsdlpkznhcALUu1M91RvRFY/edit?usp=drivesdk"
-        },
-        "sheetName": {
-          "__rl": true,
-          "value": 1160631989,
-          "mode": "list",
-          "cachedResultName": "area",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-SZG6vaM0Z7tzfKMwB9QMsdlpkznhcALUu1M91RvRFY/edit#gid=1160631989"
+          "cachedResultName": "20260208 - area",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-SZG6vaM0Z7tzfKMwB9QMsdlpkznhcALUu1M91RvRFY/edit#gid=335553914"
         },
         "options": {}
       },
@@ -463,98 +263,12 @@
     },
     {
       "parameters": {
-        "documentId": {
-          "__rl": true,
-          "value": "1-SZG6vaM0Z7tzfKMwB9QMsdlpkznhcALUu1M91RvRFY",
-          "mode": "list",
-          "cachedResultName": "company",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-SZG6vaM0Z7tzfKMwB9QMsdlpkznhcALUu1M91RvRFY/edit?usp=drivesdk"
-        },
-        "sheetName": {
-          "__rl": true,
-          "value": 1318349317,
-          "mode": "list",
-          "cachedResultName": "clinic",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-SZG6vaM0Z7tzfKMwB9QMsdlpkznhcALUu1M91RvRFY/edit#gid=1318349317"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.googleSheets",
-      "typeVersion": 4.7,
-      "position": [
-        240,
-        368
-      ],
-      "id": "7f8b5f5c-9354-4710-8ac4-7a4ddcd3ebdd",
-      "name": "clinic",
-      "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "VkqVQG6uCx2rHBuX",
-          "name": "Google Sheets account 7"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "documentId": {
-          "__rl": true,
-          "value": "1-SZG6vaM0Z7tzfKMwB9QMsdlpkznhcALUu1M91RvRFY",
-          "mode": "list",
-          "cachedResultName": "company",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-SZG6vaM0Z7tzfKMwB9QMsdlpkznhcALUu1M91RvRFY/edit?usp=drivesdk"
-        },
-        "sheetName": {
-          "__rl": true,
-          "value": 1814594511,
-          "mode": "list",
-          "cachedResultName": "care_director",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-SZG6vaM0Z7tzfKMwB9QMsdlpkznhcALUu1M91RvRFY/edit#gid=1814594511"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.googleSheets",
-      "typeVersion": 4.7,
-      "position": [
-        240,
-        560
-      ],
-      "id": "cc0b0ad0-9c5f-4f57-9113-f0678b6cb9c1",
-      "name": "care director",
-      "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "VkqVQG6uCx2rHBuX",
-          "name": "Google Sheets account 7"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "promptName": "summarize",
-        "requestOptions": {}
-      },
-      "type": "@langfuse/n8n-nodes-langfuse.langfuse",
-      "typeVersion": 1,
-      "position": [
-        640,
-        -192
-      ],
-      "id": "5955b413-bce0-46bb-9417-63b6002eb993",
-      "name": "Get a prompt",
-      "credentials": {
-        "langfuseApi": {
-          "id": "gHSORKqnJIeunW4d",
-          "name": "Langfuse account 2"
-        }
-      }
-    },
-    {
-      "parameters": {
         "jsCode": "const rows = $input.all().map(r => r.json)\n\nreturn [\n  {\n    json:{\n      sheetData: JSON.stringify(rows)\n    }\n  }\n];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        432,
+        480,
         -192
       ],
       "id": "85ddabcb-f6aa-45b3-bd7c-68c001ec1f9b",
@@ -562,39 +276,16 @@
     },
     {
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "7c386739-b02c-4e31-9eee-d263a5de7640",
-              "name": "prompt",
-              "value": "={{ $json.prompt }} Here is the spreadsheet data in JSON: \n{{ $('Code in JavaScript1').item.json.sheetData }}",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        848,
-        -192
-      ],
-      "id": "780e563a-08b6-4e12-9e49-cfc0bf1642b3",
-      "name": "Edit Fields"
-    },
-    {
-      "parameters": {
         "modelId": {
           "__rl": true,
-          "value": "gpt-4o",
+          "value": "gpt-5.2",
           "mode": "list",
-          "cachedResultName": "GPT-4O"
+          "cachedResultName": "GPT-5.2"
         },
         "responses": {
           "values": [
             {
-              "content": "={{ $json.prompt }}"
+              "content": "=You are preparing a concise executive email summarizing company-wide weekly performance.\n\nCONTEXT\n- Time granularity: weekly\n- Scope: zone-wide metrics only\n- Compare: most recent week vs previous week\n\nOBJECTIVE\nProvide a clear summary of what changed week-over-week.\n\nGUIDELINES\n- Focus only on meaningful changes (>2% WoW)\n- Keep language simple and non-technical\n- Do not speculate\n- Do not recommend actions\n- Avoid unnecessary metric restatement\n- Keep it concise and structured for email\n\nOUTPUT FORMAT\n\nSubject: Weekly Performance Summary – [Week]\n\n1. Overall Performance\n- 3–5 bullet points summarizing key changes\n\n2. Notable Movements\n- Metric name → Change → Short explanation of impact\n\n3. Metrics That Remained Stable\n- Brief note if performance was broadly steady\n\nData: {{ $json.sheetData }}"
             }
           ]
         },
@@ -604,7 +295,7 @@
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 2.1,
       "position": [
-        1056,
+        736,
         -192
       ],
       "id": "ba2e0130-efda-4e11-b781-d59d845ca48a",
@@ -623,7 +314,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        432,
+        480,
         0
       ],
       "id": "1fc782c2-027c-43d4-bbde-454580951283",
@@ -636,7 +327,7 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        432,
+        464,
         176
       ],
       "id": "47231a6a-4a19-4900-a7bf-794f112c5268",
@@ -644,214 +335,16 @@
     },
     {
       "parameters": {
-        "jsCode": "const rows = $input.all().map(r => r.json)\n\nreturn [\n  {\n    json:{\n      sheetData: JSON.stringify(rows)\n    }\n  }\n];"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        448,
-        368
-      ],
-      "id": "f31ae9a8-fa49-47d3-b40b-e7798bbb7633",
-      "name": "Code in JavaScript3"
-    },
-    {
-      "parameters": {
-        "jsCode": "const rows = $input.all().map(r => r.json)\n\nreturn [\n  {\n    json:{\n      sheetData: JSON.stringify(rows)\n    }\n  }\n];"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        448,
-        560
-      ],
-      "id": "584771db-671d-4f62-9eb6-4a9be852c348",
-      "name": "Code in JavaScript4"
-    },
-    {
-      "parameters": {
-        "promptName": "summarize",
-        "requestOptions": {}
-      },
-      "type": "@langfuse/n8n-nodes-langfuse.langfuse",
-      "typeVersion": 1,
-      "position": [
-        640,
-        0
-      ],
-      "id": "2a768447-604a-436c-b037-199c8bf049a0",
-      "name": "Get a prompt1",
-      "credentials": {
-        "langfuseApi": {
-          "id": "gHSORKqnJIeunW4d",
-          "name": "Langfuse account 2"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "promptName": "summarize",
-        "requestOptions": {}
-      },
-      "type": "@langfuse/n8n-nodes-langfuse.langfuse",
-      "typeVersion": 1,
-      "position": [
-        640,
-        176
-      ],
-      "id": "617122c6-7970-4a79-a9f8-33ffdccbf537",
-      "name": "Get a prompt2",
-      "credentials": {
-        "langfuseApi": {
-          "id": "gHSORKqnJIeunW4d",
-          "name": "Langfuse account 2"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "promptName": "summarize",
-        "requestOptions": {}
-      },
-      "type": "@langfuse/n8n-nodes-langfuse.langfuse",
-      "typeVersion": 1,
-      "position": [
-        656,
-        368
-      ],
-      "id": "8518235c-bdfb-433c-90ac-7a206baa7bf3",
-      "name": "Get a prompt3",
-      "credentials": {
-        "langfuseApi": {
-          "id": "gHSORKqnJIeunW4d",
-          "name": "Langfuse account 2"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "promptName": "summarize",
-        "requestOptions": {}
-      },
-      "type": "@langfuse/n8n-nodes-langfuse.langfuse",
-      "typeVersion": 1,
-      "position": [
-        656,
-        560
-      ],
-      "id": "4d694b0b-9fcf-48a4-ba30-d53711ca70c7",
-      "name": "Get a prompt4",
-      "credentials": {
-        "langfuseApi": {
-          "id": "gHSORKqnJIeunW4d",
-          "name": "Langfuse account 2"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "7383f653-c3ea-4d55-8615-211106e9f355",
-              "name": "",
-              "value": "={{ $json.prompt }} Here is the spreadsheet data in JSON: {{ $('Code in JavaScript').item.json.sheetData }}",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        848,
-        0
-      ],
-      "id": "d92b3be0-6e5a-4bae-abec-a9dba3428d04",
-      "name": "Edit Fields1"
-    },
-    {
-      "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "fe14dea2-952f-4ade-bd42-94b7b864ff48",
-              "name": "",
-              "value": "={{ $json.prompt }} Here is the spreadsheet data in JSON: {{ $('Code in JavaScript4').item.json.sheetData }}",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        864,
-        560
-      ],
-      "id": "8e3f4a68-2189-4b78-9539-c93f21c2dc02",
-      "name": "Edit Fields2"
-    },
-    {
-      "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "0d6b9d19-b19e-4aba-a50f-2ed4987b05bd",
-              "name": "prompt",
-              "value": "={{ $json.prompt }} Here is the spreadsheet data in JSON: {{ $('Code in JavaScript3').item.json.sheetData }}",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        848,
-        368
-      ],
-      "id": "125d84e1-4e22-4f7f-b829-f5220d48dcac",
-      "name": "Edit Fields3"
-    },
-    {
-      "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "8c4922ef-1151-4c9f-8762-ec9e425b3b70",
-              "name": "prompt",
-              "value": "={{ $json.prompt }} Here is the spreadsheet data in JSON: {{ $('Code in JavaScript2').item.json.sheetData }}",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        848,
-        176
-      ],
-      "id": "b30eb88c-b578-4cda-af60-97b389be8291",
-      "name": "Edit Fields4"
-    },
-    {
-      "parameters": {
         "modelId": {
           "__rl": true,
-          "value": "chatgpt-4o-latest",
+          "value": "gpt-5.2",
           "mode": "list",
-          "cachedResultName": "CHATGPT-4O-LATEST"
+          "cachedResultName": "GPT-5.2"
         },
         "responses": {
           "values": [
             {
-              "content": "={{ $json.prompt }}"
+              "content": "=You are preparing a concise executive email summarizing company-wide weekly performance.\n\nCONTEXT\n- Time granularity: weekly\n- Scope: company-wide metrics only\n- Compare: most recent week vs previous week\n\nOBJECTIVE\nProvide a clear summary of what changed week-over-week.\n\nGUIDELINES\n- Focus only on meaningful changes (>2% WoW)\n- Keep language simple and non-technical\n- Do not speculate\n- Do not recommend actions\n- Avoid unnecessary metric restatement\n- Keep it concise and structured for email\n\nOUTPUT FORMAT\n\nSubject: Weekly Performance Summary – [Week]\n\n1. Overall Performance\n- 3–5 bullet points summarizing key changes\n\n2. Notable Movements\n- Metric name → Change → Short explanation of impact\n\n3. Metrics That Remained Stable\n- Brief note if performance was broadly steady\n\nData: {{ $json.sheetData }}"
             }
           ]
         },
@@ -861,7 +354,7 @@
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 2.1,
       "position": [
-        1056,
+        752,
         0
       ],
       "id": "4f5f9b55-7aa3-4a79-9cab-950d3d6a57f4",
@@ -877,14 +370,14 @@
       "parameters": {
         "modelId": {
           "__rl": true,
-          "value": "chatgpt-4o-latest",
+          "value": "gpt-5.2",
           "mode": "list",
-          "cachedResultName": "CHATGPT-4O-LATEST"
+          "cachedResultName": "GPT-5.2"
         },
         "responses": {
           "values": [
             {
-              "content": "={{ $json.prompt }}"
+              "content": "=You are preparing a concise executive email summarizing company-wide weekly performance.\n\nCONTEXT\n- Time granularity: weekly\n- Scope: area-wide metrics only\n- Compare: most recent week vs previous week\n\nOBJECTIVE\nProvide a clear summary of what changed week-over-week.\n\nGUIDELINES\n- Focus only on meaningful changes (>2% WoW)\n- Keep language simple and non-technical\n- Do not speculate\n- Do not recommend actions\n- Avoid unnecessary metric restatement\n- Keep it concise and structured for email\n\nOUTPUT FORMAT\n\nSubject: Weekly Performance Summary – [Week]\n\n1. Overall Performance\n- 3–5 bullet points summarizing key changes\n\n2. Notable Movements\n- Metric name → Change → Short explanation of impact\n\n3. Metrics That Remained Stable\n- Brief note if performance was broadly steady\n\nData: {{ $json.sheetData }}"
             }
           ]
         },
@@ -894,8 +387,8 @@
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 2.1,
       "position": [
-        1056,
-        176
+        768,
+        208
       ],
       "id": "7eb69521-1d37-49f6-bd51-e1a9035e5cd4",
       "name": "Message a model2",
@@ -910,14 +403,14 @@
       "parameters": {
         "modelId": {
           "__rl": true,
-          "value": "chatgpt-4o-latest",
+          "value": "gpt-5.2",
           "mode": "list",
-          "cachedResultName": "CHATGPT-4O-LATEST"
+          "cachedResultName": "GPT-5.2"
         },
         "responses": {
           "values": [
             {
-              "content": "={{ $json.prompt }}"
+              "content": "=You are a senior Data Analyst, Summarize the text for a weekly report email. \n\nRules:\n- When including percentage change, include the numbers as well.\n\nText: {{ $json.text }}"
             }
           ]
         },
@@ -927,72 +420,8 @@
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 2.1,
       "position": [
-        1056,
-        368
-      ],
-      "id": "a703d5f9-c5ae-436c-967d-7dc7bc6a8cb2",
-      "name": "Message a model3",
-      "credentials": {
-        "openAiApi": {
-          "id": "Oj08scHKr6wdz972",
-          "name": "OpenAi account 6"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "modelId": {
-          "__rl": true,
-          "value": "chatgpt-4o-latest",
-          "mode": "list",
-          "cachedResultName": "CHATGPT-4O-LATEST"
-        },
-        "responses": {
-          "values": [
-            {
-              "content": "={{ $json.prompt }}"
-            }
-          ]
-        },
-        "builtInTools": {},
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.openAi",
-      "typeVersion": 2.1,
-      "position": [
-        1072,
-        560
-      ],
-      "id": "e0f5c9a2-159e-4f3b-ac6b-9f87aab87a4f",
-      "name": "Message a model4",
-      "credentials": {
-        "openAiApi": {
-          "id": "Oj08scHKr6wdz972",
-          "name": "OpenAi account 6"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "modelId": {
-          "__rl": true,
-          "value": "chatgpt-4o-latest",
-          "mode": "list",
-          "cachedResultName": "CHATGPT-4O-LATEST"
-        },
-        "responses": {
-          "values": [
-            {}
-          ]
-        },
-        "builtInTools": {},
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.openAi",
-      "typeVersion": 2.1,
-      "position": [
-        1856,
-        176
+        2112,
+        0
       ],
       "id": "e689a94a-1a97-4858-9cc8-fac3a9b0b283",
       "name": "Message a model5",
@@ -1007,13 +436,14 @@
       "parameters": {
         "resource": "draft",
         "subject": "Test Weekly Summary",
+        "message": "={{ $json.output[0].content[0].text }}",
         "options": {}
       },
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.2,
       "position": [
-        2208,
-        176
+        2416,
+        0
       ],
       "id": "f825c547-27b2-46b3-96ee-643e3ed9f5a5",
       "name": "Create a draft",
@@ -1028,15 +458,15 @@
     {
       "parameters": {
         "resource": "draft",
-        "subject": "test email",
+        "subject": "test email zone",
         "message": "={{ $json.output[0].content[0].text }}",
         "options": {}
       },
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.2,
       "position": [
-        1408,
-        -192
+        1120,
+        -416
       ],
       "id": "98b43fc4-fec9-4325-8b08-d1fe32565c96",
       "name": "Create a draft1",
@@ -1047,6 +477,167 @@
           "name": "Gmail account 4"
         }
       }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1-SZG6vaM0Z7tzfKMwB9QMsdlpkznhcALUu1M91RvRFY",
+          "mode": "list",
+          "cachedResultName": "company",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-SZG6vaM0Z7tzfKMwB9QMsdlpkznhcALUu1M91RvRFY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1628043281,
+          "mode": "list",
+          "cachedResultName": "20260208 - zone",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-SZG6vaM0Z7tzfKMwB9QMsdlpkznhcALUu1M91RvRFY/edit#gid=1628043281"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        -192
+      ],
+      "id": "b3d7cbad-c55a-4793-956e-8281df2edbae",
+      "name": "Zone",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "VkqVQG6uCx2rHBuX",
+          "name": "Google Sheets account 7"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1-SZG6vaM0Z7tzfKMwB9QMsdlpkznhcALUu1M91RvRFY",
+          "mode": "list",
+          "cachedResultName": "company",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-SZG6vaM0Z7tzfKMwB9QMsdlpkznhcALUu1M91RvRFY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 138952674,
+          "mode": "list",
+          "cachedResultName": "20260208",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-SZG6vaM0Z7tzfKMwB9QMsdlpkznhcALUu1M91RvRFY/edit#gid=138952674"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        0
+      ],
+      "id": "2a4cc36e-1b0a-469f-9cd6-4ed6325eb98e",
+      "name": "company",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "VkqVQG6uCx2rHBuX",
+          "name": "Google Sheets account 7"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "test email company",
+        "message": "={{ $json.output[0].content[0].text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1024,
+        -96
+      ],
+      "id": "c5c667b3-9bdd-4d99-978c-c4a298b5f18d",
+      "name": "Create a draft2",
+      "webhookId": "2e0843f9-972f-4d78-a676-44bf5a2cf8e9",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "bsd68rFO96U4ZCjM",
+          "name": "Gmail account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "test email area",
+        "message": "={{ $json.output[0].content[0].text }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1120,
+        352
+      ],
+      "id": "d6383103-a97b-4122-9324-34433e1a208a",
+      "name": "Create a draft3",
+      "webhookId": "10a3f26b-f47a-4a01-af3a-d150fa4992e0",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "bsd68rFO96U4ZCjM",
+          "name": "Gmail account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1456,
+        -16
+      ],
+      "id": "6abdce5b-e184-45a4-98c4-71752e61cd40",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7af128f3-524c-4761-b7a3-5b85c16719e4",
+              "name": "text",
+              "value": "={{ [$('Merge').all().map(item => item.json.output[0].content[0].text)].join('\\n\\n') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1664,
+        0
+      ],
+      "id": "b37e19d3-76c9-475a-92a7-4af211c4cdaa",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [$input.first()];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1872,
+        0
+      ],
+      "id": "1e8ff19d-f210-4e78-aa5e-1ceb147b1dfd",
+      "name": "Code in JavaScript3"
     }
   ],
   "origin": "n8n",
@@ -1071,6 +662,6 @@
   "staticData": null,
   "tags": [],
   "triggerCount": 0,
-  "updatedAt": "2026-02-13T18:11:44.262Z",
-  "versionId": "b1c6a3ea-e21e-4d95-87d7-bc8f88c35269"
+  "updatedAt": "2026-02-18T00:47:06.812Z",
+  "versionId": "374b798b-55f1-4d2a-a5fc-f77777419fdd"
 }
