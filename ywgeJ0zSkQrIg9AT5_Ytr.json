@@ -317,7 +317,7 @@
       "typeVersion": 1.1,
       "position": [
         1840,
-        1048
+        1056
       ],
       "id": "73d7d416-afde-4bfd-8c79-17518952cf0a",
       "name": "Wait 1s",
@@ -344,7 +344,7 @@
       "typeVersion": 4.3,
       "position": [
         2064,
-        1048
+        1056
       ],
       "id": "317f572d-ed3e-47d2-bdd3-e30eddf71c2e",
       "name": "Send DM Message2",
@@ -683,7 +683,7 @@
       "typeVersion": 1.1,
       "position": [
         1392,
-        1048
+        1056
       ],
       "id": "7684adf5-c73e-480d-9f37-7509368cbf07",
       "name": "Wait 1s1",
@@ -704,7 +704,7 @@
       "typeVersion": 4.3,
       "position": [
         1616,
-        1048
+        1056
       ],
       "id": "f0677565-3a17-4a10-83c3-3684a004f3f2",
       "name": "Setup DM Space - ahna",
@@ -717,18 +717,33 @@
     },
     {
       "parameters": {
-        "content": "# Insurance Reminder Workflow\n\nThis workflow automates the process of identifying patients with incomplete insurance information and sending reminders to the assigned Care Assistants via Google Chat.\n\n## Workflow Overview\n\nThe workflow runs daily to ensure that billing information is up-to-date, minimizing revenue loss due to unbillable care time.\n\n### Key Stages\n\n1.  **Trigger**:\n    *   **Daily Trigger (9 AM)**: The workflow is scheduled to run every morning at 9:00 AM.\n\n2.  **Data Retrieval & Filtering**:\n    *   **Read Patient Spreadsheet**: Fetches patient records from the \"Monthly Billable Time\" Google Sheet.\n    *   **Filter Incomplete Insurance**: Isolates records where the \"what's missing / incorrect info\" column specifies \"incomplete insurance information\".\n\n3.  **Reminder Throttling**:\n    *   **Check Reminder Date**: A code node that checks the \"Last Reminder Sent\" column. Reminders are only sent if no reminder has been sent before or if at least 2 days have passed since the last notification for that patient.\n\n4.  **Data Enrichment**:\n    *   **Store Spreadsheet Data1**: Momentarily stores the spreadsheet row data.\n    *   **Get Patient Details from API**: Calls the internal UC API (`/v1/uc/patient/{PatientId}`) to retrieve the Care Assistant's email and other details.\n    *   **Store Spreadsheet Data**: Combines the original spreadsheet data with the API response (e.g., CA email, patient name, billable time).\n\n5.  **Notification Pipeline**:\n    *   **Format Google Chat Message**: Generates a friendly and encouraging DM message highlighting the patient name, enrolled date, and billable time \"at risk\".\n    *   **Loop Over Items**: Iterates through each patient needing a reminder.\n    *   **Setup DM Space**: Creates or retrieves a Direct Message space with the Care Assistant.\n    *   **Send DM Message**: Delivers the formatted reminder to the Care Assistant via Google Chat.\n\n6.  **Progress Tracking**:\n    *   **Append or update row in sheet**: Updates the original Google Sheet with the timestamp of the notification in the \"1st GChat Auto Notification\" (or similar) column to ensure throttling works accurately in subsequent runs.\n\n## Important Links\n\n*   **Google Sheet**: [Patient Spreadsheet](https://docs.google.com/spreadsheets/d/1LtR4Dj7nmAwJNht6rrKJir8PLsnED--D3Ya_l1xaYXo/edit)\n*   **Patient Portal**: [Care Portal](https://portal.ihealthunifiedcare.com/care-portal/)\n",
-        "height": 1072,
-        "width": 1424
+        "content": "# Insurance Reminder Workflow\n\nThis workflow automates the process of identifying patients with incomplete insurance information and sending reminders to the assigned Care Assistants via Google Chat.\n\n### Key Stages\n\n1.  **Trigger**:\n    *   **Daily Trigger (9 AM)**: The workflow is scheduled to run every morning at 9:00 AM.\n\n2.  **Data Retrieval & Filtering**:\n    *   **Read Patient Spreadsheet**: Fetches patient records from the \"Monthly Billable Time\" Google Sheet.\n    *   **Filter Incomplete Insurance**: Isolates records where the \"what's missing / incorrect info\" column specifies \"incomplete insurance information\".\n\n3.  **Reminder Throttling**:\n    *   **Check Reminder Date**: A code node that checks the \"Last Reminder Sent\" column. Reminders are only sent if no reminder has been sent before or if at least 2 days have passed since the last notification for that patient.\n\n4.  **Data Enrichment**:\n    *   **Store Spreadsheet Data1**: Momentarily stores the spreadsheet row data.\n    *   **Get Patient Details from API**: Calls the internal UC API (`/v1/uc/patient/{PatientId}`) to retrieve the Care Assistant's email and other details.\n    *   **Store Spreadsheet Data**: Combines the original spreadsheet data with the API response (e.g., CA email, patient name, billable time).\n\n5.  **Notification Pipeline**:\n    *   **Format Google Chat Message**: Generates a friendly and encouraging DM message highlighting the patient name, enrolled date, and billable time \"at risk\".\n    *   **Loop Over Items**: Iterates through each patient needing a reminder.\n    *   **Setup DM Space**: Creates or retrieves a Direct Message space with the Care Assistant.\n    *   **Send DM Message**: Delivers the formatted reminder to the Care Assistant via Google Chat.\n\n6.  **Progress Tracking**:\n    *   **Append or update row in sheet**: Updates the original Google Sheet with the timestamp of the notification in the \"1st GChat Auto Notification\" (or similar) column to ensure throttling works accurately in subsequent runs.\n",
+        "height": 736,
+        "width": 1376
       },
       "type": "n8n-nodes-base.stickyNote",
       "position": [
         -640,
-        -64
+        304
       ],
       "typeVersion": 1,
       "id": "44217884-a3c2-4088-97b3-66fd57212efd",
       "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "# Important Links\n\n*   **Google Sheet**: [Patient Spreadsheet](https://docs.google.com/spreadsheets/d/1LtR4Dj7nmAwJNht6rrKJir8PLsnED--D3Ya_l1xaYXo/edit)\n*   **Patient Portal**: [Care Portal](https://portal.ihealthunifiedcare.com/care-portal/)\n",
+        "height": 208,
+        "width": 400
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        896,
+        816
+      ],
+      "typeVersion": 1,
+      "id": "f63e9737-db3a-4e3d-8a09-499f1b995cb2",
+      "name": "Sticky Note1"
     }
   ],
   "origin": "n8n",
@@ -753,6 +768,6 @@
   "staticData": null,
   "tags": [],
   "triggerCount": 0,
-  "updatedAt": "2026-02-13T01:11:14.924Z",
-  "versionId": "9b46f5f7-6e07-4d64-bce1-ed3b379d92b8"
+  "updatedAt": "2026-02-17T22:35:24.378Z",
+  "versionId": "775f45ec-7397-4960-9fcb-2251e739d924"
 }
