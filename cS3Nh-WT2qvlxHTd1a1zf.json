@@ -2,7 +2,41 @@
   "active": false,
   "activeVersion": null,
   "activeVersionId": null,
-  "connections": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
   "createdAt": "2026-02-09T19:51:59.714Z",
   "id": "cS3Nh-WT2qvlxHTd1a1zf",
   "isArchived": false,
@@ -13,64 +47,127 @@
   "nodes": [
     {
       "parameters": {
-        "authentication": "serviceAccount",
-        "sendTo": "thongle.sj@gmail.com",
-        "subject": "lalala",
-        "message": "lalalala",
+        "httpMethod": "POST",
+        "path": "bfd530bd-0b3d-4f29-8194-359f0eb418a7",
+        "authentication": "headerAuth",
         "options": {}
       },
-      "type": "n8n-nodes-base.gmail",
-      "typeVersion": 2.2,
-      "position": [
-        112,
-        160
-      ],
-      "id": "41fc0a42-94cb-4d7a-9fe3-5720c0aebe15",
-      "name": "Send a message",
-      "webhookId": "ac36d8c3-d1ef-4060-a3cb-0dbe8fd807dd"
-    },
-    {
-      "parameters": {
-        "events": [
-          "jira:issue_deleted"
-        ],
-        "additionalFields": {}
-      },
-      "type": "n8n-nodes-base.jiraTrigger",
-      "typeVersion": 1.1,
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
       "position": [
         0,
         0
       ],
-      "id": "5a1105d3-6a0f-4b24-a60e-3b57cd803e78",
-      "name": "Jira Trigger",
-      "webhookId": "9db681dd-796b-41e0-b514-0327023375fc",
+      "id": "b11a1999-7994-4e8f-ac09-8b57ab4f22ed",
+      "name": "Webhook",
+      "webhookId": "bfd530bd-0b3d-4f29-8194-359f0eb418a7",
       "credentials": {
-        "jiraSoftwareCloudApi": {
-          "id": "8MFK8GhY79UNHP7W",
-          "name": "JiraCloud Auth"
+        "httpHeaderAuth": {
+          "id": "SKpoiof6xEp1RBA7",
+          "name": "testapikey"
         }
       }
     },
     {
       "parameters": {
-        "resource": "drive",
-        "operation": "get",
-        "driveId": {
-          "__rl": true,
-          "mode": "list",
-          "value": ""
+        "method": "POST",
+        "url": "https://api.resend.com/emails",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
         },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"from\": \"thong.le@ihealthlabs.com\",\n  \"to\": \"thongle.sj@gmail.com\",\n  \"subject\": \"test subject\",\n  \"html\": {{$json.data}},\n  \"reply_to\": \"thong.le@ihealthlabs.com\"\n}",
         "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        512,
+        0
+      ],
+      "id": "201da206-d1f0-4535-b4af-2e6d2632530c",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "hw3HQSuQcl5wrYJb",
+          "name": "ResendAPIKey"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "1XY7X0jyoFjzwG_hxUQOgnKP-2IIi73CCbpWf3E_PY5c",
+          "mode": "list",
+          "cachedResultName": "Test Template",
+          "cachedResultUrl": "https://docs.google.com/document/d/1XY7X0jyoFjzwG_hxUQOgnKP-2IIi73CCbpWf3E_PY5c/edit?usp=drivesdk"
+        },
+        "options": {
+          "googleFileConversion": {
+            "conversion": {}
+          }
+        }
       },
       "type": "n8n-nodes-base.googleDrive",
       "typeVersion": 3,
       "position": [
-        944,
-        48
+        160,
+        0
       ],
-      "id": "c446a4b6-e952-4c3d-bd4e-73d4fd7c6fe8",
-      "name": "Get shared drive"
+      "id": "a19bc405-ac1c-4749-b26f-4a0a4b643664",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "8HxKmNOsYimOjGK7",
+          "name": "Google Drive auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "xml",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        336,
+        0
+      ],
+      "id": "60a01d22-2c37-40d5-993e-8a2ba0dc088e",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "https://docs.google.com/document/d/1XY7X0jyoFjzwG_hxUQOgnKP-2IIi73CCbpWf3E_PY5c/edit?tab=t.0",
+        "simple": false
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        80,
+        -240
+      ],
+      "id": "2282b7d7-e2eb-4cec-a52d-f82133383e82",
+      "name": "Get a document",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "K5W49nZ0uwNDrgpX",
+          "name": "Google Docs account 4"
+        }
+      }
     }
   ],
   "origin": "n8n",
@@ -95,6 +192,6 @@
   "staticData": null,
   "tags": [],
   "triggerCount": 0,
-  "updatedAt": "2026-02-16T15:50:43.007Z",
-  "versionId": "8ec8221c-f402-49af-ae4f-ee65e4546331"
+  "updatedAt": "2026-02-18T11:54:44.303Z",
+  "versionId": "d8a7440a-b5f6-44a6-9dff-415d8205766f"
 }
