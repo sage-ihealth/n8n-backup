@@ -2,13 +2,185 @@
   "active": false,
   "activeVersion": null,
   "activeVersionId": null,
-  "connections": {},
+  "connections": {
+    "TransformData": {
+      "main": [
+        []
+      ]
+    },
+    "GetRowsFromSheet1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DumpReport submission": {
+      "main": [
+        [
+          {
+            "node": "GetRowsFromSheet1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "TransformData",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
   "createdAt": "2026-02-04T19:49:08.855Z",
   "id": "pAGhqbznKLUAhsEwGNHup",
   "isArchived": false,
-  "meta": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
   "name": "DumpReportChecking",
-  "nodes": [],
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "return $input.all()\n  .map(item => item.json)\n  .filter(r =>\n    r[\"tag\"]?.trim() &&\n    r[\"keyWord\"]?.trim() &&\n    r[\"matchType\"]?.trim() &&\n    r[\"tagType\"]?.trim()\n  ).map(\n    r => ({\n    json: {\n      seq: r.row_number,\n      label: r.tag.trim(),\n      keyword: r.keyWord.trim(),\n      matchType: r.matchType.trim(),\n      type: r.tagType.trim()\n    }\n  })\n  );"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        64,
+        -144
+      ],
+      "id": "1548c26b-c4f4-403b-be8b-1cd14092cf4f",
+      "name": "TransformData"
+    },
+    {
+      "parameters": {
+        "authentication": "basicAuth",
+        "formTitle": "DumpReport",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "dumpReport",
+              "fieldType": "file"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        -640,
+        -112
+      ],
+      "id": "11779ac2-0d9a-441f-a6be-84a7c43c9bce",
+      "name": "DumpReport submission",
+      "webhookId": "b91e2363-f1ab-4e14-9be3-83b8482c2eb0",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "vz3iQyLE8VQecW8B",
+          "name": "dump report upload"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1C3ne5XoVsaFefZvsI2nWreQ-bqU-1grWLmCHFsAlo30",
+          "mode": "list",
+          "cachedResultName": "PayerKeywords",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1C3ne5XoVsaFefZvsI2nWreQ-bqU-1grWLmCHFsAlo30/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "payerMapping",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1C3ne5XoVsaFefZvsI2nWreQ-bqU-1grWLmCHFsAlo30/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -400,
+        -288
+      ],
+      "id": "d9766bab-b332-473c-a113-5e69710305ad",
+      "name": "GetRowsFromSheet1",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "AkxcXiliPoTpkXRS",
+          "name": "N8N googlesheet"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "chooseBranch"
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -128,
+        -272
+      ],
+      "id": "f7a998d0-5069-4a4c-9e20-9dc8e90a51a5",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "binaryPropertyName": "=data",
+        "options": {
+          "sheetName": "Sheet"
+        }
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -128,
+        -16
+      ],
+      "id": "bf89906d-949c-401b-ba7d-514746623a62",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        80,
+        -272
+      ],
+      "id": "984cd365-6060-49ae-bd74-389bd7ef9368",
+      "name": "Edit Fields"
+    }
+  ],
   "origin": "n8n",
   "pinData": {},
   "repo": {
@@ -38,6 +210,6 @@
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2026-02-04T19:49:20.198Z",
-  "versionId": "48dbe4ba-a69f-4b3f-9943-1a2c02cf3ffc"
+  "updatedAt": "2026-02-18T23:49:37.648Z",
+  "versionId": "27bcd7d1-58df-40d4-8ec1-26aded14fdd0"
 }
