@@ -3,30 +3,169 @@
   "activeVersion": null,
   "activeVersionId": null,
   "connections": {
-    "Start": {
+    "Get row(s) in sheet": {
       "main": [
-        []
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     }
   },
   "createdAt": "2026-01-14T00:04:20.549Z",
   "id": "vrc1ierrj3Cdc9un",
   "isArchived": false,
-  "meta": null,
-  "name": "My Sub-workflow",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "Clinic 113 Custom Billing Report",
   "nodes": [
     {
       "parameters": {
-        "inputSource": "passthrough"
+        "documentId": {
+          "__rl": true,
+          "value": "1HsCEOSdCC03F5FeHXdUtOVNRrIS3TIp_MtfQMUrs5Iw",
+          "mode": "list",
+          "cachedResultName": "Copy of Clinic 113- Monthly Billing Report",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HsCEOSdCC03F5FeHXdUtOVNRrIS3TIp_MtfQMUrs5Iw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 918780124,
+          "mode": "list",
+          "cachedResultName": "0riginal",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HsCEOSdCC03F5FeHXdUtOVNRrIS3TIp_MtfQMUrs5Iw/edit#gid=918780124"
+        },
+        "options": {}
       },
-      "id": "e27db547-8131-4164-ab6f-8f12b92badd9",
-      "typeVersion": 1.1,
-      "name": "Start",
-      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
       "position": [
-        -288,
+        -16,
         0
-      ]
+      ],
+      "id": "6cdb6787-5ea7-46ed-84c5-7969b1acada9",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "DUxiKNrgVSTJhacl",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const outputItems = [];\n\n// 2nd column key = clinic name (n8n used source row 1 as column headers)\nconst sampleKeys = Object.keys($input.first().json).filter(k => k !== 'row_number');\nconst col2Key = sampleKeys[1]; // e.g. \"113 CA/SF - Chinese Hospital\"\n\n// Row 1: reconstruct org/clinic line from n8n column names\noutputItems.push({ json: {\n  'Name'                          : 'Organization',\n  'Patient Medical ID'            : col2Key,\n  'Encounter'                     : '',\n  'CPT 99453 - DOS'               : '',\n  'CPT 99454/99445 - DOS'         : '',\n  'CAT II Codes (Vitals)'         : '',\n  'Monthly Other CPT Codes - DOS' : '',\n  'CAT II Codes (Time)'           : '',\n  'CAT II Codes (HbA1c)'          : '',\n  'APCM HCPCS-DOS'                : '',\n}});\n\nfor (const item of $input.all()) {\n  const d = item.json;\n  const rowNum = d.row_number || 0;\n  const orgVal = (d['Organization'] || '').toString().trim();\n\n  // ── rows 1–4: metadata rows ───────────────────────────────────────────────\n  if (rowNum >= 1 && rowNum <= 4) {\n    const val2 = (d[col2Key] || '').toString().trim();\n    outputItems.push({ json: {\n      'Name'                          : orgVal,\n      'Patient Medical ID'            : val2,\n      'Encounter'                     : '',\n      'CPT 99453 - DOS'               : '',\n      'CPT 99454/99445 - DOS'         : '',\n      'CAT II Codes (Vitals)'         : '',\n      'Monthly Other CPT Codes - DOS' : '',\n      'CAT II Codes (Time)'           : '',\n      'CAT II Codes (HbA1c)'          : '',\n      'APCM HCPCS-DOS'                : '',\n    }});\n    continue;\n  }\n\n  // ── row 5: column header row — skip it ───────────────────────────────────\n  if (rowNum === 5) if (rowNum === 5) {\n    outputItems.push({ json: {\n      'Name'                          : 'Name',\n      'Patient Medical ID'            : 'Patient Medical ID',\n      'Encounter'                     : 'Encounter',\n      'CPT 99453 - DOS'               : 'CPT 99453 - DOS',\n      'CPT 99454/99445 - DOS'         : 'CPT 99454/99445 - DOS',\n      'CAT II Codes (Vitals)'         : 'CAT II Codes (Vitals)',\n      'Monthly Other CPT Codes - DOS' : 'Monthly Other CPT Codes - DOS',\n      'CAT II Codes (Time)'           : 'CAT II Codes (Time)',\n      'CAT II Codes (HbA1c)'          : 'CAT II Codes (HbA1c)',\n      'APCM HCPCS-DOS'                : 'APCM HCPCS-DOS',\n    }});\n    continue;\n  };\n\n  // ── row 6+: patient data rows ─────────────────────────────────────────────\n  if (rowNum < 6) continue;\n\n  const name      = orgVal;\n  const medId     = (d['col_3']  || '').toString().trim(); // Patient Medical ID\n  const cpt99453  = (d['col_7']  || '').toString().trim(); // CPT 99453 - DOS\n  const cpt99454  = (d['col_8']  || '').toString().trim(); // CPT 99454/99445 - DOS\n  const catVitals = (d['col_9']  || '').toString().trim(); // CAT II Codes (Vitals)\n  const monthly   = (d['col_10'] || '').toString().trim(); // Monthly Other CPT Codes - DOS\n  const catTime   = (d['col_11'] || '').toString().trim(); // CAT II Codes (Time)\n  const catHbA1c  = (d['col_12'] || '').toString().trim(); // CAT II Codes (HbA1c)\n  const apcm      = (d['col_13'] || '').toString().trim(); // APCM HCPCS-DOS\n\n  const hasDevice  = !!(cpt99453 || cpt99454 || catVitals);\n  const hasService = !!(monthly   || catTime   || catHbA1c);\n  const hasAPCM    = !!apcm;\n\n  if (!hasDevice && !hasService && !hasAPCM) continue;\n\n  let first = true;\n\n  if (hasDevice) {\n    outputItems.push({ json: {\n      'Name'                          : first ? name  : '',\n      'Patient Medical ID'            : first ? medId : '',\n      'Encounter'                     : '',\n      'CPT 99453 - DOS'               : cpt99453,\n      'CPT 99454/99445 - DOS'         : cpt99454,\n      'CAT II Codes (Vitals)'         : catVitals,\n      'Monthly Other CPT Codes - DOS' : '',\n      'CAT II Codes (Time)'           : '',\n      'CAT II Codes (HbA1c)'          : '',\n      'APCM HCPCS-DOS'                : '',\n    }});\n    first = false;\n  }\n\n  if (hasService) {\n    outputItems.push({ json: {\n      'Name'                          : first ? name  : '',\n      'Patient Medical ID'            : first ? medId : '',\n      'Encounter'                     : '',\n      'CPT 99453 - DOS'               : '',\n      'CPT 99454/99445 - DOS'         : '',\n      'CAT II Codes (Vitals)'         : '',\n      'Monthly Other CPT Codes - DOS' : monthly,\n      'CAT II Codes (Time)'           : catTime,\n      'CAT II Codes (HbA1c)'          : catHbA1c,\n      'APCM HCPCS-DOS'                : '',\n    }});\n    first = false;\n  }\n\n  if (hasAPCM) {\n    outputItems.push({ json: {\n      'Name'                          : first ? name  : '',\n      'Patient Medical ID'            : first ? medId : '',\n      'Encounter'                     : '',\n      'CPT 99453 - DOS'               : '',\n      'CPT 99454/99445 - DOS'         : '',\n      'CAT II Codes (Vitals)'         : '',\n      'Monthly Other CPT Codes - DOS' : '',\n      'CAT II Codes (Time)'           : '',\n      'CAT II Codes (HbA1c)'          : '',\n      'APCM HCPCS-DOS'                : apcm,\n    }});\n  }\n}\n\nreturn outputItems;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "6e904a3f-13e9-42e3-97d6-a8e8b539fb73",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "sendTo": "mavis.tsoi@ihealthlabs.com",
+        "subject": "={{ $today.year }}_{{ $today.monthShort }}_113_iHealth_custom_billing_report",
+        "message": "=Please see attached csv for {{ $today.year }}_{{ $today.monthShort }}_113_iHealth_custom_billing_report",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {
+                "property": "={{ $today.year }}_{{ $today.monthShort }}_113_iHealth_custom_billing_report"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        656,
+        0
+      ],
+      "id": "4feaee26-7cee-4431-9361-3ecb62da37c3",
+      "name": "Send a message",
+      "webhookId": "db888fd8-8efe-4ec0-a186-1edad6c89ebb",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "l127qbpdBjvhIX1W",
+          "name": "Gmail account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "binaryPropertyName": "={{ $today.year }}_{{ $today.monthShort }}_113_iHealth_custom_billing_report",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        432,
+        0
+      ],
+      "id": "5d8b3a3d-82a4-4ec3-8f3b-b63edbe393ed",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "months",
+              "triggerAtDayOfMonth": 15
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -240,
+        0
+      ],
+      "id": "c8c32219-87b8-4187-ac07-d1b1d8e4fc04",
+      "name": "Schedule Trigger"
     }
   ],
   "origin": "n8n",
@@ -36,7 +175,11 @@
     "name": "n8n-backup"
   },
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "timeSavedMode": "fixed",
+    "timezone": "America/Los_Angeles",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
   },
   "shared": [
     {
@@ -50,6 +193,6 @@
   "staticData": null,
   "tags": [],
   "triggerCount": 0,
-  "updatedAt": "2026-02-14T00:54:04.771Z",
-  "versionId": "0e8e478c-b273-4418-aeba-f0adf18ffe52"
+  "updatedAt": "2026-02-19T10:22:51.389Z",
+  "versionId": "86a4c1ae-d718-4b25-9aa2-b873e96c38d5"
 }
