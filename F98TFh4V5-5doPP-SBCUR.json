@@ -439,7 +439,7 @@
   "meta": {
     "templateCredsSetupCompleted": true
   },
-  "name": "UC Weekly Alignment Update",
+  "name": "UC Admin - UC Weekly Alignment Update - v1.0",
   "nodes": [
     {
       "parameters": {
@@ -702,7 +702,10 @@
   },
   "settings": {
     "executionOrder": "v1",
-    "availableInMCP": false
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "timezone": "America/Los_Angeles",
+    "callerPolicy": "workflowsFromSameOwner"
   },
   "shared": [
     {
@@ -716,6 +719,6 @@
   "staticData": null,
   "tags": [],
   "triggerCount": 2,
-  "updatedAt": "2026-02-17T19:10:12.042Z",
-  "versionId": "bb7f26f1-2d46-4aba-bc61-a7c2ec2f9b0d"
+  "updatedAt": "2026-02-19T01:10:04.056Z",
+  "versionId": "6dd5e0ca-2f9c-42fb-a632-6c3b297dc2ed"
 }
