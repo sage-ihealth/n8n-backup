@@ -1,0 +1,83 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-02-18T22:08:46.295Z",
+  "id": "G49kH5oacVTdeWe6NDSXV",
+  "isArchived": false,
+  "meta": null,
+  "name": "Engineer - Error",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "77dae373-4506-41b9-a55b-a78f7d17aa19",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "sendTo": "sage.gu@ihealthlabs.com",
+        "subject": "Error in N8N Workflow",
+        "message": "=Error in workflow:  {{ $json.workflow.name }}. Error Message: {{ $json.execution.error.message }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "bde0c055-ee16-40ea-ab72-4d058f7722ea",
+      "name": "Send a message",
+      "webhookId": "8ce0d93e-afbf-439e-be5e-a5084159ce83",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "bsd68rFO96U4ZCjM",
+          "name": "Gmail account 4"
+        }
+      }
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-18T22:08:46.297Z",
+      "createdAt": "2026-02-18T22:08:46.297Z",
+      "role": "workflow:owner",
+      "workflowId": "G49kH5oacVTdeWe6NDSXV",
+      "projectId": "Gtx3vMtqTSpomXFD"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-02-18T22:09:40.140Z",
+  "versionId": "cb2f184f-c04a-4c8d-aef8-77a86190f65b"
+}
