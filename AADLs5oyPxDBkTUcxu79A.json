@@ -1,0 +1,172 @@
+{
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-02-19T01:09:08.000Z",
+    "createdAt": "2026-02-19T01:04:25.011Z",
+    "versionId": "5d7b0a91-b61c-453b-8f32-7fd2ed514bd8",
+    "workflowId": "AADLs5oyPxDBkTUcxu79A",
+    "nodes": [
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "weeks",
+                "triggerAtDay": [
+                  5
+                ],
+                "triggerAtHour": 13
+              }
+            ]
+          }
+        },
+        "id": "a66a3461-ef42-46dd-88df-5a92a6708550",
+        "name": "Schedule Trigger",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          -224,
+          -48
+        ]
+      },
+      {
+        "parameters": {
+          "spaceId": "spaces/AAQAP-pez3I",
+          "messageUi": {
+            "text": "Hi Team! Happy Friday. Please remember to fill out your inventory system check."
+          },
+          "additionalFields": {}
+        },
+        "type": "n8n-nodes-base.googleChat",
+        "typeVersion": 1,
+        "position": [
+          -32,
+          -48
+        ],
+        "id": "97776c65-769d-44bc-99ba-8afb2e6d0c41",
+        "name": "Create a message",
+        "webhookId": "1554baac-88d7-4885-a908-10dfe4c19823",
+        "credentials": {
+          "googleApi": {
+            "id": "hfHCd3S3dAc5ygli",
+            "name": "Google Service Account account 3"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Schedule Trigger": {
+        "main": [
+          [
+            {
+              "node": "Create a message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Tina Zou",
+    "name": "v1.0",
+    "description": "",
+    "autosaved": true
+  },
+  "activeVersionId": "5d7b0a91-b61c-453b-8f32-7fd2ed514bd8",
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Create a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-02-19T00:23:36.368Z",
+  "id": "AADLs5oyPxDBkTUcxu79A",
+  "isArchived": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "name": "Solutions - Inventory System Reminder to CA - v1.0",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                5
+              ],
+              "triggerAtHour": 13
+            }
+          ]
+        }
+      },
+      "id": "a66a3461-ef42-46dd-88df-5a92a6708550",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -224,
+        -48
+      ]
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAQAVneizF0",
+        "messageUi": {
+          "text": "Hi Team! Please remember to fill out your weekly inventory system check. Thank you! "
+        },
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        -48
+      ],
+      "id": "97776c65-769d-44bc-99ba-8afb2e6d0c41",
+      "name": "Create a message",
+      "webhookId": "1554baac-88d7-4885-a908-10dfe4c19823",
+      "credentials": {
+        "googleApi": {
+          "id": "hfHCd3S3dAc5ygli",
+          "name": "Google Service Account account 3"
+        }
+      }
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "timezone": "America/Los_Angeles",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-19T00:23:36.371Z",
+      "createdAt": "2026-02-19T00:23:36.371Z",
+      "role": "workflow:owner",
+      "workflowId": "AADLs5oyPxDBkTUcxu79A",
+      "projectId": "PvZitumGnZP1AedJ"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2026-02-19T01:10:55.592Z",
+  "versionId": "4061cd46-b719-48d8-8136-4f73a341bdc8"
+}
