@@ -1,0 +1,74 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-02-18T23:48:48.214Z",
+  "id": "UjY9fnURKYCoDZNT574LF",
+  "isArchived": false,
+  "meta": null,
+  "name": "My workflow 36",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "ae7f1e2d-cfa8-4bd3-982c-4c55f6d75e6b",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "78d7650f-a817-467a-b6ec-8f667db64a64",
+      "name": "Extract from File"
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-18T23:48:48.216Z",
+      "createdAt": "2026-02-18T23:48:48.216Z",
+      "role": "workflow:owner",
+      "workflowId": "UjY9fnURKYCoDZNT574LF",
+      "projectId": "Gtx3vMtqTSpomXFD"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-02-18T23:48:48.214Z",
+  "versionId": "a412d8fe-0f4a-4f64-b7cc-c1d4dbf4b09e"
+}
