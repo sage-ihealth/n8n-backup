@@ -1,9 +1,9 @@
 {
   "active": true,
   "activeVersion": {
-    "updatedAt": "2026-02-19T01:09:08.000Z",
-    "createdAt": "2026-02-19T01:04:25.011Z",
-    "versionId": "5d7b0a91-b61c-453b-8f32-7fd2ed514bd8",
+    "updatedAt": "2026-02-20T09:00:27.000Z",
+    "createdAt": "2026-02-19T01:10:55.593Z",
+    "versionId": "4061cd46-b719-48d8-8136-4f73a341bdc8",
     "workflowId": "AADLs5oyPxDBkTUcxu79A",
     "nodes": [
       {
@@ -31,9 +31,9 @@
       },
       {
         "parameters": {
-          "spaceId": "spaces/AAQAP-pez3I",
+          "spaceId": "spaces/AAQAVneizF0",
           "messageUi": {
-            "text": "Hi Team! Happy Friday. Please remember to fill out your inventory system check."
+            "text": "Hi Team! Please remember to fill out your weekly inventory system check. Thank you! "
           },
           "additionalFields": {}
         },
@@ -68,11 +68,11 @@
       }
     },
     "authors": "Tina Zou",
-    "name": "v1.0",
+    "name": "Version 1.0",
     "description": "",
     "autosaved": true
   },
-  "activeVersionId": "5d7b0a91-b61c-453b-8f32-7fd2ed514bd8",
+  "activeVersionId": "4061cd46-b719-48d8-8136-4f73a341bdc8",
   "connections": {
     "Schedule Trigger": {
       "main": [
