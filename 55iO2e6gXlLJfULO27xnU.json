@@ -85,7 +85,7 @@
   "id": "55iO2e6gXlLJfULO27xnU",
   "isArchived": false,
   "meta": null,
-  "name": "Get Patient Chat Messages",
+  "name": "Solution - Get Patient Chat Messages",
   "nodes": [
     {
       "parameters": {},
@@ -105,13 +105,13 @@
             {
               "id": "set-email",
               "name": "email",
-              "value": "sage.gu@ihealthlabs.com",
+              "value": "elena.tian@ihealthlabs.com",
               "type": "string"
             },
             {
               "id": "set-password",
               "name": "password",
-              "value": "iHealth99$",
+              "value": "iHealth2026!",
               "type": "string"
             },
             {
@@ -411,6 +411,6 @@
   "staticData": null,
   "tags": [],
   "triggerCount": 0,
-  "updatedAt": "2026-02-18T04:30:04.840Z",
-  "versionId": "b60f9101-c17b-46aa-82ae-e0c29c4437c5"
+  "updatedAt": "2026-02-20T02:13:30.917Z",
+  "versionId": "4be105b0-28f4-4abd-8361-c64eb7079fec"
 }
