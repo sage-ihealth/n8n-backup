@@ -28,9 +28,9 @@
   },
   "createdAt": "2026-02-18T23:10:09.262Z",
   "id": "FVZbx4eyBH4J1eTE5N9EU",
-  "isArchived": false,
+  "isArchived": true,
   "meta": null,
-  "name": "My workflow 35",
+  "name": "randome",
   "nodes": [
     {
       "parameters": {},
@@ -93,6 +93,6 @@
   "staticData": null,
   "tags": [],
   "triggerCount": 0,
-  "updatedAt": "2026-02-18T23:10:47.233Z",
-  "versionId": "a240d025-ee97-41c2-a8d8-a4e628985d8b"
+  "updatedAt": "2026-02-19T23:45:19.000Z",
+  "versionId": "12f747d3-d032-4f4c-8036-346be61491ad"
 }
