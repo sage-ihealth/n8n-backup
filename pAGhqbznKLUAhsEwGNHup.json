@@ -23,12 +23,7 @@
       "main": [
         [
           {
-            "node": "GetRowsFromSheet1",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Extract from File",
+            "node": "Code in JavaScript",
             "type": "main",
             "index": 0
           }
@@ -91,7 +86,7 @@
       "typeVersion": 2.5,
       "position": [
         -640,
-        -112
+        0
       ],
       "id": "11779ac2-0d9a-441f-a6be-84a7c43c9bce",
       "name": "DumpReport submission",
@@ -152,23 +147,6 @@
     },
     {
       "parameters": {
-        "operation": "xlsx",
-        "binaryPropertyName": "=data",
-        "options": {
-          "sheetName": "Sheet"
-        }
-      },
-      "type": "n8n-nodes-base.extractFromFile",
-      "typeVersion": 1.1,
-      "position": [
-        -128,
-        -16
-      ],
-      "id": "bf89906d-949c-401b-ba7d-514746623a62",
-      "name": "Extract from File"
-    },
-    {
-      "parameters": {
         "options": {}
       },
       "type": "n8n-nodes-base.set",
@@ -179,6 +157,54 @@
       ],
       "id": "984cd365-6060-49ae-bd74-389bd7ef9368",
       "name": "Edit Fields"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -368,
+        -112
+      ],
+      "id": "55a7f37a-c53a-4dec-8694-b906593bca9a",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\n\nconst xlsx = require('xlsx');\n\nconst binary = $binary.dumpReport;\nconst buffer = Buffer.from(binary.data, 'base64');\n\nconst workbook = xlsx.read(buffer, { type: 'buffer' });\n\n// 默认读取第一个 sheet\nconst sheetName = workbook.SheetNames[0];\nconst sheet = workbook.Sheets[sheetName];\n\nconst jsonData = xlsx.utils.sheet_to_json(sheet);\n\nreturn jsonData.map(row => ({ json: row }));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -96,
+        16
+      ],
+      "id": "3243b79e-b263-41e6-93bc-6c6128377677",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "root",
+          "cachedResultName": "/ (Root folder)"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        224,
+        48
+      ],
+      "id": "c6fb6a58-896b-4c00-85ca-f3931b159873",
+      "name": "Upload file"
     }
   ],
   "origin": "n8n",
@@ -210,6 +236,6 @@
     }
   ],
   "triggerCount": 0,
-  "updatedAt": "2026-02-18T23:49:37.648Z",
-  "versionId": "27bcd7d1-58df-40d4-8ec1-26aded14fdd0"
+  "updatedAt": "2026-02-20T01:03:44.001Z",
+  "versionId": "4581a923-55b2-48c3-a139-799923ba4e69"
 }
