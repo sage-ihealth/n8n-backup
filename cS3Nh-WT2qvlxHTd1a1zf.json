@@ -2,86 +2,7 @@
   "active": false,
   "activeVersion": null,
   "activeVersionId": null,
-  "connections": {
-    "Webhook": {
-      "main": [
-        [
-          {
-            "node": "If",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Extract from File": {
-      "main": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "If": {
-      "main": [
-        [
-          {
-            "node": "CareTeam_Template",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "NonCareTeam_Template",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "CareTeam_Template": {
-      "main": [
-        [
-          {
-            "node": "Extract from File",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "NonCareTeam_Template": {
-      "main": [
-        [
-          {
-            "node": "Extract from File",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "HTTP Request": {
-      "main": [
-        []
-      ]
-    },
-    "Anthropic Chat Model": {
-      "ai_languageModel": [
-        [
-          {
-            "node": "AI Agent",
-            "type": "ai_languageModel",
-            "index": 0
-          }
-        ]
-      ]
-    }
-  },
+  "connections": {},
   "createdAt": "2026-02-09T19:51:59.714Z",
   "id": "cS3Nh-WT2qvlxHTd1a1zf",
   "isArchived": false,
@@ -90,31 +11,6 @@
   },
   "name": "JiraGmail",
   "nodes": [
-    {
-      "parameters": {
-        "httpMethod": "POST",
-        "path": "bfd530bd-0b3d-4f29-8194-359f0eb418a7",
-        "authentication": "headerAuth",
-        "options": {
-          "ignoreBots": true
-        }
-      },
-      "type": "n8n-nodes-base.webhook",
-      "typeVersion": 2.1,
-      "position": [
-        -752,
-        -112
-      ],
-      "id": "b11a1999-7994-4e8f-ac09-8b57ab4f22ed",
-      "name": "Webhook",
-      "webhookId": "bfd530bd-0b3d-4f29-8194-359f0eb418a7",
-      "credentials": {
-        "httpHeaderAuth": {
-          "id": "SKpoiof6xEp1RBA7",
-          "name": "testapikey"
-        }
-      }
-    },
     {
       "parameters": {
         "method": "POST",
@@ -132,14 +28,14 @@
         },
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"from\": \"thong.le@ihealthlabs.com\",\n  \"to\": \"{{$('Webhook').item.json.body.to}}\",\n  \"subject\": \"{{ $('Webhook').item.json.body.subject }}\",\n  \"html\": {{$json.data}},\n  \"reply_to\": \"thong.le@ihealthlabs.com\"\n}",
+        "jsonBody": "={\n  \"from\": \"thong.le@ihealthlabs.com\",\n  \"to\": \"thongle.sj@gmail.com\",\n  \"subject\": \"test\",\n  \"html\": \"<div>Test</div>\",\n  \"reply_to\": \"thong.le@ihealthlabs.com\"\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        576,
-        -464
+        32,
+        -240
       ],
       "id": "201da206-d1f0-4535-b4af-2e6d2632530c",
       "name": "HTTP Request",
@@ -149,151 +45,6 @@
           "name": "ResendAPIKey"
         }
       }
-    },
-    {
-      "parameters": {
-        "operation": "xml",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.extractFromFile",
-      "typeVersion": 1.1,
-      "position": [
-        192,
-        -144
-      ],
-      "id": "60a01d22-2c37-40d5-993e-8a2ba0dc088e",
-      "name": "Extract from File"
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": false,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 3
-          },
-          "conditions": [
-            {
-              "id": "7cac5fbc-2dd7-47b9-9f99-264fa9c63183",
-              "leftValue": "={{ $('Webhook').item.json.body.issue.fields.customfield_12205.value }}",
-              "rightValue": "=Care Team",
-              "operator": {
-                "type": "string",
-                "operation": "contains"
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {
-          "ignoreCase": true
-        }
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
-      "position": [
-        -448,
-        -160
-      ],
-      "id": "279d3146-9f2f-45c7-a21d-ff12c1ffd2c1",
-      "name": "If"
-    },
-    {
-      "parameters": {
-        "operation": "download",
-        "fileId": {
-          "__rl": true,
-          "value": "1h6XKUrUnQqXK4w-dl0iCoC_k8M5qqBYey77CuURiyuY",
-          "mode": "list",
-          "cachedResultName": "Test Template - Care Team",
-          "cachedResultUrl": "https://docs.google.com/document/d/1h6XKUrUnQqXK4w-dl0iCoC_k8M5qqBYey77CuURiyuY/edit?usp=drivesdk"
-        },
-        "options": {
-          "googleFileConversion": {
-            "conversion": {}
-          }
-        }
-      },
-      "type": "n8n-nodes-base.googleDrive",
-      "typeVersion": 3,
-      "position": [
-        16,
-        -336
-      ],
-      "id": "a19bc405-ac1c-4749-b26f-4a0a4b643664",
-      "name": "CareTeam_Template",
-      "credentials": {
-        "googleDriveOAuth2Api": {
-          "id": "8HxKmNOsYimOjGK7",
-          "name": "Google Drive auth"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "operation": "download",
-        "fileId": {
-          "__rl": true,
-          "value": "1XY7X0jyoFjzwG_hxUQOgnKP-2IIi73CCbpWf3E_PY5c",
-          "mode": "list",
-          "cachedResultName": "Test Template",
-          "cachedResultUrl": "https://docs.google.com/document/d/1XY7X0jyoFjzwG_hxUQOgnKP-2IIi73CCbpWf3E_PY5c/edit?usp=drivesdk"
-        },
-        "options": {
-          "googleFileConversion": {
-            "conversion": {}
-          }
-        }
-      },
-      "type": "n8n-nodes-base.googleDrive",
-      "typeVersion": 3,
-      "position": [
-        0,
-        -96
-      ],
-      "id": "f72832f6-f049-4e89-8529-cebb970c1d28",
-      "name": "NonCareTeam_Template",
-      "credentials": {
-        "googleDriveOAuth2Api": {
-          "id": "8HxKmNOsYimOjGK7",
-          "name": "Google Drive auth"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "promptType": "define",
-        "text": "=Find first and last name from {{ $('Webhook').item.json.body.issue.toJsonString() }}",
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.agent",
-      "typeVersion": 3.1,
-      "position": [
-        288,
-        80
-      ],
-      "id": "ec969795-9c06-4758-b0e4-a2eab322b82e",
-      "name": "AI Agent"
-    },
-    {
-      "parameters": {
-        "model": {
-          "__rl": true,
-          "mode": "list",
-          "value": "claude-sonnet-4-5-20250929",
-          "cachedResultName": "Claude Sonnet 4.5"
-        },
-        "options": {}
-      },
-      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
-      "typeVersion": 1.3,
-      "position": [
-        160,
-        288
-      ],
-      "id": "97fdc85a-07f5-4899-8b41-195f54eb92d7",
-      "name": "Anthropic Chat Model"
     }
   ],
   "origin": "n8n",
@@ -318,6 +69,6 @@
   "staticData": null,
   "tags": [],
   "triggerCount": 0,
-  "updatedAt": "2026-02-18T13:11:21.764Z",
-  "versionId": "a6de0d6e-363b-497d-972d-1f8084cf41df"
+  "updatedAt": "2026-02-19T22:48:00.776Z",
+  "versionId": "0fdb4c57-b0be-40eb-b466-46519511483d"
 }
