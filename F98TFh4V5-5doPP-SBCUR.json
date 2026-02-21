@@ -1,9 +1,9 @@
 {
   "active": true,
   "activeVersion": {
-    "updatedAt": "2026-02-20T09:00:50.000Z",
-    "createdAt": "2026-02-19T01:09:47.761Z",
-    "versionId": "6dd5e0ca-2f9c-42fb-a632-6c3b297dc2ed",
+    "updatedAt": "2026-02-20T19:18:51.000Z",
+    "createdAt": "2026-02-20T19:18:45.015Z",
+    "versionId": "95517a5a-4c35-416d-8289-90c1bdb0ad86",
     "workflowId": "F98TFh4V5-5doPP-SBCUR",
     "nodes": [
       {
@@ -145,7 +145,7 @@
                 "triggerAtDay": [
                   5
                 ],
-                "triggerAtHour": 15
+                "triggerAtHour": 13
               }
             ]
           }
@@ -339,11 +339,11 @@
       }
     },
     "authors": "Tina Zou",
-    "name": "v1.0",
+    "name": "v2.0",
     "description": "",
     "autosaved": true
   },
-  "activeVersionId": "6dd5e0ca-2f9c-42fb-a632-6c3b297dc2ed",
+  "activeVersionId": "95517a5a-4c35-416d-8289-90c1bdb0ad86",
   "connections": {
     "Schedule (Friday 6PM)": {
       "main": [
@@ -570,7 +570,7 @@
               "triggerAtDay": [
                 5
               ],
-              "triggerAtHour": 15
+              "triggerAtHour": 13
             }
           ]
         }
@@ -660,7 +660,6 @@
     },
     {
       "parameters": {
-        "authentication": "oAuth2",
         "spaceId": "spaces/AAQAknpNPFc",
         "messageUi": {
           "text": "=Hello <users/{{ $json[\"Google Chat Handle\"] }}>, this is a friendly reminder to fill out your Weekly Update for the {{ $json[\"Team/Department\"] }}team. Thank you!"
@@ -677,9 +676,9 @@
       "name": "Create a message",
       "webhookId": "c9fc3c7a-1f47-4ac1-9d17-f11ebe250d8a",
       "credentials": {
-        "googleChatOAuth2Api": {
-          "id": "Ss1Rm3mRKdDYE2xW",
-          "name": "Chat account 6"
+        "googleApi": {
+          "id": "hfHCd3S3dAc5ygli",
+          "name": "Google Service Account account 3"
         }
       }
     }
@@ -709,6 +708,6 @@
   "staticData": null,
   "tags": [],
   "triggerCount": 2,
-  "updatedAt": "2026-02-19T01:10:04.056Z",
-  "versionId": "6dd5e0ca-2f9c-42fb-a632-6c3b297dc2ed"
+  "updatedAt": "2026-02-20T21:59:42.531Z",
+  "versionId": "75104800-b563-4429-8012-640a0e835f21"
 }
