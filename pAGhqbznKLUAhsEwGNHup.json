@@ -1,45 +1,96 @@
 {
-  "active": false,
-  "activeVersion": null,
-  "activeVersionId": null,
+  "active": true,
+  "activeVersion": {
+    "updatedAt": "2026-02-20T21:31:00.000Z",
+    "createdAt": "2026-02-20T21:30:56.091Z",
+    "versionId": "d19f9c3e-5d63-417d-99bf-2b60d94c4717",
+    "workflowId": "pAGhqbznKLUAhsEwGNHup",
+    "nodes": [
+      {
+        "parameters": {
+          "authentication": "basicAuth",
+          "formTitle": "DumpReport",
+          "formFields": {
+            "values": [
+              {
+                "fieldLabel": "dumpReport",
+                "fieldType": "file"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.formTrigger",
+        "typeVersion": 2.5,
+        "position": [
+          -640,
+          0
+        ],
+        "id": "11779ac2-0d9a-441f-a6be-84a7c43c9bce",
+        "name": "DumpReport submission",
+        "webhookId": "b91e2363-f1ab-4e14-9be3-83b8482c2eb0",
+        "credentials": {
+          "httpBasicAuth": {
+            "id": "vz3iQyLE8VQecW8B",
+            "name": "dump report upload"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nconst item = $input.first();\nconst file = item.binary.dumpReport;\n\nreturn [\n  {\n    json: {\n      fileName: file.fileName,\n      mimeType: file.mimeType\n    }\n  }\n];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -432,
+          0
+        ],
+        "id": "d1d0fefd-104f-4fc4-9148-526e304e2c0f",
+        "name": "Code in JavaScript1"
+      }
+    ],
+    "connections": {
+      "DumpReport submission": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Lu Ouyang",
+    "name": "Version d19f9c3e",
+    "description": "",
+    "autosaved": true
+  },
+  "activeVersionId": "d19f9c3e-5d63-417d-99bf-2b60d94c4717",
   "connections": {
-    "TransformData": {
+    "DumpReport submission": {
       "main": [
         []
       ]
     },
-    "GetRowsFromSheet1": {
+    "FetchDumpReport": {
       "main": [
         [
           {
             "node": "Merge",
             "type": "main",
-            "index": 0
+            "index": 1
           }
         ]
       ]
     },
-    "DumpReport submission": {
+    "FetchClinicStatus": {
       "main": [
         [
           {
-            "node": "Code in JavaScript",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Merge": {
-      "main": [
-        [
-          {
-            "node": "TransformData",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Edit Fields",
+            "node": "Merge",
             "type": "main",
             "index": 0
           }
@@ -57,19 +108,6 @@
   "nodes": [
     {
       "parameters": {
-        "jsCode": "return $input.all()\n  .map(item => item.json)\n  .filter(r =>\n    r[\"tag\"]?.trim() &&\n    r[\"keyWord\"]?.trim() &&\n    r[\"matchType\"]?.trim() &&\n    r[\"tagType\"]?.trim()\n  ).map(\n    r => ({\n    json: {\n      seq: r.row_number,\n      label: r.tag.trim(),\n      keyword: r.keyWord.trim(),\n      matchType: r.matchType.trim(),\n      type: r.tagType.trim()\n    }\n  })\n  );"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        64,
-        -144
-      ],
-      "id": "1548c26b-c4f4-403b-be8b-1cd14092cf4f",
-      "name": "TransformData"
-    },
-    {
-      "parameters": {
         "authentication": "basicAuth",
         "formTitle": "DumpReport",
         "formFields": {
@@ -85,8 +123,8 @@
       "type": "n8n-nodes-base.formTrigger",
       "typeVersion": 2.5,
       "position": [
-        -640,
-        0
+        -1040,
+        -80
       ],
       "id": "11779ac2-0d9a-441f-a6be-84a7c43c9bce",
       "name": "DumpReport submission",
@@ -102,29 +140,28 @@
       "parameters": {
         "documentId": {
           "__rl": true,
-          "value": "1C3ne5XoVsaFefZvsI2nWreQ-bqU-1grWLmCHFsAlo30",
+          "value": "10AypHrMSRpIY_YiK7wZvFH4B0LN2F6Ja64LXhimS3o0",
           "mode": "list",
-          "cachedResultName": "PayerKeywords",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1C3ne5XoVsaFefZvsI2nWreQ-bqU-1grWLmCHFsAlo30/edit?usp=drivesdk"
+          "cachedResultName": "Organization Name to Clinical Group Mapping",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10AypHrMSRpIY_YiK7wZvFH4B0LN2F6Ja64LXhimS3o0/edit?usp=drivesdk"
         },
         "sheetName": {
           "__rl": true,
-          "value": "gid=0",
+          "value": 1257389047,
           "mode": "list",
-          "cachedResultName": "payerMapping",
-          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1C3ne5XoVsaFefZvsI2nWreQ-bqU-1grWLmCHFsAlo30/edit#gid=0"
+          "cachedResultName": "ALL Clinic - Zone Mapping",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/10AypHrMSRpIY_YiK7wZvFH4B0LN2F6Ja64LXhimS3o0/edit#gid=1257389047"
         },
         "options": {}
       },
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        -400,
-        -288
+        -784,
+        -272
       ],
-      "id": "d9766bab-b332-473c-a113-5e69710305ad",
-      "name": "GetRowsFromSheet1",
-      "executeOnce": true,
+      "id": "f5810568-8c0a-4110-a009-e1949c5e7ef8",
+      "name": "FetchClinicStatus",
       "credentials": {
         "googleSheetsOAuth2Api": {
           "id": "AkxcXiliPoTpkXRS",
@@ -134,77 +171,47 @@
     },
     {
       "parameters": {
-        "mode": "chooseBranch"
-      },
-      "type": "n8n-nodes-base.merge",
-      "typeVersion": 3.2,
-      "position": [
-        -128,
-        -272
-      ],
-      "id": "f7a998d0-5069-4a4c-9e20-9dc8e90a51a5",
-      "name": "Merge"
-    },
-    {
-      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1KnTx2B9CVyCIYJjh1XwyExSq0twDLBt-mRVGU5xtOQU",
+          "mode": "list",
+          "cachedResultName": "DUMP REPORT_2026-02-19 15_04_50",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1KnTx2B9CVyCIYJjh1XwyExSq0twDLBt-mRVGU5xtOQU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 160746373,
+          "mode": "list",
+          "cachedResultName": "dump report",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1KnTx2B9CVyCIYJjh1XwyExSq0twDLBt-mRVGU5xtOQU/edit#gid=160746373"
+        },
         "options": {}
       },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
       "position": [
-        80,
-        -272
+        -768,
+        -64
       ],
-      "id": "984cd365-6060-49ae-bd74-389bd7ef9368",
-      "name": "Edit Fields"
+      "id": "1ccd123f-99d8-47c4-9035-58b1b6b64fb3",
+      "name": "FetchDumpReport",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "AkxcXiliPoTpkXRS",
+          "name": "N8N googlesheet"
+        }
+      }
     },
     {
       "parameters": {},
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
       "position": [
-        -368,
-        -112
+        -464,
+        -240
       ],
-      "id": "55a7f37a-c53a-4dec-8694-b906593bca9a",
-      "name": "Merge1"
-    },
-    {
-      "parameters": {
-        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\n\nconst xlsx = require('xlsx');\n\nconst binary = $binary.dumpReport;\nconst buffer = Buffer.from(binary.data, 'base64');\n\nconst workbook = xlsx.read(buffer, { type: 'buffer' });\n\n// 默认读取第一个 sheet\nconst sheetName = workbook.SheetNames[0];\nconst sheet = workbook.Sheets[sheetName];\n\nconst jsonData = xlsx.utils.sheet_to_json(sheet);\n\nreturn jsonData.map(row => ({ json: row }));\n"
-      },
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        -96,
-        16
-      ],
-      "id": "3243b79e-b263-41e6-93bc-6c6128377677",
-      "name": "Code in JavaScript"
-    },
-    {
-      "parameters": {
-        "driveId": {
-          "__rl": true,
-          "mode": "list",
-          "value": "My Drive"
-        },
-        "folderId": {
-          "__rl": true,
-          "mode": "list",
-          "value": "root",
-          "cachedResultName": "/ (Root folder)"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.googleDrive",
-      "typeVersion": 3,
-      "position": [
-        224,
-        48
-      ],
-      "id": "c6fb6a58-896b-4c00-85ca-f3931b159873",
-      "name": "Upload file"
+      "id": "4be0c4d4-3fc9-4672-8490-24b579b45bd8",
+      "name": "Merge"
     }
   ],
   "origin": "n8n",
@@ -235,7 +242,7 @@
       "name": "billing"
     }
   ],
-  "triggerCount": 0,
-  "updatedAt": "2026-02-20T01:03:44.001Z",
-  "versionId": "4581a923-55b2-48c3-a139-799923ba4e69"
+  "triggerCount": 1,
+  "updatedAt": "2026-02-20T23:59:38.466Z",
+  "versionId": "98409e4b-6c58-4c83-9a1d-b6ae95f09f3d"
 }
