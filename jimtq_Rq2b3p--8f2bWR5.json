@@ -1,0 +1,659 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Split Content": {
+      "main": [
+        [
+          {
+            "node": "append to Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Screening Data - Dariush Zandi  provider id 5c53676bff867e00121bd789",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Content1": {
+      "main": [
+        [
+          {
+            "node": "append to Sheets2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Get Screening Data Douglas Zhang - 5b52687346237d0012f1546a",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Screening Data - Dariush Zandi  provider id 5c53676bff867e00121bd789": {
+      "main": [
+        [
+          {
+            "node": "Split Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Screening Data Douglas Zhang - 5b52687346237d0012f1546a": {
+      "main": [
+        [
+          {
+            "node": "Split Content1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-02-21T00:02:20.824Z",
+  "id": "jimtq_Rq2b3p--8f2bWR5",
+  "isArchived": false,
+  "meta": null,
+  "name": "Test - Screening Extract Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1jSyN4Fy9DzksOZwEavWepY-68Hh5RcvH4v4zKuOoDds",
+          "mode": "list",
+          "cachedResultName": "screening spreadsheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jSyN4Fy9DzksOZwEavWepY-68Hh5RcvH4v4zKuOoDds/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 202066593,
+          "mode": "list",
+          "cachedResultName": "Clinic 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jSyN4Fy9DzksOZwEavWepY-68Hh5RcvH4v4zKuOoDds/edit#gid=202066593"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{ $json.createdAt }}",
+            "Time": "={{ $json.visitTimeRaw }}",
+            "Last A1C": "={{ $json.a1c }}",
+            "Notes": "={{ $json.note }}",
+            "Patient ID": "={{ $json.screeningInitiation.screeningPatientId }}",
+            "Provider": "={{ $json.providerName }}",
+            "Pre-screening Status": "={{ $json.preScreeningStatus }}",
+            "DOB": "={{ $json.birthday }}",
+            "Sex": "={{ $json.gender }}",
+            "Insurance": "={{ $json.primaryInsurance }}",
+            "CGM Outcome": "={{ $json.cgmOutcome }}",
+            "Insulin?": "={{ $json.hasInsulin }}"
+          },
+          "matchingColumns": [
+            "Patient ID"
+          ],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Time",
+              "displayName": "Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Provider",
+              "displayName": "Provider",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Patient ID",
+              "displayName": "Patient ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Pre-screening Status",
+              "displayName": "Pre-screening Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "DOB",
+              "displayName": "DOB",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Sex",
+              "displayName": "Sex",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Last A1C",
+              "displayName": "Last A1C",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Insulin?",
+              "displayName": "Insulin?",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Insurance",
+              "displayName": "Insurance",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "CGM Outcome",
+              "displayName": "CGM Outcome",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Notes",
+              "displayName": "Notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        448,
+        -176
+      ],
+      "id": "df29cbe8-8183-4567-9e20-c7f770a2fe43",
+      "name": "append to Sheets"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data.content",
+        "options": {}
+      },
+      "id": "24e28b22-16ae-41f2-bc36-d48daa7b683b",
+      "name": "Split Content",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 1,
+      "position": [
+        224,
+        -176
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -224,
+        -176
+      ],
+      "id": "a22a301c-c7fb-4e05-b6fd-acf669c89b54",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data.content",
+        "options": {}
+      },
+      "id": "1f65760f-fa17-4368-b884-76f10358fee6",
+      "name": "Split Content1",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 1,
+      "position": [
+        224,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -224,
+        48
+      ],
+      "id": "4d6e5e26-48e9-4aa2-97f6-c0771d654855",
+      "name": "Schedule Trigger1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://uc-prod.ihealth-eng.com/v1/uc/screening-patient/list",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json, text/plain, */*"
+            },
+            {
+              "name": "accept-language",
+              "value": "en,en-US;q=0.9,zh-CN;q=0.8,zh;q=0.7"
+            },
+            {
+              "name": "cache-control",
+              "value": "no-cache"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            },
+            {
+              "name": "origin",
+              "value": "https://portal.ihealthunifiedcare.com"
+            },
+            {
+              "name": "pragma",
+              "value": "no-cache"
+            },
+            {
+              "name": "priority",
+              "value": "u=1, i"
+            },
+            {
+              "name": "referer",
+              "value": "https://portal.ihealthunifiedcare.com/"
+            },
+            {
+              "name": "sec-ch-ua",
+              "value": "\"Not(A:Brand\";v=\"8\", \"Chromium\";v=\"144\", \"Google Chrome\";v=\"144\""
+            },
+            {
+              "name": "sec-ch-ua-mobile",
+              "value": "?0"
+            },
+            {
+              "name": "sec-ch-ua-platform",
+              "value": "\"macOS\""
+            },
+            {
+              "name": "sec-fetch-dest",
+              "value": "empty"
+            },
+            {
+              "name": "sec-fetch-mode",
+              "value": "cors"
+            },
+            {
+              "name": "sec-fetch-site",
+              "value": "cross-site"
+            },
+            {
+              "name": "user-agent",
+              "value": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"filter\": {\n    \"clinicId\": \"5b4d072f1d1b2fbe8ddc674f\",\n    \"visitTimeRange\": {\n     \"gte\": \"2025-12-18T00:00:00\",\n     \"lte\": \"{{$now.setZone(\"America/Los_Angeles\").format(\"yyyy-MM-dd\")}}T23:59:59\"\n    },\n    \"providerIdIn\": {\n      \"in\": [\"5c53676bff867e00121bd789\", \"5b52687346237d0012f1546a\"]\n    }\n  },\n  \"pageInfo\": {\n    \"page\": 1,\n    \"size\": 10000,\n    \"sort\": [\n      {\n        \"direction\": \"ASC\",\n        \"property\": \"visitTime\"\n      }\n    ],\n    \"pagination\": true\n  }\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        0,
+        -176
+      ],
+      "id": "1a59dca8-fcea-4491-8f8b-57f670dd3093",
+      "name": "Get Screening Data - Dariush Zandi  provider id 5c53676bff867e00121bd789"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1jSyN4Fy9DzksOZwEavWepY-68Hh5RcvH4v4zKuOoDds",
+          "mode": "list",
+          "cachedResultName": "screening spreadsheet",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jSyN4Fy9DzksOZwEavWepY-68Hh5RcvH4v4zKuOoDds/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1492575190,
+          "mode": "list",
+          "cachedResultName": "Clinic 997",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jSyN4Fy9DzksOZwEavWepY-68Hh5RcvH4v4zKuOoDds/edit#gid=1492575190"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{ $json.createdAt }}",
+            "Time": "={{ $json.visitTimeRaw }}",
+            "Last A1C": "={{ $json.a1c }}",
+            "Notes": "={{ $json.note }}",
+            "Patient ID": "={{ $json.screeningInitiation.screeningPatientId }}",
+            "Provider": "={{ $json.providerName }}",
+            "Pre-screening Status": "={{ $json.preScreeningStatus }}",
+            "DOB": "={{ $json.birthday }}",
+            "Sex": "={{ $json.gender }}",
+            "Insurance": "={{ $json.primaryInsurance }}",
+            "CGM Outcome": "={{ $json.cgmOutcome }}",
+            "Insulin?": "={{ $json.hasInsulin }}"
+          },
+          "matchingColumns": [
+            "Patient ID"
+          ],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Time",
+              "displayName": "Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Provider",
+              "displayName": "Provider",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Patient ID",
+              "displayName": "Patient ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Pre-screening Status",
+              "displayName": "Pre-screening Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "DOB",
+              "displayName": "DOB",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Sex",
+              "displayName": "Sex",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Last A1C",
+              "displayName": "Last A1C",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Insulin?",
+              "displayName": "Insulin?",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Insurance",
+              "displayName": "Insurance",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "CGM Outcome",
+              "displayName": "CGM Outcome",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Notes",
+              "displayName": "Notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        448,
+        48
+      ],
+      "id": "174e0342-001e-4467-aa85-9731cbbdb1b1",
+      "name": "append to Sheets2"
+    },
+    {
+      "parameters": {
+        "content": "\"visitTimeRange\": {\n     \"gte\": \"{{$now.setZone(\"America/Los_Angeles\").format(\"yyyy-MM-dd\")}}T00:00:00\",\n     \"lte\": \"{{$now.setZone(\"America/Los_Angeles\").format(\"yyyy-MM-dd\")}}T23:59:59\"\n    },",
+        "height": 208,
+        "width": 800
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -32,
+        -432
+      ],
+      "typeVersion": 1,
+      "id": "9a7f7141-772c-4cf6-a9ab-3531653559ba",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://uc-prod.ihealth-eng.com/v1/uc/screening-patient/list",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json, text/plain, */*"
+            },
+            {
+              "name": "cache-control",
+              "value": "no-cache"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            },
+            {
+              "name": "origin",
+              "value": "https://portal.ihealthunifiedcare.com"
+            },
+            {
+              "name": "pragma",
+              "value": "no-cache"
+            },
+            {
+              "name": "referer",
+              "value": "https://portal.ihealthunifiedcare.com/"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"filter\": {\n    \"clinicId\": \"66075804d3ef147656bc966a\",\n    \"visitTimeRange\": {\n      \"gte\": \"{{$now.setZone(\"America/Los_Angeles\").format(\"yyyy-MM-dd\")}}T00:00:00\",\n      \"lte\": \"{{$now.setZone(\"America/Los_Angeles\").format(\"yyyy-MM-dd\")}}T23:59:59\"\n    }\n  },\n  \"pageInfo\": {\n    \"page\": 1,\n    \"size\": 10000,\n    \"sort\": [\n      {\n        \"direction\": \"ASC\",\n        \"property\": \"visitTime\"\n      }\n    ],\n    \"pagination\": true\n  }\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        0,
+        48
+      ],
+      "id": "73adaca8-1c5d-4c2d-8e21-fbaf3620f919",
+      "name": "Get Screening Data Douglas Zhang - 5b52687346237d0012f1546a"
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-21T00:02:20.826Z",
+      "createdAt": "2026-02-21T00:02:20.826Z",
+      "role": "workflow:owner",
+      "workflowId": "jimtq_Rq2b3p--8f2bWR5",
+      "projectId": "PvZitumGnZP1AedJ"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-02-21T00:04:08.874Z",
+  "versionId": "fde494cf-6cda-4ff4-98d3-721b0e51fa6f"
+}
