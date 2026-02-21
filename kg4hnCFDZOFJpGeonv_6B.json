@@ -1,0 +1,416 @@
+{
+  "active": false,
+  "activeVersion": null,
+  "activeVersionId": null,
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Config": {
+      "main": [
+        [
+          {
+            "node": "Step 1: UC Login",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Step 1: UC Login": {
+      "main": [
+        [
+          {
+            "node": "Extract Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Token": {
+      "main": [
+        [
+          {
+            "node": "Step 2: Get Messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Step 2: Get Messages": {
+      "main": [
+        [
+          {
+            "node": "Parse Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Response": {
+      "main": [
+        [
+          {
+            "node": "Split Messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Messages": {
+      "main": [
+        [
+          {
+            "node": "Format Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2026-02-21T00:03:45.107Z",
+  "id": "kg4hnCFDZOFJpGeonv_6B",
+  "isArchived": false,
+  "meta": null,
+  "name": "Test - Get Patient Messages",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "0da49d82-611d-4bf4-8cc3-c288fff942b3",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        32
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "set-email",
+              "name": "email",
+              "value": "sage.gu@ihealthlabs.com",
+              "type": "string"
+            },
+            {
+              "id": "set-password",
+              "name": "password",
+              "value": "iHealth99$",
+              "type": "string"
+            },
+            {
+              "id": "set-patient-id",
+              "name": "patientId",
+              "value": "67edcdcc4c2d90530f84bece",
+              "type": "string"
+            },
+            {
+              "id": "set-limit",
+              "name": "limit",
+              "value": 50,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4ab72fbf-bb1d-4fbb-bee1-a73ddd214633",
+      "name": "Set Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -16,
+        32
+      ],
+      "notes": "Configure patient ID and message limit"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://uc-prod.ihealth-eng.com/v1/uc/auth/login",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json, text/plain, */*"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            },
+            {
+              "name": "origin",
+              "value": "https://portal.ihealthunifiedcare.com"
+            },
+            {
+              "name": "referer",
+              "value": "https://portal.ihealthunifiedcare.com/"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"usernameOrEmail\": \"{{ $json.email }}\",\n  \"password\": \"{{ $json.password }}\"\n}",
+        "options": {}
+      },
+      "id": "f8affa57-27b1-45d3-9726-cc0e8f91da76",
+      "name": "Step 1: UC Login",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        208,
+        32
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "extract-token",
+              "name": "sessionToken",
+              "value": "={{ $json.data.sessionToken }}",
+              "type": "string"
+            },
+            {
+              "id": "keep-patient-id",
+              "name": "patientId",
+              "value": "={{ $node['Set Config'].json.patientId }}",
+              "type": "string"
+            },
+            {
+              "id": "keep-limit",
+              "name": "limit",
+              "value": "={{ $node['Set Config'].json.limit }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5670276c-9041-44f4-b7a9-7b41887ae047",
+      "name": "Extract Token",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        432,
+        32
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://uc-msg.ihealth-eng.com/api/patient/{{ $json.patientId }}/messages?limit={{ $json.limit }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            },
+            {
+              "name": "x-session-token",
+              "value": "={{ $json.sessionToken }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a7d18020-99fa-4b9a-aa73-cf694823df0b",
+      "name": "Step 2: Get Messages",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        640,
+        32
+      ],
+      "notes": "Fetch most recent messages"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "extract-channel-id",
+              "name": "channelId",
+              "value": "={{ $json.channelId }}",
+              "type": "string"
+            },
+            {
+              "id": "extract-patient-id",
+              "name": "patientId",
+              "value": "={{ $json.patientId }}",
+              "type": "string"
+            },
+            {
+              "id": "extract-timezone",
+              "name": "timezone",
+              "value": "={{ $json.timezone }}",
+              "type": "string"
+            },
+            {
+              "id": "extract-total",
+              "name": "totalMessages",
+              "value": "={{ $json.total }}",
+              "type": "number"
+            },
+            {
+              "id": "extract-has-more",
+              "name": "hasMore",
+              "value": "={{ $json.hasMore }}",
+              "type": "boolean"
+            },
+            {
+              "id": "extract-oldest",
+              "name": "oldestTimestamp",
+              "value": "={{ $json.oldestTimestamp }}",
+              "type": "string"
+            },
+            {
+              "id": "extract-messages",
+              "name": "messages",
+              "value": "={{ $json.messages }}",
+              "type": "array"
+            },
+            {
+              "id": "count-returned",
+              "name": "messagesReturned",
+              "value": "={{ $json.messages.length }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c751110c-b1a1-4f59-9a4e-18408d570d88",
+      "name": "Parse Response",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        864,
+        32
+      ]
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "messages",
+        "options": {}
+      },
+      "id": "172ecc49-dd01-4637-a704-3b4102fa6bd1",
+      "name": "Split Messages",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1088,
+        32
+      ],
+      "notes": "Split array into individual message items"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "msg-id",
+              "name": "messageId",
+              "value": "={{ $json._id }}",
+              "type": "string"
+            },
+            {
+              "id": "msg-timestamp",
+              "name": "timestamp",
+              "value": "={{ $json.timestamp }}",
+              "type": "number"
+            },
+            {
+              "id": "msg-formatted-time",
+              "name": "formattedTime",
+              "value": "={{ $json.formattedTimestamp }}",
+              "type": "string"
+            },
+            {
+              "id": "msg-display-name",
+              "name": "displayName",
+              "value": "={{ $json.displayName }}",
+              "type": "string"
+            },
+            {
+              "id": "msg-role",
+              "name": "userRole",
+              "value": "={{ $json.userRole }}",
+              "type": "string"
+            },
+            {
+              "id": "msg-is-patient",
+              "name": "isPatient",
+              "value": "={{ $json.isPatient }}",
+              "type": "boolean"
+            },
+            {
+              "id": "msg-text",
+              "name": "text",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "msg-payload-type",
+              "name": "payloadType",
+              "value": "={{ $json.payloadType }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2814cc9b-3715-4c14-a357-5c486b34f377",
+      "name": "Format Message",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1312,
+        32
+      ],
+      "notes": "Extract individual message fields"
+    }
+  ],
+  "origin": "n8n",
+  "pinData": {},
+  "repo": {
+    "owner": "sage-ihealth",
+    "name": "n8n-backup"
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "shared": [
+    {
+      "updatedAt": "2026-02-21T00:03:45.109Z",
+      "createdAt": "2026-02-21T00:03:45.109Z",
+      "role": "workflow:owner",
+      "workflowId": "kg4hnCFDZOFJpGeonv_6B",
+      "projectId": "PvZitumGnZP1AedJ"
+    }
+  ],
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-02-21T00:04:02.393Z",
+  "versionId": "23460557-ba21-4e2e-919e-e21c1f86a7ad"
+}
