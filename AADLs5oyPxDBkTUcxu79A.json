@@ -1,9 +1,9 @@
 {
   "active": true,
   "activeVersion": {
-    "updatedAt": "2026-02-20T09:00:27.000Z",
-    "createdAt": "2026-02-19T01:10:55.593Z",
-    "versionId": "4061cd46-b719-48d8-8136-4f73a341bdc8",
+    "updatedAt": "2026-02-20T21:55:48.000Z",
+    "createdAt": "2026-02-20T21:55:41.475Z",
+    "versionId": "9f2a654c-d0cb-46cf-821e-d9f826ac59f4",
     "workflowId": "AADLs5oyPxDBkTUcxu79A",
     "nodes": [
       {
@@ -52,6 +52,53 @@
             "name": "Google Service Account account 3"
           }
         }
+      },
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "weeks",
+                "triggerAtDay": [
+                  5
+                ],
+                "triggerAtHour": 14
+              }
+            ]
+          }
+        },
+        "id": "b866700c-fce7-4893-a8d2-2e24584fad28",
+        "name": "Schedule Trigger1",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "position": [
+          -224,
+          160
+        ]
+      },
+      {
+        "parameters": {
+          "spaceId": "spaces/AAQAWFlR5eo",
+          "messageUi": {
+            "text": "Hi Team! Please remember to fill out your weekly inventory system check. Thank you! "
+          },
+          "additionalFields": {}
+        },
+        "type": "n8n-nodes-base.googleChat",
+        "typeVersion": 1,
+        "position": [
+          -32,
+          160
+        ],
+        "id": "207ead31-41f7-47ef-bb01-2549f1058d96",
+        "name": "Create a message1",
+        "webhookId": "1554baac-88d7-4885-a908-10dfe4c19823",
+        "credentials": {
+          "googleApi": {
+            "id": "hfHCd3S3dAc5ygli",
+            "name": "Google Service Account account 3"
+          }
+        }
       }
     ],
     "connections": {
@@ -65,20 +112,42 @@
             }
           ]
         ]
+      },
+      "Schedule Trigger1": {
+        "main": [
+          [
+            {
+              "node": "Create a message1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
       }
     },
     "authors": "Tina Zou",
-    "name": "Version 1.0",
+    "name": "v2.0",
     "description": "",
     "autosaved": true
   },
-  "activeVersionId": "4061cd46-b719-48d8-8136-4f73a341bdc8",
+  "activeVersionId": "9f2a654c-d0cb-46cf-821e-d9f826ac59f4",
   "connections": {
     "Schedule Trigger": {
       "main": [
         [
           {
             "node": "Create a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Create a message1",
             "type": "main",
             "index": 0
           }
@@ -140,6 +209,53 @@
           "name": "Google Service Account account 3"
         }
       }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks",
+              "triggerAtDay": [
+                5
+              ],
+              "triggerAtHour": 14
+            }
+          ]
+        }
+      },
+      "id": "b866700c-fce7-4893-a8d2-2e24584fad28",
+      "name": "Schedule Trigger1",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -224,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "spaceId": "spaces/AAQAWFlR5eo",
+        "messageUi": {
+          "text": "Hi Team! Please remember to fill out your weekly inventory system check. Thank you! "
+        },
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.googleChat",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        160
+      ],
+      "id": "207ead31-41f7-47ef-bb01-2549f1058d96",
+      "name": "Create a message1",
+      "webhookId": "1554baac-88d7-4885-a908-10dfe4c19823",
+      "credentials": {
+        "googleApi": {
+          "id": "hfHCd3S3dAc5ygli",
+          "name": "Google Service Account account 3"
+        }
+      }
     }
   ],
   "origin": "n8n",
@@ -166,7 +282,7 @@
   ],
   "staticData": null,
   "tags": [],
-  "triggerCount": 1,
-  "updatedAt": "2026-02-19T01:10:55.592Z",
-  "versionId": "4061cd46-b719-48d8-8136-4f73a341bdc8"
+  "triggerCount": 2,
+  "updatedAt": "2026-02-20T21:55:41.474Z",
+  "versionId": "9f2a654c-d0cb-46cf-821e-d9f826ac59f4"
 }
